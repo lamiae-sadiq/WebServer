@@ -6,61 +6,44 @@
 #    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/01/25 15:26:02 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/01/28 16:01:07 by lsadiq           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+NAME =	Webserv
 
-
-NAME	=	Webserv
-
-MAIN	=	./src/main.cpp
-
-SRCS	=	config.cpp
-
-SRC		=	test.cpp
+MAIN =  main.cpp 
 
 P_SRCS	= 	$(addprefix src/parsing/,$(SRCS))
 
 M_SRCS	=	$(addprefix src/methods/,$(SRC))
 
+OBJS = $(MAIN:.cpp=.o)
 
-OBJS	=	$(P_SRCS:.c=.o) $(M_SRCS:.c=.o) $(MAIN:.c=.o)
+CXX = c++
 
+RM = rm -f
 
-CXXFLAGS	=	-Wall -Wextra -Werror  #-fsanitize=address -g3 
-
-
-CXX		=	c++
-
-AR 		=	ar rc
-
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 
 NONE	=	'\033[0m'
-GREEN	=	'\033[32m'
+PURPLE	=	'\033[35m'
 RED		=	'\033[1;91m'
 GRAY	=	'\033[2;37m'
 ITALIC	=	'\033[3m'
+			
+all : $(NAME)
 
-.c.o	:
-			@echo $(ITALIC)$(GRAY) "    Compiling $<" $(NONE)
-			@$(CXX) $(CXXFLAGS) -c $< -o $(<:.c=.o)
-
-all		:	$(NAME)
-
-$(NAME)	:  	$(OBJS)
-			@echo $(GREEN) "Compiling $(NAME)..." $(NONE)
+$(NAME) : $(OBJS)
 			@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
-			@echo $(GREEN) "\n ~ Compiled !!" $(NONE)
+			@echo $(GRAY) "Compiled $(NAME)..." $(NONE)
 
+clean :
+		@$(RM) $(OBJS)
+		@echo $(RED) "Removing object files..." $(NONE)
 
-clean	:
-			@echo $(RED) "Removing object files..." $(NONE)
-			@rm -rf $(OBJS)
-
-fclean	:	clean
+fclean : clean
 			@echo $(RED) "Removing $(NAME)..." $(NONE)
-			@rm -f $(NAME)
+			@$(RM) $(NAME)
 
-re		:	fclean $(NAME)
-
+re : fclean $(NAME)
