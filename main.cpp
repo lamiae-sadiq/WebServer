@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/06 19:02:09 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/07 21:13:14 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int main()
 {
     location loc;
     
-    loc.methodGet();
+    loc.fillMime();
     try
     {
         signal(SIGPIPE, SIG_IGN);
@@ -46,13 +46,25 @@ int main()
             int clientsocket = accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
             if (clientsocket < 0)
                 throw std::runtime_error("Error: didn't accept");
-            std::ifstream videoFile("/Users/lsadiq/Desktop/heart.gif", std::ios::binary);
-            if (!videoFile)
+            // while (loc.close)
+            // {
+                loc.methodGet();
+            // }
+            std::ifstream videoFile("/Users/lsadiq/Desktop/SpongeBob.mp4", std::ios::binary);
+            if (!videoFile.is_open())
                 throw std::runtime_error("Error: failed to open video file");
-            std::string resHeader = "HTTP/1.1 200 OK\r\n";
-            resHeader += "Content-Type: image/jpg\r\n";
-            resHeader += "Transfer-Encoding: chunked\r\n";
-            resHeader += "\r\n";
+            // std::string resHeader = "HTTP/1.1 " + std::to_string(loc.status_code) + " OK\r\n";
+            // if (loc.status_code == 301)
+            //     resHeader += "Location: " + loc.newlocation + "\r\n\r\n";
+            // else
+            // {
+                std::string resHeader = "HTTP/1.1 200 OK\r\n";
+                resHeader += "Content-Type: video/mp4";
+                // resHeader += loc.content_type;
+                resHeader +="\r\n";
+                resHeader += "Transfer-Encoding: chunked\r\n";
+                resHeader += "\r\n";
+            // }
             send(clientsocket, resHeader.c_str(), resHeader.length(), 0);
             const int chunkSize = 1024;
             char buffer[chunkSize];
@@ -71,8 +83,7 @@ int main()
                     send(clientsocket, "\r\n", 2, 0);
                 }
             }
-            // send(clientsocket, "0\r\n\r\n", 5, 0);
-            
+            send(clientsocket, "0\r\n\r\n", 5, 0);
             videoFile.close();
             close(clientsocket);
         }

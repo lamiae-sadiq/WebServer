@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/06 19:24:00 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/07 12:02:42 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 #include <iostream> 
 #include <signal.h>
 #include <sstream>
+#include <map>
 
 
 #define PORT 8080
@@ -46,14 +47,16 @@ class location
 		std::string location_name;
 		std::string target_url;
 		std::string	newlocation;
-
 		std::string uploade;
+		std::string line, name;
 		std::string return_;
 		std::string path;
 		std::fstream file;
 		std::string content_type;
 		std::string extention;
 		int status_code ;
+		std::map<std::string, std::string> _mime;
+		void    fillMime();
 		location();
 		~location();
 		struct data{int y;};
