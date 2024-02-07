@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/07 21:19:23 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/07 21:20:58 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ int main()
             // {
                 loc.methodGet();
             // }
-            
             std::ifstream videoFile("/Users/lsadiq/Desktop/SpongeBob.mp4", std::ios::binary);
             if (!videoFile.is_open())
                 throw std::runtime_error("Error: failed to open video file");
