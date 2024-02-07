@@ -6,7 +6,7 @@
 #    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/01/28 16:01:07 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/02/03 17:54:26 by lsadiq           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,9 +16,11 @@ MAIN =  main.cpp
 
 P_SRCS	= 	$(addprefix src/parsing/,$(SRCS))
 
+SRC = GET.cpp
+
 M_SRCS	=	$(addprefix src/methods/,$(SRC))
 
-OBJS = $(MAIN:.cpp=.o)
+OBJS = $(MAIN:.cpp=.o) $(M_SRCS:.cpp=.o)
 
 CXX = c++
 

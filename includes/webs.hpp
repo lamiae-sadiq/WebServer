@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webS.hpp                                           :+:      :+:    :+:   */
+/*   webs.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/01/26 16:24:57 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/06 19:24:00 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,52 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 #include <stdexcept>
 #include <sys/socket.h>
 #include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <vector>
 #include <string.h>
+#include <iostream> 
+#include <signal.h>
+#include <sstream>
+
 
 #define PORT 8080
 
+#define FILE 1
+#define DIRECTORY 0
+#define NOT_FOUND -1
 
-class Server
+class location
 {
-    public:
-        Server(std::string config_file);
-        ~Server();
-        void run();
-    private:
-        std::string config_file;
+	public :
+		std::string index;
+		std::string	auto_index;
+		std::vector<std::string>	method;
+		std::string root;
+		std::string location_name;
+		std::string target_url;
+		std::string	newlocation;
+
+		std::string uploade;
+		std::string return_;
+		std::string path;
+		std::fstream file;
+		std::string content_type;
+		std::string extention;
+		int status_code ;
+		location();
+		~location();
+		struct data{int y;};
+
+		void	methodGet();
+		bool    autoIndexCheck();
+		bool    allowedMethods();
+		void check_extention(std::string file);
 };

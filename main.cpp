@@ -1,18 +1,33 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
+/*   Updated: 2024/02/06 19:02:09 by lsadiq           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "./includes/webs.hpp"
 
 
 int main()
 {
+    location loc;
+    
+    loc.methodGet();
     try
     {
-        int opt =1;
+        signal(SIGPIPE, SIG_IGN);
+        int opt = 1;
         int sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (sockfd < 0)
             throw std::runtime_error("Error: socket creation failed");
         struct sockaddr_in address;
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) 
+        memset(&address, 0, sizeof(address));
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt)))
         {
             perror("setsockopt");
             exit(EXIT_FAILURE);
@@ -20,27 +35,46 @@ int main()
         address.sin_family = AF_INET;
         address.sin_addr.s_addr = INADDR_ANY;
         address.sin_port = htons(PORT);
-
         int addrlen = sizeof(address);
         if (bind(sockfd, (struct sockaddr *)&address, sizeof(address)) < 0)
             throw std::runtime_error("Error: bind failed");
-        if (listen(sockfd, 10) < 0)
+        if (listen(sockfd, 10) < 0) 
             throw std::runtime_error("Error: listen failed");
-        std::cout << "Server listening on port "<<  PORT << std::endl;
-        while(1)
+        std::cout << "Server listening on port " << PORT << std::endl;
+        while (1)
         {
-            int clientsocket = accept(sockfd,(struct sockaddr *)&address, (socklen_t*)&addrlen);
-            if (clientsocket < 0 )
-                throw std::runtime_error("Error: didnt accept ");
-            char buffer[30000] = {0};
-            int valread = read( clientsocket , buffer, 30000);
-            buffer[valread] = '\0';
-            write(1, buffer, valread) ;
-            std::string hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 19\n\nwa bit gha nghawet!\n";
-            send(clientsocket, hello.c_str(), hello.length(), 0);
-            std::cout << "Hello message sent" << std::endl;
-
-        close (clientsocket);
+            int clientsocket = accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+            if (clientsocket < 0)
+                throw std::runtime_error("Error: didn't accept");
+            std::ifstream videoFile("/Users/lsadiq/Desktop/heart.gif", std::ios::binary);
+            if (!videoFile)
+                throw std::runtime_error("Error: failed to open video file");
+            std::string resHeader = "HTTP/1.1 200 OK\r\n";
+            resHeader += "Content-Type: image/jpg\r\n";
+            resHeader += "Transfer-Encoding: chunked\r\n";
+            resHeader += "\r\n";
+            send(clientsocket, resHeader.c_str(), resHeader.length(), 0);
+            const int chunkSize = 1024;
+            char buffer[chunkSize];
+            while (!videoFile.eof())
+            {
+                videoFile.read(buffer, chunkSize);
+                int bytesRead = videoFile.gcount();
+                if (bytesRead > 0)
+                {
+                    std::stringstream ss;
+                    ss << std::hex << bytesRead;
+                    std::string chunkSizeHex = ss.str();
+                    std::string chunkHeader = chunkSizeHex + "\r\n";
+                    send(clientsocket, chunkHeader.c_str(), chunkHeader.length(), 0);
+                    send(clientsocket, buffer, bytesRead, 0);
+                    send(clientsocket, "\r\n", 2, 0);
+                }
+            }
+            // send(clientsocket, "0\r\n\r\n", 5, 0);
+            
+            videoFile.close();
+            close(clientsocket);
         }
         close(sockfd);
     }
@@ -48,7 +82,5 @@ int main()
     {
         std::cerr << e.what() << std::endl;
     }
-    return (0);
+    return 0;
 }
-
-
