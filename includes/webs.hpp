@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/07 12:02:42 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/08 10:30:09 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ class location
 		struct data{int y;};
 
 		void	methodGet();
+		void    listDocs();
 		bool    autoIndexCheck();
 		bool    allowedMethods();
 		void check_extention(std::string file);

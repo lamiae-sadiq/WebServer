@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/07 20:56:57 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/08 13:47:19 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ location::location()
     this->location_name = "/User/";
     this->uploade = "off";
     this->return_ = "200";
+	this->newlocation = "/nfs/homes/lsadiq/Desktop/";
     this->status_code = 200;
 }
 void    location::fillMime()
@@ -99,6 +100,38 @@ bool    location::allowedMethods()
     return false;
 }
 
+void    location::listDocs()
+{
+    
+	location loc;
+    std::string	buff;
+    struct dirent*	enter;
+    DIR *dir;
+	buff = "<!DOCTYPE html>\n<html>\n<head>\n<title>Directory Of ";
+    buff.append(loc.newlocation);
+    buff.append("\n</title>\n</head>\n<body>\n");
+	// std::cout << buff<<  std::endl;
+    if (!(dir = opendir(loc.newlocation.c_str()))){
+        std::cout << "dkhlt \n";
+		throw 403;
+    }
+    for(;(enter = readdir(dir));){
+        buff.append("<h1><a href=\"");
+        // std::cout << enter->d_name<< std::endl;
+        if (strncmp(enter->d_name, ".",1)){
+            buff.append(loc.newlocation);
+            
+        }
+        else if (strncmp(enter->d_name, "..", 2)){
+            std::cout<< enter->d_name << std::endl;
+        }
+        buff.append("\">");
+        buff.append(loc.newlocation);
+        buff.append("</a>");
+    }
+    std::cout << buff<<  std::endl;
+}
+
 void    location::methodGet()
 {
     // if (status_code != 200)
@@ -107,7 +140,7 @@ void    location::methodGet()
     if(!allowedMethods())
         status_code = 405;
     //newlocation = url (remplace loc with root);
-    newlocation = "./User/lsadiq/Desktop/SpongeBob.mp4";
+    
     if(access(this->newlocation.c_str(), F_OK) == 0)
     {
         if(access(this->newlocation.c_str(), R_OK) == 0)
@@ -135,6 +168,7 @@ void    location::methodGet()
                     newlocation = this->target_url + "/";
                     return;
                 }
+				listDocs();
                 // if (!index.empty() ) // check that F_OK and R_OK 
                 // {
                 //     status_code = 301;
