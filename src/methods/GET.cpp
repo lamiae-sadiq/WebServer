@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GET.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: weirdo <weirdo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/08 13:47:19 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/10 17:29:40 by weirdo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@ location::location()
     this->auto_index = "off";
     this->method.push_back("GET");
     this->method.push_back("POST");
-    this->root = "./User/lsadiq/Desktop/";
+    this->root = "/home/weirdo/Desktop/";
     this->target_url = "SpongeBob.mp4";
     this->location_name = "/User/";
     this->uploade = "off";
     this->return_ = "200";
-	this->newlocation = "/nfs/homes/lsadiq/Desktop/";
+	this->newlocation = "/home/weirdo/Desktop/";
     this->status_code = 200;
 }
 void    location::fillMime()
@@ -100,36 +100,37 @@ bool    location::allowedMethods()
     return false;
 }
 
-void    location::listDocs()
+void location::listDirectories()
 {
-    
-	location loc;
-    std::string	buff;
-    struct dirent*	enter;
-    DIR *dir;
-	buff = "<!DOCTYPE html>\n<html>\n<head>\n<title>Directory Of ";
-    buff.append(loc.newlocation);
-    buff.append("\n</title>\n</head>\n<body>\n");
-	// std::cout << buff<<  std::endl;
-    if (!(dir = opendir(loc.newlocation.c_str()))){
-        std::cout << "dkhlt \n";
-		throw 403;
-    }
-    for(;(enter = readdir(dir));){
-        buff.append("<h1><a href=\"");
-        // std::cout << enter->d_name<< std::endl;
-        if (strncmp(enter->d_name, ".",1)){
-            buff.append(loc.newlocation);
-            
+    location loc;
+    std::string html = "<html>\n<head>\n<title>Index of ";
+    html.append(loc.newlocation); 
+    html.append("</title>\n</head>\n<body>\n<h1>Index of ");
+    html.append(loc.newlocation); 
+    html.append("</h1>\n<hr>\n<ul>\n");
+
+    DIR* dir;
+    struct dirent* entry;
+    if ((dir = opendir(loc.newlocation.c_str())))
+    {
+        while ((entry = readdir(dir)))
+        {
+            std::string fileName = entry->d_name;
+            if (fileName != "." && fileName != "..")
+            {
+                html += "<li><a href=\"" + fileName + "\">" + fileName + "</a></li>\n";
+            }
         }
-        else if (strncmp(enter->d_name, "..", 2)){
-            std::cout<< enter->d_name << std::endl;
-        }
-        buff.append("\">");
-        buff.append(loc.newlocation);
-        buff.append("</a>");
+        closedir(dir);
     }
-    std::cout << buff<<  std::endl;
+
+    html += "</ul>\n<hr>\n</body>\n</html>\n";
+    // std::cout << html << std::endl;
+
+    // You can do something with the generated HTML, like writing it to a file or sending it as a response.
+    std::ofstream outputFile("index.html");
+    outputFile << html;
+    outputFile.close();
 }
 
 void    location::methodGet()
@@ -168,13 +169,15 @@ void    location::methodGet()
                     newlocation = this->target_url + "/";
                     return;
                 }
-				listDocs();
-                // if (!index.empty() ) // check that F_OK and R_OK 
-                // {
-                //     status_code = 301;
-                //     newlocation = this->target_url + index;
-                //     return;
-                // }
+                listDirectories();
+                content_type = "text/html";
+                return ;
+                if (!index.empty() ) // check that F_OK and R_OK 
+                {
+                    status_code = 301;
+                    newlocation = this->target_url + index;
+                    return;
+                }
                 // else if (autoIndexCheck()){
                     
                     

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
+#    By: weirdo <weirdo@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/02/03 17:54:26 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/02/10 16:27:08 by weirdo           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ CXX = c++
 
 RM = rm -f
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++11 -g3
 
 NONE	=	'\033[0m'
 PURPLE	=	'\033[35m'
