@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weirdo <weirdo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/10 16:40:42 by weirdo           ###   ########.fr       */
+/*   Updated: 2024/02/12 20:09:39 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,7 @@
 
 int main()
 {
-    location loc;
-    
-    loc.fillMime();
+    location::fillMime();
     try
     {
         signal(SIGPIPE, SIG_IGN);
@@ -43,52 +41,54 @@ int main()
         std::cout << "Server listening on port " << PORT << std::endl;
         while (1)
         {
-            int clientsocket = accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-            if (clientsocket < 0)
+            location loc;
+            loc.fd = accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+            if (loc.fd < 0)
                 throw std::runtime_error("Error: didn't accept");
-            // while (loc.close)
-            // {
-            loc.methodGet();
-            // }
+            char c[1000];
+            read(loc.fd, c, 1000);
+            while (loc.close)
+            {
+                loc.methodGet();
+            }
 
-            
-            std::ifstream videoFile(loc.newlocation, std::ios::binary);
-            if (!videoFile.is_open())
-                throw std::runtime_error("Error: failed to open video file");
-            std::string resHeader = "HTTP/1.1 " + std::to_string(loc.status_code) + " OK\r\n";
-            if (loc.status_code == 301)
-                resHeader += "Location: " + loc.newlocation + "\r\n\r\n";
-            else
-            {
-                // std::string resHeader = "HTTP/1.1 200 OK\r\n";
-                resHeader += "Content-Type: ";
-                resHeader += loc.content_type;
-                std::cout<< loc.content_type << std::endl;
-                resHeader +="\r\n";
-                resHeader += "Transfer-Encoding: chunked\r\n";
-                resHeader += "\r\n";
-            }
-            send(clientsocket, resHeader.c_str(), resHeader.length(), 0);
-            const int chunkSize = 1024;
-            char buffer[chunkSize];
-            while (!videoFile.eof())
-            {
-                videoFile.read(buffer, chunkSize);
-                int bytesRead = videoFile.gcount();
-                if (bytesRead > 0)
-                {
-                    std::stringstream ss;
-                    ss << std::hex << bytesRead;
-                    std::string chunkSizeHex = ss.str();
-                    std::string chunkHeader = chunkSizeHex + "\r\n";
-                    send(clientsocket, chunkHeader.c_str(), chunkHeader.length(), 0);
-                    send(clientsocket, buffer, bytesRead, 0);
-                    send(clientsocket, "\r\n", 2, 0);
-                }
-            }
-            send(clientsocket, "0\r\n\r\n", 5, 0);
-            videoFile.close();
-            close(clientsocket);
+            // std::ifstream videoFile(loc.newlocation, std::ios::binary);
+            // if (!videoFile.is_open())
+            //     throw std::runtime_error("Error: failed to open video file");
+            // std::string resHeader = "HTTP/1.1 " + std::to_string(loc.status_code) + " OK\r\n";
+            // if (loc.status_code == 301)
+            //     resHeader += "Location: " + loc.newlocation + "\r\n\r\n";
+            // else
+            // {
+            //     // std::string resHeader = "HTTP/1.1 200 OK\r\n";
+            //     resHeader += "Content-Type: ";
+            //     resHeader += loc.content_type;
+            //     std::cout<< loc.content_type << std::endl;
+            //     resHeader +="\r\n";
+            //     resHeader += "Transfer-Encoding: chunked\r\n";
+            //     resHeader += "\r\n";
+            // }
+            // send(clientsocket, resHeader.c_str(), resHeader.length(), 0);
+            // const int chunkSize = 1024;
+            // char buffer[chunkSize];
+            // while (!videoFile.eof())
+            // {
+            //     videoFile.read(buffer, chunkSize);
+            //     int bytesRead = videoFile.gcount();
+            //     if (bytesRead > 0)
+            //     {
+            //         std::stringstream ss;
+            //         ss << std::hex << bytesRead;
+            //         std::string chunkSizeHex = ss.str();
+            //         std::string chunkHeader = chunkSizeHex + "\r\n";
+            //         send(clientsocket, chunkHeader.c_str(), chunkHeader.length(), 0);
+            //         send(clientsocket, buffer, bytesRead, 0);
+            //         send(clientsocket, "\r\n", 2, 0);
+            //     }
+            // }
+            // send(clientsocket, "0\r\n\r\n", 5, 0);
+            // videoFile.close();
+            close(loc.fd);
         }
         close(sockfd);
     }
