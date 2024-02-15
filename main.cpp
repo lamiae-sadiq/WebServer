@@ -6,16 +6,16 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/12 20:09:39 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/14 11:17:54 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/webs.hpp"
+#include "./includes/response.hpp"
 
 
 int main()
 {
-    location::fillMime();
+    response::fillMime();
     try
     {
         signal(SIGPIPE, SIG_IGN);
@@ -41,7 +41,7 @@ int main()
         std::cout << "Server listening on port " << PORT << std::endl;
         while (1)
         {
-            location loc;
+            response loc;
             loc.fd = accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
             if (loc.fd < 0)
                 throw std::runtime_error("Error: didn't accept");

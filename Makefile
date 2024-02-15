@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: weirdo <weirdo@student.42.fr>              +#+  +:+       +#+         #
+#    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/02/10 16:27:08 by weirdo           ###   ########.fr        #
+#    Updated: 2024/02/14 11:04:54 by lsadiq           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ MAIN =  main.cpp
 
 P_SRCS	= 	$(addprefix src/parsing/,$(SRCS))
 
-SRC = GET.cpp
+SRC = getMethod.cpp methodHelp.cpp
 
 M_SRCS	=	$(addprefix src/methods/,$(SRC))
 
@@ -26,7 +26,7 @@ CXX = c++
 
 RM = rm -f
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++11 -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 
 NONE	=	'\033[0m'
 PURPLE	=	'\033[35m'

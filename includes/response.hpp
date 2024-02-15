@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webs.hpp                                           :+:      :+:    :+:   */
+/*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/12 21:25:34 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/15 17:48:29 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <vector>
 #include <string.h>
 #include <iostream> 
+#include <dirent.h>
 #include <signal.h>
 #include <sstream>
 #include <map>
@@ -36,36 +37,43 @@
 #define FILE 1
 #define DIRECTORY 0
 #define NOT_FOUND -1
+#define FORBIDDEN -2
 
-class location
+typedef struct location
+{
+	int 						return_;
+	size_t						max_body_size;
+	std::string 				root;
+	std::string 				index;
+	std::string 				auto_index;
+	std::string 				upload;
+	std::string 				location_name;
+	std::vector<std::string> 	method;
+
+}location;
+
+class response
 {
 	public :
+		
 		std::ifstream ifile;
 		std::ofstream ofile;
-		std::string index;
-		std::string	auto_index;
-		std::vector<std::string>	method;
-		std::string root;
-		std::string location_name;
 		std::string target_url;
-		std::string	newlocation;
-		std::string uploade;
+		std::string	targetUri;
 		std::string line, name;
-		std::string return_;
-		std::string path;
-		std::fstream file;
 		std::string content_type;
 		std::string extention;
+		DIR* dir;
+		location loc;
 		bool close;
 		int fd;
 		int status_code ;
 		int flag;
-	static	std::map<std::string, std::string> _mime;
-	static	void    fillMime();
-		location();
-		~location();
-		struct data{int y;};
+		static	std::map<std::string, std::string> _mime;
 
+		response();
+		~response();
+		static	void    fillMime();
 		void	methodGet();
 		bool    autoIndexCheck();
 		bool    allowedMethods();
@@ -73,4 +81,5 @@ class location
 		void 	listDirectories();
 		void 	handel_error();
 		void    sendData();
+		int 	checkType(std::string path);
 };
