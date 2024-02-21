@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/15 18:04:29 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/21 16:34:44 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,23 +18,25 @@ response::~response(){}
 
 response::response(){
     this->loc.return_ = 200,
-    this->loc.index = "",//consdering
+    this->loc.index = "",
+    this->uplod_type = "length";
     this->loc.auto_index = "on",
-    this->loc.upload = "off",
+    this->loc.upload = "/upload",
+    this->loc.allowedUpload = true,
     this->loc.location_name = "/",
-    this->loc.root = "/nfs/homes/lsadiq/Desktop/";
-    this->target_url = "/webCuddler/ecran.jpg";
+    this->loc.root = "/nfs/homes/lsadiq/Desktop/webCuddler/src";
+    this->target_url = "/webCuddler/body";
 	this->targetUri = "";
     this->status_code = 200;
-    this->loc.method.push_back("GET");
     this->loc.method.push_back("POST");
+    this->loc.method.push_back("GET");
     this->loc.method.push_back("DELETE");
+    this->body_length = 200000000000;
     fd = -1;
     close = true;
     flag = 0;
     dir = NULL;
 }
-
 
 void response::listDirectories()
 {
@@ -137,7 +139,7 @@ void    response::methodGet()
                 if(checkType(targetUri) == FILE)
                 {
                     check_extention(targetUri);
-                    content_type = extention;
+                    content_type = fileType;
                     flag = 2;
                     return;
                 }

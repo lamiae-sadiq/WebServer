@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/15 12:13:56 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/21 12:59:45 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,66 @@ std::string to_string(T value) {
     std::ostringstream os;
     os << value;
     return os.str();
+}
+
+std::string response::getTargetUrl(){
+			return target_url;
+}
+
+std::string response::getTargetUri(){
+    return targetUri;
+}
+
+std::string response::getLine(){
+    return line;
+}
+
+std::string response::getName(){
+    return name;
+}
+
+std::string response::getContentType(){
+    return content_type;
+}
+
+std::string response::getExtension(){
+    return fileType;
+}
+
+int response::getFlag(){
+    return flag;
+}
+
+int response::getStatusCode(){
+    return status_code;
+}
+
+int response::getFd(){
+    return fd;
+}
+
+bool response::getClose(){
+    return close;
+}
+
+std::ifstream& response::getIfile() {
+    return ifile;
+}
+
+std::ofstream& response::getOfile() {
+    return ofile;
+}
+
+DIR* response::getDir(){
+    return dir;
+}
+
+location response::getLocation(){
+    return loc;
+}
+
+std::map<std::string, std::string> response::getMime() {
+    return _mime;
 }
 
 void    response::fillMime()
@@ -113,10 +173,10 @@ void response::check_extention(std::string file)
     idx = file.rfind('.');
     if (idx != std::string::npos){
         extention = file.substr(idx + 1);
-        extention =  _mime[extention];
+        fileType =  _mime[extention];
     }
     else
-        extention = "text/plain";
+        fileType = "text/plain";
 }
 
 bool    response::autoIndexCheck(){
@@ -130,6 +190,7 @@ bool    response::allowedMethods()
     std::vector<std::string>::iterator it = this->loc.method.begin();
     for(;it != this->loc.method.end(); it++){
         if(*it == "GET" || *it == "POST" || *it == "DELETE")
+        // std::cout << *it << std::endl;
             return true;
     }
     return false;

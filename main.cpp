@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/14 11:17:54 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/21 13:27:00 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,53 +42,18 @@ int main()
         while (1)
         {
             response loc;
-            loc.fd = accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-            if (loc.fd < 0)
+            // std::cout << loc.getFd() << std::endl;
+            loc.setFd(accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen));
+            if (loc.getFd() < 0)
                 throw std::runtime_error("Error: didn't accept");
-            char c[1000];
-            read(loc.fd, c, 1000);
-            while (loc.close)
+            while (loc.getClose())
             {
-                loc.methodGet();
+                if (loc.getStatusCode() != 200)
+                    loc.methodGet();
+                else
+                    loc.methodPost();
             }
-
-            // std::ifstream videoFile(loc.newlocation, std::ios::binary);
-            // if (!videoFile.is_open())
-            //     throw std::runtime_error("Error: failed to open video file");
-            // std::string resHeader = "HTTP/1.1 " + std::to_string(loc.status_code) + " OK\r\n";
-            // if (loc.status_code == 301)
-            //     resHeader += "Location: " + loc.newlocation + "\r\n\r\n";
-            // else
-            // {
-            //     // std::string resHeader = "HTTP/1.1 200 OK\r\n";
-            //     resHeader += "Content-Type: ";
-            //     resHeader += loc.content_type;
-            //     std::cout<< loc.content_type << std::endl;
-            //     resHeader +="\r\n";
-            //     resHeader += "Transfer-Encoding: chunked\r\n";
-            //     resHeader += "\r\n";
-            // }
-            // send(clientsocket, resHeader.c_str(), resHeader.length(), 0);
-            // const int chunkSize = 1024;
-            // char buffer[chunkSize];
-            // while (!videoFile.eof())
-            // {
-            //     videoFile.read(buffer, chunkSize);
-            //     int bytesRead = videoFile.gcount();
-            //     if (bytesRead > 0)
-            //     {
-            //         std::stringstream ss;
-            //         ss << std::hex << bytesRead;
-            //         std::string chunkSizeHex = ss.str();
-            //         std::string chunkHeader = chunkSizeHex + "\r\n";
-            //         send(clientsocket, chunkHeader.c_str(), chunkHeader.length(), 0);
-            //         send(clientsocket, buffer, bytesRead, 0);
-            //         send(clientsocket, "\r\n", 2, 0);
-            //     }
-            // }
-            // send(clientsocket, "0\r\n\r\n", 5, 0);
-            // videoFile.close();
-            close(loc.fd);
+            close(loc.getFd());
         }
         close(sockfd);
     }

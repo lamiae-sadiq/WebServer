@@ -6,7 +6,7 @@
 #    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/02/14 11:04:54 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/02/20 18:56:06 by lsadiq           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ MAIN =  main.cpp
 
 P_SRCS	= 	$(addprefix src/parsing/,$(SRCS))
 
-SRC = getMethod.cpp methodHelp.cpp
+SRC = getMethod.cpp methodHelp.cpp postMethod.cpp 
 
 M_SRCS	=	$(addprefix src/methods/,$(SRC))
 
