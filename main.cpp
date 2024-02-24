@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/21 13:27:00 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/23 16:30:46 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,10 @@ int main()
                 throw std::runtime_error("Error: didn't accept");
             while (loc.getClose())
             {
-                if (loc.getStatusCode() != 200)
+                // if (loc.getStatusCode() != 200)
                     loc.methodGet();
-                else
-                    loc.methodPost();
+                // else
+                //     loc.methodPost();
             }
             close(loc.getFd());
         }

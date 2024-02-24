@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/21 16:34:44 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/24 17:48:50 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,13 @@ response::~response(){}
 response::response(){
     this->loc.return_ = 200,
     this->loc.index = "",
-    this->uplod_type = "length";
+    this->uplod_type = "Chunk";
+    this->ihex = 0;
     this->loc.auto_index = "on",
     this->loc.upload = "/upload",
     this->loc.allowedUpload = true,
     this->loc.location_name = "/",
-    this->loc.root = "/nfs/homes/lsadiq/Desktop/webCuddler/src";
+    this->loc.root = "/nfs/homes/lsadiq/Desktop/new/src";
     this->target_url = "/webCuddler/body";
 	this->targetUri = "";
     this->status_code = 200;
@@ -121,7 +122,6 @@ void response::handel_error() {
 
 void    response::methodGet()
 {
-    
     if (status_code != 200)
     {
         handel_error();

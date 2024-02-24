@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/21 21:47:00 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/24 15:19:00 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,40 +58,123 @@ void response::parsLength(char *con, size_t& index, size_t size)
 
 void    response::parseChunk(char *con, size_t& index, size_t size)
 {
-    std::string chunkSizeStr;
     while (index < size)
     {
-        if (con[index] == '\r' && con[index + 1] == '\n')
+        static int pflag = 0;
+        
+        if (pflag != flag)
+            std::cout << "flag : " << flag << std::endl;
+        pflag = flag;
+        
+        if (flag == 2)
         {
-            index += 2;
-            break;
+            while (index < size && ihex < 20)
+            {
+                if (con[index] == '\r')
+                    break;
+                chunkSizeStr += con[index];
+                index++;
+                ihex++;
+            }
+            if (ihex == 20)
+            {
+                upfile.close();
+                status_code = 400;
+                return;
+            }
+            if (con[index] != '\r')
+            {
+                return;
+            }
+            std::istringstream iss(chunkSizeStr);
+            chunkSizeStr.clear();
+            ihex = 0;
+            if (!(iss >> std::hex >> chunkSize))
+            {
+                upfile.close();
+                status_code = 400;
+                return;
+            }
+            if (chunkSize == 0)
+            {
+                upfile.close();
+                status_code = 201;
+                return;
+            }
+            flag = 3;
         }
-        chunkSizeStr += con[index];
-        index++;
+        if (flag == 3)
+        {
+            if (index >= size)
+                return;
+            if (con[index] != '\r')
+            {
+                upfile.close();
+                status_code = 400;
+                return;
+            }
+            index++;
+            flag = 4;
+        }
+        if (flag == 4)
+        {
+            if (index >= size)
+                return;
+            if (con[index] != '\n')
+            {
+                upfile.close();
+                status_code = 400;
+                return;
+            }
+            index++;
+            flag = 5;
+        }
+        if (flag == 5)
+        {
+            if (size - index >= chunkSize)
+            {
+                upfile.write(con + index, chunkSize);
+                upfile.flush();
+                index += chunkSize;
+                chunkSize = 0;
+                flag = 6;
+            }
+            else
+            {
+                upfile.write(con + index, size - index);
+                upfile.flush();
+                chunkSize -= size - index;
+                index = size;
+            }
+        }
+        if (flag == 6)
+        {
+            if (index >= size)
+                return;
+            if (con[index] != '\r')
+            {
+                upfile.close();
+                status_code = 400;
+                return;
+            }
+            index++;
+            flag = 7;
+        }
+        if (flag == 7)
+        {
+            if (index >= size)
+                return;
+            if (con[index] != '\n')
+            {
+                upfile.close();
+                status_code = 400;
+                return;
+            }
+            index++;
+            flag = 2;
+        }
     }
-    int chunkSize = 0;
-    std::istringstream iss(chunkSizeStr);
-    iss >> std::hex >> chunkSize;
-    if (chunkSize == 0)
-    {
-        upfile.close();
-        status_code = 201;
-        return;
-    }
-    if (size - index >= chunkSize)
-    {
-        upfile.write(con + index, chunkSize);
-        upfile.flush();
-        body_length -= chunkSize;
-        index += chunkSize;
-    }
-    else
-    {
-        upfile.write(con + index, size - index);
-        upfile.flush();
-        body_length -= size - index;
-        index = size;
-    }
+    
 }
 
 void    response::methodPost()
@@ -108,12 +191,17 @@ void    response::methodPost()
         if (status_code == 403)
             return;
         if (uplod_type == "Chunk")
+        {
+            flag = 2;
             parseChunk(con, index, size);
+        }
         else if (uplod_type == "length")
+        {
+            flag = 1;
             parsLength(con, index, size);
+        }
         else
             status_code = 400;
-        flag = 1;    
     }
     else if (flag == 1) {
         size_t index = 0;
@@ -121,10 +209,15 @@ void    response::methodPost()
         size_t size = read(fd, con, 1024);
         // write(1, con + index, size - index);
         // write(1, con, size);
-        if (uplod_type == "Chunk")
-            parseChunk(con, index, size);
-        else if (uplod_type == "length")
-            parsLength(con, index, size);
+        parsLength(con, index, size);
+    }
+    else if (flag >= 2 && flag <= 10) {
+        size_t index = 0;
+        char con[1024];
+        size_t size = read(fd, con, 1024);
+        // write(1, con + index, size - index);
+        // write(1, con, size);
+        parseChunk(con, index, size);
     }
     
     // if(!allowedMethods())
@@ -222,8 +315,9 @@ void    response::createFile()
         //i need content type to create the file
         content_type = fileType;
         extention = "mp4";
-        upfile.open((UplDir +"/" + randName + "." + extention).c_str());
-        if (upfile.is_open() == false)
+        // std::cout << UplDir +"/" + randName + "." + extention << std::endl;
+        upfile.open((UplDir+"/" + randName + "." + extention).c_str());
+        if (upfile.is_open() == false) 
         {
             perror((UplDir + "/" + randName + "." + extention).c_str());
             status_code = 403;
