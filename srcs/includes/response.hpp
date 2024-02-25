@@ -58,7 +58,6 @@ class response
 		size_t 			body_length;
 		std::string		uplod_type;
 		location		loc;
-		
 		std::ofstream 	upfile;
 		bool 			close;
 		Request request;
@@ -71,7 +70,6 @@ class response
 		std::string		targetUri;
 		std::string 	line, name;
 		std::string 	content_type;
-		
 		std::string 	extention;
 		std::string		pathUpload;
 		static			std::map<std::string, std::string> _mime;

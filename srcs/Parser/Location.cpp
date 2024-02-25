@@ -13,10 +13,10 @@
 #include "../includes/Location.hpp"
 
 
-Location::Location
-(
-){};
+Location::Location(){};
+
 Location::~Location(){};
+
 void Location::setLocationData(std::string key, std::vector<std::string> vec)
 {
     locationData[key].insert(locationData[key].end(),vec.begin(),vec.end());
@@ -50,6 +50,7 @@ void Location::printData()
         std::cout << "      upload " << locationData["upload"][0] << std::endl;
 }
 
+
 void Location::checkMembershipInLocation(std::string directive)
 {
     if(directive != "index" && directive !="autoindex" && directive != "http_methods" && directive != "return" &&
@@ -61,7 +62,7 @@ void Location::checkAutoindexError(std::vector<std::string> autoindex)
 {
     if(autoindex.size() > 1)
         throw autoindexError();
-    if(autoindex[0] != "on" && autoindex[0] != "off")
+    if(autoindex[0] != ON && autoindex[0] != OFF)
         throw autoindexError();
 }
 
@@ -73,7 +74,6 @@ void Location::checkMethodsError(std::vector<std::string> methods)
     std::count(methods.begin(),methods.end(),DELETE_METHODE) > 1 || 
     std::count(methods.begin(),methods.end(),GET_METHODE) > 1)
             throw  httpMethodsError();
-
     for(size_t i = 0; i < methods.size();i++)
     {
         if(methods[i] != GET_METHODE && methods[i] != POST_METHODE && methods[i] != DELETE_METHODE)
@@ -81,34 +81,59 @@ void Location::checkMethodsError(std::vector<std::string> methods)
     }
 }
 
-void  Location::checkPathError(std::vector<std::string> location_name)
+void  Location::checkLocationName(std::vector<std::string> location_name)
 {
     if(location_name.size() > 1 || location_name[0][0] != '/')
         throw location_nameError();
     //should i check that location_name or not in this step 
 }
-// void Location::checkUpload(std::vector<std::string> allowedApload)
-// {
-    
-//     if(allowedApload.size() > 1 || (allowedApload[0]== "on" && allowedApload[0]=="off"))
-//         throw ConfigueFileError();
-//     //check this error
-// }
+
+void Location::checkUpload(std::vector<std::string> allowedApload)
+{
+    if(allowedApload.size() > 1 || (allowedApload[0] != ON && allowedApload[0] != OFF))
+        throw uploadError();
+}
+
+void Location::checkIndexError(std::vector<std::string> index)
+{
+    //check if is just string or extension???
+    if(index.size() > 1)
+        throw indexError();
+}
+void Location::checkReturnError(std::vector<std::string> returnDirective)
+{
+    if(returnDirective.size() > 2)
+        throw returnError();
+    //check if the first  umber 301 and  another one the second one is a path maybe i should check for him too
+}
+
+void Location::checkRootError(std::vector<std::string> root)
+{
+    if(root.size() > 1 || root[0][0] != '/')
+        throw rootError();
+    //check here / 
+}
+
 void Location::checkLocationError(std::string directive,std::vector<std::string> vec,int countSpaces)
  {
-    //std::cout << directive << "====>" << vec[0] <<std::endl;
-    std::cout << directive << std::endl;
     if(countSpaces != 2)
         throw ConfigueFileError();
-    // if(directive == "allowedUpload")
-    //     checkUpload(vec);
-    // checkMembershipInLocation(directive);
-    // index error not now
-    //i store return but whitout spliting vec ==> 301 wwww.fwcebook.com
+    if(directive == "index")
+        checkIndexError(vec);
     if(directive =="location_name")
-        checkPathError(vec);
+        checkLocationName(vec);
+    if(directive == "allowedUpload")
+        checkUpload(vec);
     else if(directive == "autoindex")
         checkAutoindexError(vec);
     else if(directive == "http_methods")
         checkMethodsError(vec);
+    else if(directive == "return")
+        checkReturnError(vec);
+    else if(directive == "root")
+        checkRootError(vec);
+    //error pages
+    // checkMembershipInLocation(directive);
+    // index error not now
+    //i store return but whitout spliting vec ==> 301 wwww.fwcebook.com
 }

@@ -12,7 +12,7 @@
 
 NAME =	Webserv
 
-MAIN =  main.cpp ./parse/parse.cpp ./parse/server.cpp ./parse/utils.cpp ./parse/Location.cpp ./multiplexer/Multiplixer.cpp ./parse/Request.cpp  ./methods/getMethod.cpp ./methods/postMethod.cpp ./methods/methodHelp.cpp
+MAIN =  main.cpp ./Parser/Parse.cpp ./Parser/Server.cpp ./Parser/Utils.cpp ./Parser/Location.cpp ./Multiplexer/Multiplixer.cpp ./Parser/Request.cpp  ./methods/getMethod.cpp ./methods/postMethod.cpp ./methods/methodHelp.cpp
 
 # P_SRCS	= 	$(addprefix src/parsing/,$(SRCS))
 

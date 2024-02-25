@@ -127,6 +127,7 @@ void Multiplixer::start(std::vector<Server> servers)
 			}
 			else
 			{
+
 				int socketFd = events[i].data.fd;
 				Request &request = this->requests[socketFd];
 				if((events[i].events & EPOLLIN ) && !request.getStatus())
@@ -143,19 +144,17 @@ void Multiplixer::start(std::vector<Server> servers)
 				{
 
 					response &res = *(responses[socketFd]);
-						// if(res.gflag == 1)
-						// 	res.sendData();
-						responses[socketFd]->setFd(socketFd);
-						responses[socketFd]->methodGet();
-						if(res.flag == 10)
-						{
-							if(epoll_ctl(epo,EPOLL_CTL_DEL,socketFd,&events[i]) < 0)
-								throw networkError();
-							close(socketFd);
-							std::cout << "respone sent to  " << socketFd << "is done" << std::endl;
-							responses.erase(socketFd);
-							requests.erase(socketFd);
-						}
+					responses[socketFd]->setFd(socketFd);
+					responses[socketFd]->methodGet();
+					if(res.flag == 10)
+					{
+						if(epoll_ctl(epo,EPOLL_CTL_DEL,socketFd,&events[i]) < 0)
+							throw networkError();
+						close(socketFd);
+						std::cout << "respone sent to  " << socketFd << "is done" << std::endl;
+						responses.erase(socketFd);
+						requests.erase(socketFd);
+					}
 				}
 			}
 			
@@ -164,10 +163,5 @@ void Multiplixer::start(std::vector<Server> servers)
 	//close master sockets
 	// close(sockfd);
 }
-
-// std::cout <<"writing\n";
-					// std::string content = "<html><body>Hello, world!</body></html>";
-					// std::string response =
-					// 	"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 39\r\n\r\n" + content;
 
 

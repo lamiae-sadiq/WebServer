@@ -23,16 +23,15 @@
 #define GET_METHODE "GET"
 #define POST_METHODE "POST"
 #define DELETE_METHODE "DELETE"
+#define ON "on"
+#define OFF "off"
 
 class Location
 {
         private:
                 std::map<std::string,std::vector<std::string> > locationData;
-                // bool allowedUpload;
-                // struct Loca loc;
         public:
                 Location();
-                //static void checkUpload(std::vector<std::string> allowedApload);
                 void setLocationData(std::string key, std::vector<std::string> vec);
                 std::vector<std::string> getLocationData(std::string key);
                 void printData();
@@ -41,20 +40,31 @@ class Location
                 static bool isValidPath(std::string location_name);
                 static void checkAutoindexError(std::vector<std::string> autoindex);
                 static void checkMethodsError(std::vector<std::string> methods); 
-                static void  checkPathError(std::vector<std::string> location_name);              
+                static void  checkLocationName(std::vector<std::string> location_name);   
+                static void checkUpload(std::vector<std::string> allowedApload);
+                static void checkIndexError(std::vector<std::string> index);
+                static void checkReturnError(std::vector<std::string> returnDirective);
+                static void checkRootError(std::vector<std::string> root);
                 ~Location();
                 class autoindexError:public std::exception 
                 {
                         const char* what() const throw()
                         {
-                                return "you have an error in autoindex\n";
+                                return "autoindex error\n";
                         }
                 };
                 class httpMethodsError:public std::exception 
                 {
                         const char* what() const throw()
                         {
-                                return "you have an error in http methods\n";
+                                return "http methods error\n";
+                        }
+                };
+                class indexError:public std::exception 
+                {
+                        const char* what() const throw()
+                        {
+                                return "index error\n";
                         }
                 };
                 class ConfigueFileError:public std::exception 
@@ -68,14 +78,35 @@ class Location
                 {
                         const char* what() const throw()
                         {
-                                return "you have an error in directives name \n";
+                                return "directives name error \n";
+                        }
+                };
+                class rootError:public std::exception 
+                {
+                        const char* what() const throw()
+                        {
+                                return "directives name error \n";
                         }
                 };
                 class location_nameError:public std::exception 
                 {
                         const char* what() const throw()
                         {
-                                return "you have an error in location location_name \n";
+                                return "location_name error \n";
+                        }
+                };
+                class uploadError:public std::exception 
+                {
+                        const char* what() const throw()
+                        {
+                                return "upload error\n";
+                        }
+                };
+                class returnError:public std::exception 
+                {
+                        const char* what() const throw()
+                        {
+                                return "return error \n";
                         }
                 };
 };

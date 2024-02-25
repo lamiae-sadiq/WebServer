@@ -128,7 +128,6 @@ void    response::methodGet()
         handel_error();
         return;
     }
-
     if (flag == 0)
     {
         targetUri = loc.root + target_url.substr(loc.location_name.size());
@@ -190,8 +189,7 @@ void    response::methodGet()
     if (flag >= 2 && flag <= 4){
         // gflag = 1;
         sendData();
-    }
-        
+    } 
     else if (flag >= 6 && flag <= 10)
         listDirectories();
 }

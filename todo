@@ -2,157 +2,26 @@
 // check errors 
 
 
-server_name / index/client_max_body_size ==>> what should i parse in thiiiis
-port ===>> dooone
-host =====>> dooone
-autoindex===>> doone
-http_methods ======> dooone
-retuun hoooow and whaaat
-
-index //tocheeeck
-check thiis ====> root //nfs/homes/kel-baam
 
 
+// GET / HTTP/1.1
+// Host: localhost:8080
+// Connection: keep-alive
+// Cache-Control: max-age=0
+// sec-ch-ua: "Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"
+// sec-ch-ua-mobile: ?0
+// sec-ch-ua-platform: "Linux"
+// Upgrade-Insecure-Requests: 1
+// User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
+// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
 
-
-set a default for a server and for a location in case the configur file empty
-root can be in server and in location
-
-
-
-GET / HTTP/1.1
-Host: localhost:8080
-Connection: keep-alive
-Cache-Control: max-age=0
-sec-ch-ua: "Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "Linux"
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
-Sec-Fetch-Site: none
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Accept-Encoding: gzip, deflate, br
-Accept-Language: en-US,en;q=0.9
-
-
-HTTP/1.x 200 OK
-Transfer-Encoding: chunked
-Date: Sat, 28 Nov 2009 04:36:25 GMT
-Server: LiteSpeed
-Connection: close
-X-Powered-By: W3 Total Cache/0.8
-Pragma: public
-Expires: Sat, 28 Nov 2009 05:36:25 GMT
-Etag: "pub1259380237;gz"
-Cache-Control: max-age=3600, public
-Content-Type: text/html; charset=UTF-8
-Last-Modified: Sat, 28 Nov 2009 03:50:37 GMT
-X-Pingback: https://code.tutsplus.com/xmlrpc.php
-Content-Encoding: gzip
-Vary: Accept-Encoding, Cookie, User-Agent
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Top 20+ MySQL Best Practices - Nettuts+</title>
-<!-- ... rest of the html ... -->
-
-//////index
 
 //check server_name code
 
 
 
-Content-Length
+// Content-Length
 
 
 
 
-postman 
-User-Agent: PostmanRuntime/7.34.0
-Accept: */*
-Postman-Token: 9bdafd17-ccfa-45c5-ad08-7b51d4466260
-Host: localhost:8000
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-
-
-
-readyFiles = epoll_wait(epo,events,MAX_EVENTS,-1);
-		
-		for(size_t i = 0; i < readyFiles;++i)
-		{
-			if((masterSockets.count(events[i].data.fd)) && (events[i].events & EPOLLIN))
-			{
-				res.setFd(events[i].data.fd);
-				acceptNewConnection(epo, events[i].data.fd,events);
-			}
-			else
-			{
-				int socketFd = events[i].data.fd;
-				Request &request = this->requests[socketFd];
-				if((events[i].events & EPOLLIN )  || ((events[i].events & EPOLLOUT)))
-				{
-					int byt = read(socketFd,buff,1024);
-					std::cout << buff << std::endl;
-					//buff[byt] = '\0';
-					// if(request.parseHeaders(buff,completeRead,matchServers[socketFd]))
-					// {
-					 	//response *res = new (responses[socketFd]);
-						//if(!count)		
-						//	 responses[socketFd]->setFd(socketFd);
-						// count = 1;	// response *res = responses[socketFd];
-						// if(!count)		
-						// 	 res->setFd(socketFd);
-						// res->methodGet();
-						 count = 1;
-						// if(!count)		
-						// 	 res->setFd(socketFd);
-						// res->methodGet();
-						
-					// }
-
-					 std::cout << "heeelo" << std::endl;
-						// responses[socketFd] = new response();			// response *res = responses[socketFd];
-						 res.methodGet();
-						std::cout << "heeere\n";
-					if (res.flag == 2)
-						res.sendData();
-					std::cout << "why\n";
-		
-					std::cout << res.flag << std::endl;
-					if(res.flag == 10)
-					{
-						if(epoll_ctl(epo,EPOLL_CTL_DEL,socketFd,&events[i]) < 0)
-							throw networkError();
-						close(socketFd);
-					}
-					
-				}
-				// if((events[i].events & EPOLLOUT) && count == 1)
-				// {
-				// 	 std::cout << "heeelo" << std::endl;
-				// 		// responses[socketFd] = new response();			// response *res = responses[socketFd];
-				// 		 res.methodGet();
-				// 		std::cout << "heeere\n";
-				// 	if (res.flag == 2)
-				// 		res.sendData();
-				// 	std::cout << "why\n";
-		
-				// 	std::cout << res.flag << std::endl;
-				// 	if(res.flag == 10)
-				// 	{
-				// 		if(epoll_ctl(epo,EPOLL_CTL_DEL,socketFd,&events[i]) < 0)
-				// 			throw networkError();
-				// 		close(socketFd);
-				// 	}
-				// 	// std::string toSend = res.getData(1024);
-				// 	// int sendedCount = send(socketFd,toSend.c_str(),toSend.length(),0);
-				// 	//check if sending response done
-				// }
-			}
-			
-		}

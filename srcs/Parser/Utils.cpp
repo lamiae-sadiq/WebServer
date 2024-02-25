@@ -10,8 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/utils.hpp"
-std::vector<std::string> Utils::splitString(std::string &string,int del)
+#include "../includes/Utils.hpp"
+
+std::vector<std::string> Utils::splitString(std::string string,int del)
 {
 	std::vector<std::string> vec;
 	std::string tmpString = string;
@@ -53,12 +54,7 @@ int  Utils::countTabulation(std::string &line)
 
   int last = 0;
   size_t len = line.length() - 1;
-  // for(size_t i = 0 ; i <len ;i++)
-  // {
-  //   if(line[i] != ' ')
-  //     break;
-  //   count++;
-  // }
+
   for(size_t i = 0 ; i < len ;i++)
   {
     if(line[i] !='\t')
@@ -74,3 +70,6 @@ int  Utils::countTabulation(std::string &line)
   line = line.substr(count,len - count - last + 1);
   return count;
 }
+
+
+

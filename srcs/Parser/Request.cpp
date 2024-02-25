@@ -12,9 +12,28 @@
 
 #include "../includes/Request.hpp"
 
+
+Request::Request()
+{
+	tmpBuff = "";
+	countHeaders = 0;
+	isDone = 0;
+	isChunke = 1;
+	status = 0;
+};
+
+loc Request::getLocation()
+{
+	return this->location;
+}
+
 void Request::setHeader(std::string &key,std::string &value)
 {
 	headers[key] = value;
+}
+int Request::getStatus()
+{
+	return status;
 }
 
 std::string Request::getHeader(std::string key)
@@ -114,9 +133,13 @@ void Request::storeRequest(std::string line)
 	}
 	if(key == "Host")
 		storeHostHeader(line);
+	else if(key == "Content-Length")
+		body_length = atoi(line.c_str());
+	// else if(key == )
 	//check headers key : value
 	//setHeader(key,line);
 }
+
 void Request::analyseHeaders(std::string buff)
 {
 	int index = 1;
@@ -132,7 +155,6 @@ void Request::analyseHeaders(std::string buff)
 			requests = requests.substr(index + 1);
 			if(requests == "\r\n")
 		 	{
-				
 				tmpBuff = requests;
 				status = 1;
 				isDone = 1;	
@@ -147,30 +169,47 @@ void Request::analyseHeaders(std::string buff)
 	}
 }
 
-std::string Request::checkemptyData(std::vector<std::string> vec)
+std::string Request::checkemptyData(std::vector<std::string> vec,int index)
 {
 	if(!vec.empty())
 	{
-		return vec[0];
+		return vec[index];
 	}
 	return "";
 }
 void Request::storeLocation(Server &server, Location iniLocation)
 {
-	//return
+	// error pages
+	location.redirect_code = atoi(checkemptyData(iniLocation.getLocationData("return"),0).c_str());
+	location.redirect_path = checkemptyData(iniLocation.getLocationData("return"),1);
 	location.max_body_size = atoi(server.getServerData("client_max_body_size")[0].c_str());
-	location.root =	checkemptyData(server.getServerData("root"));
-	location.index =  checkemptyData(iniLocation.getLocationData("index"));
-	location.auto_index = checkemptyData(iniLocation.getLocationData("autoindex"));
-	location.upload = checkemptyData(iniLocation.getLocationData("upload"));
-	location.location_name =  checkemptyData(iniLocation.getLocationData("location_name"));
+	location.root =	checkemptyData(server.getServerData("root"),0);
+	location.index =  checkemptyData(iniLocation.getLocationData("index"),0);
+	location.auto_index = checkemptyData(iniLocation.getLocationData("autoindex"),0);
+	location.upload = checkemptyData(iniLocation.getLocationData("upload"),0);
+	location.location_name =  checkemptyData(iniLocation.getLocationData("location_name"),0);
 	location.method =  iniLocation.getLocationData("http_methods");
-	if(iniLocation.getLocationData("allowedUpload").empty() &&  iniLocation.getLocationData("allowedUpload")[0]== "on")
+	if(!(iniLocation.getLocationData("allowedUpload").empty()) &&  iniLocation.getLocationData("allowedUpload")[0] == "on")
 		location.allowedUpload = true;
 	else
 		location.allowedUpload = false;
 }
 
+void  Request::printREquest()
+{
+	std::cout << "max_body_size ======>>>>" <<  location.max_body_size <<"\n";
+	std::cout << "root ======>>>>" <<  location.root<<"\n";
+	std::cout << "index ======>>>>" <<  location.index<<"\n";
+	std::cout << "auto_index ======>>>>" <<  location.auto_index<<"\n";
+	std::cout << "upload ======>>>>" <<  location.upload<<"\n";
+	std::cout << "location_name ======>>>>" <<  location.location_name<<"\n";
+	std::cout << "allowedUpload ======>>>>" <<  location.allowedUpload<<"\n";
+	std::cout << "redirect_path ======>>>>" << location.redirect_path<<"\n";
+	for(size_t i = 0;i < location.method.size();i++)
+	{
+		std::cout << "methods ======>>>>" <<  location.method[i] << "\n";
+	}
+}
 void Request::setContentType(std::string initVar)
 {
 	contentType = initVar;
@@ -184,18 +223,12 @@ int Request::matchLocation(std::string host,Server server)
 			if(server.getLocations()[j].getLocationData("location_name")[0] == url)
 			{
 				storeLocation(server,server.getLocations()[j]);
-				// std::cout << "======>>>>" <<  location.max_body_size <<"\n";
-				// std::cout << "======>>>>" <<  location.root<<"\n";
-				// std::cout << "======>>>>" <<  location.index<<"\n";
-				// std::cout << "======>>>>" <<  location.auto_index<<"\n";
-				// std::cout << "======>>>>" <<  location.upload<<"\n";
-				// std::cout << "======>>>>" <<  location.location_name<<"\n";
+			
 				break;
 			}
 		}
 		return 1;
 	}
-	
 	return 0;
 }
 void Request::matchServer()

@@ -10,14 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/parse.hpp"
+#include "../includes/Parse.hpp"
 
 
 Parser::Parser()
 {
-  
   locationLen = -1;
   serverLen = -1;
+  
 }
 
 void Parser::serversAddBack()
@@ -30,6 +30,7 @@ void  Parser::printServersInfo()
 {
   for(size_t i = 0; i < servers.size();i++)
   {
+    std::cout << "siiize" << servers[i].getSizeServerData() << std::endl;
     servers[i].printLOcationINfo();    
   }
 }
@@ -37,8 +38,7 @@ void  Parser::printServersInfo()
 void   Parser::storeServerData(std::string &directive, std::string &line, int countTab,Server &servers)
 {
   size_t index = 1;
-  int count;
-
+ 
   Server::checkServersError(directive,Utils::splitString(line,' '),countTab);
   servers.setServerData (directive,Utils::splitString(line,' '));
  }
@@ -51,7 +51,7 @@ void Parser::analyseLocationData(std::string &line,Server &servers,std::ifstream
   int countTab;
   
   locationLen++;
-  servers.locationAddBack();// root 
+  servers.locationAddBack();
   while(std::getline(readFile,line))
   {
     if(!line.empty())
@@ -114,10 +114,11 @@ void Parser::readFile(std::string line,std::ifstream& readFile)
         analyseLocationData(line,servers[serverLen],readFile);
     }
   }
-  if(readFile.eof())
-  {
-      printServersInfo();
-  }
+  //chack the necassry directive;
+  // if(readFile.eof())
+  // {
+  //     printServersInfo();
+  // }
 }
 
 std::vector<Server> Parser::paseConfigueFile(std::string &configueFile)

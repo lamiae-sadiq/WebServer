@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./parse.hpp"
+#include "./Parse.hpp"
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string.h>
@@ -19,14 +19,16 @@
 typedef struct loc
 {
 	int 						return_;
-	int						max_body_size;
+	int							max_body_size;
 	std::string 				root;
 	std::string 				index;
 	std::string 				auto_index;
-	bool		 				allowedUpload; //string
+	bool		 				allowedUpload;
 	std::string 				upload;
 	std::string 				location_name;
 	std::vector<std::string> 	method;
+	int							redirect_code;
+	std::string 				redirect_path;
 	
 }loc;
 
@@ -46,24 +48,12 @@ class Request
 		int isDone;
 		int status;
 		int countHeaders;
+		size_t body_length;
 	public:
 		std::string tmpBuff;
-		int getStatus()
-		{
-			return status;
-		}
-		Request()
-		{
-			tmpBuff = "";
-			countHeaders = 0;
-			isDone = 0;
-			isChunke = 1;
-			status = 0;
-		};
-		loc get()
-		{
-			return this->location;
-		}
+		int getStatus();
+		Request();
+		loc getLocation();
 		void setHeader(std::string &key,std::string &value);
 		std::string getHeader(std::string key);
 		std::string getMethod();
@@ -71,7 +61,7 @@ class Request
 		std::string getVersion();
 		std::string getContentLength();
 		std::string getContentType();
-		std::string checkemptyData(std::vector<std::string> vec);
+		std::string checkemptyData(std::vector<std::string> vec,int index);
 		void setMethod(std::string initVar);
 		void setUrl(std::string initVar);
 		void setVersion(std::string initVar);
@@ -85,6 +75,7 @@ class Request
 		void storeRequestLineInfo(std::vector<std::string> vec);
 		int matchLocation(std::string host,Server server);
 		void storeLocation(Server &server,Location iniLocation);
+		void printREquest();
 		class readError:public std::exception 
         {
             const char* what() const throw()

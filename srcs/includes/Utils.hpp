@@ -25,7 +25,7 @@
 class Utils
 {
 	public:
-   		static std::vector<std::string> splitString(std::string &string,int del);
+   		static std::vector<std::string> splitString(std::string string,int del);
 		static int  countTabulation(std::string &line);
 		static void skipSpaces(std::string &line);
 		static int isWhitSpaces(int a);

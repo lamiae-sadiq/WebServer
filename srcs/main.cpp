@@ -1,4 +1,4 @@
-#include "./includes/parse.hpp"
+#include "./includes/Parse.hpp"
 #include "./includes/Multiplixer.hpp"
 
 
@@ -12,7 +12,6 @@ int main(int ac, char**av)
     {
       std::string configueFile = av[1];
       servers = Parser::paseConfigueFile(configueFile);
-      // exit(1);
 	    multiplixer.start(servers);
     }
     else

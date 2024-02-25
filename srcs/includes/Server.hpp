@@ -21,7 +21,7 @@
 #include <exception>
 #include "./Location.hpp"
 #include <cstdlib>
-#include "./utils.hpp"
+#include "./Utils.hpp"
 #include <algorithm> 
 #include <sys/types.h>
 #include <dirent.h>
@@ -29,22 +29,25 @@
 typedef std::map<std::string,std::vector<std::string> > mapOfVectors;
 class Server
 {
-        //SERVER DATA LIKE PORT HOST....
-        mapOfVectors serverData; 
-        // LOCATION DATA
+        mapOfVectors serverData;
+        std::map<std::string, std::string> error_pages;
+        int countServerData;
         std::vector<Location> locations;
     public:
         Server();
         ~Server(){};
+        size_t getSizeServerData()
+        {
+            return serverData.size();
+        }
         void setServerData(std::string key ,std::vector<std::string> vec);
         std::vector<std::string> getServerData(std::string key);
-        void checkServersError();
         void printLOcationINfo();
         size_t directiveSize(std::string directive);
         bool isValidBodySize(std::string size);
-        bool isValidPort(std::string &port);
-        bool isValidHost(std::string host);
+        void checkServersError();
         void locationAddBack();
+        static void checkErrorPages(std::vector<std::string> vec);
         static void checkServernameError(std::vector<std::string> serverName);
         static void checkPortError(std::vector<std::string> port);
         static void checkHostError(std::vector<std::string> host);
@@ -52,7 +55,6 @@ class Server
         static void checkServersError(std::string directive, std::vector<std::string> vec,int countSpaces);
         std::vector<Location> getLocations();
         Location& operator[](size_t index);
-        static void checkRoot(std::vector<std::string> root);
         class ConfigueFileError:public std::exception 
         {
             const char* what() const throw()
@@ -100,6 +102,20 @@ class Server
             const char* what() const throw()
             {
                 return "you have an error in directives name \n";
+            }
+        };
+        class duplicatedError:public std::exception 
+        {
+            const char* what() const throw()
+            {
+                return "duplicated error \n";
+            }
+        };
+        class errorPages:public std::exception 
+        {
+            const char* what() const throw()
+            {
+                return "duplicated error \n";
             }
         };
 };

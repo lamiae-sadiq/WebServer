@@ -19,9 +19,9 @@
 #include <string>
 #include <fstream>
 #include <exception>
-#include "./server.hpp"
+#include "./Server.hpp"
 #include "./Location.hpp"
-#include "./utils.hpp"
+#include "./Utils.hpp"
 // ishould check if the server data is four or not 
 
 class Parser
