@@ -30,7 +30,7 @@
 #include <signal.h>
 #include <sstream>
 #include <map>
-
+#include "Request.hpp"
 
 #define PORT 8080
 
@@ -39,25 +39,32 @@
 #define NOT_FOUND -1
 #define FORBIDDEN -2
 
-typedef struct location
-{
-	int 						return_;
-	size_t						max_body_size;
-	std::string 				root;
-	std::string 				index;
-	std::string 				auto_index;
-	bool		 				allowedUpload;
-	std::string 				upload;
-	std::string 				location_name;
-	std::vector<std::string> 	method;
-}location;
+// typedef struct location
+// {
+// 	int 						return_;
+// 	size_t						max_body_size;
+// 	std::string 				root;
+// 	std::string 				index;
+// 	std::string 				auto_index;
+// 	bool		 				allowedUpload;
+// 	std::string 				upload;
+// 	std::string 				location_name;
+// 	std::vector<std::string> 	method;
+// }location;
 
 class response
 {
 	private :
-		std::string 	chunkSizeStr;
 		size_t 			body_length;
+		std::string 	target_url;
+		std::string 	content_type;
+		std::string		uplod_type;
+
+		// location 		loc;
+		Request         request;
+
 		std::ofstream 	upfile;
+		std::string 	chunkSizeStr;
 		bool 			close;
 		DIR* 			dir;
 		int 			flag;
@@ -65,29 +72,34 @@ class response
 		int 			fd;
 		std::ifstream 	ifile;
 		std::ofstream 	ofile;
-		std::string 	target_url;
 		std::string		targetUri;
 		std::string 	line, name;
-		std::string 	content_type;
 		std::string 	extention;
-		location 		loc;
 		std::string		pathUpload;
 		static			std::map<std::string, std::string> _mime;
 		std::string		uploadFileNmae;
 		std::string		fileType;
 		std::string		body;
-		std::string		uplod_type;
 		size_t chunkSize;
 		int ihex;
 	public :
 
 		response();
+		response(Request initRequest)
+		{
+			request = initRequest;
+		}
 		~response();
 		void	methodGet();
 		void	methodPost();
 		void	setFd(int fd){
 			this->fd = fd;
 		};
+		Request getRequest()
+		{
+			std::cout << "req\n";
+			return request;
+		}
 		bool    autoIndexCheck();
 		bool    allowedMethods();
 		bool    checkUpload();
@@ -106,6 +118,7 @@ class response
 		std::string getContentType();
 		std::string getExtension();
 		std::string	getUploadFN();
+		void setRequest(Request initReq);
 		int getFlag();
 		int getStatusCode();
 		int getFd();
@@ -113,7 +126,7 @@ class response
 		std::ifstream& getIfile();
 		std::ofstream& getOfile();
 		DIR* getDir();
-		location getLocation();
+		loc getLocation();
 		std::string newUpload();
 		std::map<std::string, std::string> getMime();
 		void createFile();
@@ -121,4 +134,5 @@ class response
 		void parsLength(char *con, size_t& index, size_t size);
 		void parseChunk(char *con, size_t& index, size_t size);
 		void	Delete();
+		void init();
 };

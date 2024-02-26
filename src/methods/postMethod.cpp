@@ -42,14 +42,14 @@ bool passheader(char *con, size_t& index, size_t size)
 
 void response::parsLength(char *con, size_t& index, size_t size)
 {
-    if (body_length < size - index)
-        size = body_length + index;
+    if (request.getContentLength() < size - index)
+        size = request.getContentLength() + index;
     
     upfile.write(con + index, size - index);
     upfile.flush();
-    body_length -= size - index;
+    request.contentLength -= size - index;
     index = size;
-    if (body_length == 0)
+    if (request.contentLength == 0)
     {
         upfile.close();
         status_code = 201;
@@ -269,26 +269,6 @@ void    response::methodPost()
     //     status_code = 404;
 }
 
-std::string response::newUpload()
-{
-    if (loc.upload[loc.upload.size() - 1] == '/' && targetUri[0] == '/'){
-		pathUpload = loc.upload + targetUri.substr(1);
-		// std::cout << "pathUpload : " << pathUpload << std::endl;
-        return (pathUpload);
-	}
-    else if (loc.upload[loc.upload.size() - 1] != '/' && targetUri[0] != '/')
-	{
-		pathUpload = loc.upload + "/" + targetUri;
-		// std::cout << "pathUpload :: " << pathUpload << std::endl;
-		return (pathUpload);
-	}
-    else{
-		pathUpload = loc.upload + target_url.substr(loc.location_name.size());
-		// std::cout << "pathUpload ::: " << pathUpload << std::endl;
-        return (pathUpload );
-	}
-}
-
 std::string response::generateName()
 {
     std::string name = "";
@@ -300,10 +280,10 @@ std::string response::generateName()
 
 void    response::createFile()
 {
-    if (loc.upload[0] == '/')
-		loc.upload.erase(0, 1);
-    if (loc.upload.length() > 1){
-        std::string UplDir = loc.root + "/" + loc.upload;
+    if (request.location.upload[0] == '/')
+		request.location.upload.erase(0, 1);
+    if (request.location.upload.length() > 1){
+        std::string UplDir = request.location.root + "/" + request.location.upload;
         if(access(UplDir.c_str(), F_OK | W_OK) == -1)
         {
             perror("Upload Directory");

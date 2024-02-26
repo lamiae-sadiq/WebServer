@@ -1,65 +1,29 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/02 14:45:23 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/23 16:30:46 by lsadiq           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "./includes/response.hpp"
+#include "./includes/Parse.hpp"
+#include "./includes/Multiplixer.hpp"
 
 
-int main()
+int main(int ac, char**av)
 {
-    response::fillMime();
-    try
+  try
+  {
+    Multiplixer multiplixer;
+    std::vector<Server> servers;
+    if(ac == 2)
     {
-        signal(SIGPIPE, SIG_IGN);
-        int opt = 1;
-        int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sockfd < 0)
-            throw std::runtime_error("Error: socket creation failed");
-        struct sockaddr_in address;
-        memset(&address, 0, sizeof(address));
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt)))
-        {
-            perror("setsockopt");
-            exit(EXIT_FAILURE);
-        }
-        address.sin_family = AF_INET;
-        address.sin_addr.s_addr = INADDR_ANY;
-        address.sin_port = htons(PORT);
-        int addrlen = sizeof(address);
-        if (bind(sockfd, (struct sockaddr *)&address, sizeof(address)) < 0)
-            throw std::runtime_error("Error: bind failed");
-        if (listen(sockfd, 10) < 0)
-            throw std::runtime_error("Error: listen failed");
-        std::cout << "Server listening on port " << PORT << std::endl;
-        while (1)
-        {
-            response loc;
-            // std::cout << loc.getFd() << std::endl;
-            loc.setFd(accept(sockfd, (struct sockaddr *)&address, (socklen_t *)&addrlen));
-            if (loc.getFd() < 0)
-                throw std::runtime_error("Error: didn't accept");
-            while (loc.getClose())
-            {
-                // if (loc.getStatusCode() != 200)
-                    loc.methodGet();
-                // else
-                //     loc.methodPost();
-            }
-            close(loc.getFd());
-        }
-        close(sockfd);
+      std::string configueFile = av[1];
+      servers = Parser::paseConfigueFile(configueFile);
+	    multiplixer.start(servers);
     }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    return 0;
+    else
+    throw "please enter the configue file\n";
+
+  }
+  catch(const std::exception& e)
+  {
+      std::cerr << e.what() << '\n';
+  }
+  catch(std::string msgError)
+  {
+        std::cerr << msgError << '\n';
+  }
 }

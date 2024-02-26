@@ -14,13 +14,20 @@ NAME =	Webserv
 
 MAIN =  main.cpp 
 
-P_SRCS	= 	$(addprefix src/parsing/,$(SRCS))
+
+MULT = Multiplixer.cpp
+
+M_MULT = $(addprefix src/Multiplexer/,$(MULT))
+
+SRCS =  Parse.cpp Server.cpp Utils.cpp Location.cpp  Request.cpp
+
+P_SRCS	= 	$(addprefix src/Parser/,$(SRCS))
 
 SRC = getMethod.cpp methodHelp.cpp postMethod.cpp 
 
 M_SRCS	=	$(addprefix src/methods/,$(SRC))
 
-OBJS = $(MAIN:.cpp=.o) $(M_SRCS:.cpp=.o)
+OBJS = $(MAIN:.cpp=.o) $(M_SRCS:.cpp=.o) $(P_SRCS:.cpp=.o) $(M_MULT:.cpp=.o)
 
 CXX = c++
 

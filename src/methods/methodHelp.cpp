@@ -72,8 +72,8 @@ DIR* response::getDir(){
     return dir;
 }
 
-location response::getLocation(){
-    return loc;
+loc response::getLocation(){
+    return request.location;
 }
 
 std::map<std::string, std::string> response::getMime() {
@@ -180,15 +180,15 @@ void response::check_extention(std::string file)
 }
 
 bool    response::autoIndexCheck(){
-    if (loc.auto_index == "on")
+    if (request.location.auto_index == "on")
         return true;
     return false;
 }
 
 bool    response::allowedMethods()
 {
-    std::vector<std::string>::iterator it = this->loc.method.begin();
-    for(;it != this->loc.method.end(); it++){
+    std::vector<std::string>::iterator it = this->request.location.method.begin();
+    for(;it != this->request.location.method.end(); it++){
         if(*it == "GET" || *it == "POST" || *it == "DELETE")
         // std::cout << *it << std::endl;
             return true;
@@ -205,7 +205,7 @@ void    response::sendData()
                 throw std::runtime_error("Error: failed to open video ifile");
             std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " OK\r\n";
                 resHeader += "Content-Type: ";
-                resHeader += content_type;
+                resHeader += "video/mp4";
                 resHeader +="\r\n";
                 resHeader += "Transfer-Encoding: chunked\r\n";
                 resHeader += "\r\n";
@@ -232,5 +232,6 @@ void    response::sendData()
             send(fd, "0\r\n\r\n", 5, 0);
             ifile.close();
             close = 0;
+            flag = 30;
         }
 }

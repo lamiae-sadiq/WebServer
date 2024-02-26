@@ -11,31 +11,66 @@
 /* ************************************************************************** */
 
 #include "../../includes/response.hpp"
+#include "../../includes/Request.hpp"
 
+
+// void response::init()
+// {
+//     request.location.redirect_code = 200,
+//     request.location.index = "",
+//     request.location.root = "/nfs/homes/kel-baam/Desktop/newV";
+//     request.location.auto_index = "on",
+//     request.location.upload = "/upload",
+//     request.location.allowedUpload = true,
+//     request.location.location_name = "/",
+//     request.location.method.push_back("POST");
+//     request.location.method.push_back("GET");
+//     request.location.method.push_back("DELETE");
+
+//     this->target_url = "/webCuddler/body";
+//     fd = -1;
+//     this->status_code = 200;
+//     this->request.contentLength = 200000000000;
+//     close = true;
+// 	this->targetUri = "";
+//     this->uplod_type = "Chunk";
+//     flag = 0;
+//     this->ihex = 0;
+//     dir = NULL;
+// }
 
 std::map<std::string, std::string> response::_mime;
 response::~response(){}
 
+// void response::setRequest(Request initReq)
+// {
+// 	std::cout << "init REq\n";
+//     (void)initReq;
+// 	// request = initReq;
+//     init();
+			
+// }
 response::response(){
-    this->loc.return_ = 200,
-    this->loc.index = "",
-    this->uplod_type = "Chunk";
-    this->ihex = 0;
-    this->loc.auto_index = "on",
-    this->loc.upload = "/upload",
-    this->loc.allowedUpload = true,
-    this->loc.location_name = "/",
-    this->loc.root = "/nfs/homes/lsadiq/Desktop/new/src";
+    request.location.redirect_code = 200,
+    request.location.index = "",
+    request.location.root = "/nfs/homes/kel-baam/Desktop/newV";
+    request.location.auto_index = "on",
+    request.location.upload = "/upload",
+    request.location.allowedUpload = true,
+    request.location.location_name = "/",
+    request.location.method.push_back("POST");
+    request.location.method.push_back("GET");
+    request.location.method.push_back("DELETE");
+
     this->target_url = "/webCuddler/body";
-	this->targetUri = "";
-    this->status_code = 200;
-    this->loc.method.push_back("POST");
-    this->loc.method.push_back("GET");
-    this->loc.method.push_back("DELETE");
-    this->body_length = 200000000000;
     fd = -1;
+    this->status_code = 200;
+    this->request.contentLength = 200000000000;
     close = true;
+	this->targetUri = "";
+    this->uplod_type = "Chunk";
     flag = 0;
+    this->ihex = 0;
     dir = NULL;
 }
 
@@ -122,6 +157,7 @@ void response::handel_error() {
 
 void    response::methodGet()
 {
+    request.printREquest();
     if (status_code != 200)
     {
         handel_error();
@@ -129,7 +165,8 @@ void    response::methodGet()
     }
     if (flag == 0)
     {
-        targetUri = loc.root + target_url.substr(loc.location_name.size());
+        targetUri = request.location.root + target_url.substr(request.location.location_name.size());
+        targetUri = "/nfs/homes/kel-baam/Desktop/newV/vd.mp4";
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)
@@ -151,10 +188,10 @@ void    response::methodGet()
                         target_url.append("/");
                         return;
                     }
-                    if (!loc.index.empty() && (access((targetUri + loc.index).c_str(), F_OK | R_OK) == 0)) 
+                    if (!request.location.index.empty() && (access((targetUri + request.location.index).c_str(), F_OK | R_OK) == 0)) 
                     {
                         status_code = 301;
-                        target_url.append(loc.index);
+                        target_url.append(request.location.index);
                         // std::cout << targetUri << std::endl;
                         return;
                     }
