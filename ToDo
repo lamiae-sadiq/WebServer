@@ -1,0 +1,15 @@
+version======>HTTP/1.1
+url=======>/
+content_Type======>
+uplod_type======>length
+max_body_size ======>>>>0
+root ======>>>>
+index ======>>>>
+auto_index ======>>>>on
+upload ======>>>>/upload
+location_name ======>>>>/
+allowedUpload ======>>>>1
+redirect_path ======>>>>
+methods ======>>>>POST
+methods ======>>>>GET
+methods ======>>>>DELETE
