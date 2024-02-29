@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/23 18:05:09 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/29 18:33:40 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ class response
 		std::string		fileType;
 		std::string		body;
 		size_t chunkSize;
+		bool	lastChunk;
 		int ihex;
 	public :
 
@@ -77,9 +78,9 @@ class response
 		void	methodPost(const char *con, size_t size);
 		void	setFd(int fd)
 		{
-			if(i == 0)
-     			request.printREquest();
-			i = 1;
+			// if(i == 0)
+     		// 	request.printREquest();
+			// i = 1;
 			this->fd = fd;
 		};
 		bool    autoIndexCheck();
@@ -117,6 +118,10 @@ class response
 		void parsLength(const char *con, size_t& index, size_t size);
 		void parseChunk(const char *con, size_t& index, size_t size);
 		void	Delete();
+		void	deleteDir(std::string uri);
 		void init();
 		void executeMethodes(const char *buff,size_t size,int fd);
+		const std::string ErrorPage();
+		const std::string    setStatus(int status);
+		void ErrorHeader();
 };

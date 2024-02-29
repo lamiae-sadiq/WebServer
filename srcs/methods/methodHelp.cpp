@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/21 12:59:45 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/29 19:38:07 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ void    response::sendData()
                 throw std::runtime_error("Error: failed to open video ifile");
             std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " OK\r\n";
                 resHeader += "Content-Type: ";
-                resHeader += "text/html";
+                resHeader += content_type;
                 resHeader +="\r\n";
                 resHeader += "Transfer-Encoding: chunked\r\n";
                 resHeader += "\r\n";
@@ -222,16 +222,17 @@ void    response::sendData()
             ss << std::hex << bytesRead;
             std::string chunkSizeHex = ss.str();
             std::string chunkHeader = chunkSizeHex + "\r\n";
-            send(fd, chunkHeader.c_str(), chunkHeader.length(), 0);
-            send(fd, buffer, bytesRead, 0);
-            send(fd, "\r\n", 2, 0);
+            char concatenatedSends[chunkHeader.length() + bytesRead + 2];
+            memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
+            memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
+            memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
+            send(fd, concatenatedSends, chunkHeader.length() + bytesRead + 2, 0);
             if (ifile.eof())
                 flag = 4;
         }
         else if (flag == 4) {
             send(fd, "0\r\n\r\n", 5, 0);
             ifile.close();
-            close = 0;
             flag = 30;
         }
 }

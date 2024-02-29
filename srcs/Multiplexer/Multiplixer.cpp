@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/24 18:50:43 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/02/29 19:23:48 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ void Multiplixer::start(std::vector<Server> servers)
 				{
 					if(request.getStatus() == 1)
 					{
+							// responses[socketFd]->methodGet();
 							responses[socketFd]->executeMethodes(buff,byt,socketFd);
 							if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)
 							{

@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/24 15:19:00 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/29 16:34:08 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void response::parsLength(const char *con, size_t& index, size_t size)
         upfile.close();
         flag = 201;
         status_code = 201;
+        flag = 0;
     }
 }
 
@@ -82,6 +83,7 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 400;
+                flag = 0;
                 return;
             }
             if (con[index] != '\r')
@@ -95,13 +97,12 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 400;
+                flag = 0;
                 return;
             }
             if (chunkSize == 0)
             {
-                upfile.close();
-                status_code = 201;
-                return;
+                lastChunk = true;
             }
             flag = 3;
         }
@@ -113,6 +114,7 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 400;
+                flag = 0;
                 return;
             }
             index++;
@@ -126,6 +128,7 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 400;
+                flag = 0;
                 return;
             }
             index++;
@@ -157,6 +160,7 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 400;
+                flag = 0;
                 return;
             }
             index++;
@@ -170,6 +174,14 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 400;
+                flag = 0;
+                return;
+            }
+            if (lastChunk)
+            {
+                upfile.close();
+                status_code = 201;
+                flag = 0;
                 return;
             }
             index++;
@@ -181,11 +193,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 
 void    response::methodPost(const char *con, size_t size)
 {
- 
+    // if(!allowedMethods())
+    //         status_code = 405;
     if (flag == 0)
     {
         size_t index = 0;
-
         createFile();
         if (status_code == 403)
             return;
@@ -212,53 +224,6 @@ void    response::methodPost(const char *con, size_t size)
         parseChunk(con, index, size);
     }
     
-    // if(!allowedMethods())
-    //         status_code = 405;
-    // if (!checkUpload())
-    // {
-    //     if (access(getUploadFN().c_str(), F_OK | R_OK) == 0)
-    //     {
-    //         // targetUri = loc.root + target_url.substr(loc.location_name.size());
-    //         if(checkType(loc.upload) == FILE)
-    //         {
-    //             check_extention(loc.upload);
-    //             if (extention == "php" || extention == "py")
-    //                 std::cout << "its a cgi" << std::endl;
-    //             else
-    //             {
-    //                 std::remove(uploadFileNmae.c_str());
-    //                 status_code = 403;
-    //                 return ;
-    //             }
-    //         }
-    //         if (checkType(loc.upload) == DIRECTORY)
-    //         {
-    //             if (loc.upload[loc.upload.length() - 1] != '/')
-    //             {
-    //                 status_code = 301;
-    //                 target_url.append("/");
-    //                 std::remove(uploadFileNmae.c_str());
-    //                 return;
-    //             }
-    //             if (!loc.index.empty())
-    //             {
-    //                 std::remove(uploadFileNmae.c_str());
-    //                 status_code = 403;
-    //                 return ;
-    //             }
-    //         }
-    //         if (checkType(loc.upload) == NOT_FOUND)
-    //         {
-    //             std::remove(uploadFileNmae.c_str());
-    //             status_code = 403;
-    //             return ;
-    //         }
-    //     }
-    //     else
-    //         std::remove(getUploadFN().c_str());
-    // }
-    // else
-    //     status_code = 404;
 }
 
 std::string response::generateName()

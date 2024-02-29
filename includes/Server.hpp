@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:46:06 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/23 14:12:39 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/02/29 16:20:01 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,11 @@ class Server
         }
         void setServerData(std::string key ,std::vector<std::string> vec);
         std::vector<std::string> getServerData(std::string key);
-        void printLOcationINfo();
-        size_t directiveSize(std::string directive);
-        bool isValidBodySize(std::string size);
-        void checkServersError();
-        void locationAddBack();
+        void        printLOcationINfo();
+        size_t      directiveSize(std::string directive);
+        bool        isValidBodySize(std::string size);
+        void        checkServersError();
+        void        locationAddBack();
         static void checkErrorPages(std::vector<std::string> vec);
         static void checkServernameError(std::vector<std::string> serverName);
         static void checkPortError(std::vector<std::string> port);

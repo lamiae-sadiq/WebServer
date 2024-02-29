@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/24 17:51:06 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/02/29 19:45:46 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,11 +266,13 @@ int Request::matchLocation(std::string host,Server server)
 		{
 			locationName = server.getLocations()[j].getLocationData("location_name")[0];
 			countMatcher = LocationLongestPrefix(locationName, url);
+			// std::cout << locationName << "|||" << url << "|||" << countMatcher << "\n";
 			if(countMatcher > 0)
 			{
 				if(countMatcher > maxMatcher)
 				{
 					storeLocation(server,server.getLocations()[j]);
+					std::cout << "stoore done\n";
 					maxMatcher = countMatcher;
 				}
 				break;
@@ -296,7 +298,9 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 		servers = initServers;
 		if(analyseHeaders(buff))
 		{
+			// std::cout << "check\n";
 			matchServer();
+			// printREquest();
 			status = 1;
 			return 1;
 		}

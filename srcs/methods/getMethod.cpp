@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/24 17:48:50 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/29 19:46:42 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,29 +16,36 @@
 
 void response::init()
 {
-    // request.location.redirect_code = 200,
-    // request.location.index = "",
-    // request.location.root = "/nfs/homes/kel-baam/Desktop/WebServer-weirdo/srcs";
-    // request.location.auto_index = "on",
-    // request.location.upload = "/upload",
-    // request.location.allowedUpload = true,
-    // request.location.location_name = "/",
-    // request.location.method.push_back("POST");
-    // request.location.method.push_back("GET");
-    // request.location.method.push_back("DELETE");
+    request.location.redirect_code = 200,
+    request.location.index = "",
+    request.location.root = "/nfs/homes/lsadiq/Desktop/web/srcs";
+    request.location.auto_index = "on",
+    request.location.upload = "/upload",
+    request.location.allowedUpload = true,
+    request.location.location_name = "/",
+    request.location.method.push_back("POST");
+    request.location.method.push_back("GET");
+    request.location.method.push_back("DELETE");
 
     // this->target_url = "/webCuddler/body";
     fd = -1;
     this->status_code = 200;
-    this->request.contentLength = 200000000000;
+    // this->request.contentLength = 200000000000;
     close = true;
 	this->targetUri = "";
     this->uplod_type = "length";
     flag = 0;
     this->ihex = 0;
+    lastChunk = false;
     dir = NULL;
 }
 
+template <typename T>
+std::string to_string(T value) {
+    std::ostringstream os;
+    os << value;
+    return os.str();
+}
 
 response::response(Request& initRequest):request(initRequest)
 {
@@ -48,44 +55,7 @@ response::response(Request& initRequest):request(initRequest)
 std::map<std::string, std::string> response::_mime;
 response::~response(){}
 
-void response::executeMethodes(const char *buff,size_t size,int fd)
-{
-    // delete post get methods scop
 
-    //this cod here just for post cases 
-    setFd(fd);
-	if(request.getFirstReadBody())
-	{
-	    methodPost(request.tmpBuff.c_str(),request.tmpBuff.size());
-		request.setFirstReadOfBody(false);
-	}
-    else
-	    methodPost(buff, size);
-}
-		
-// response::response(){
-//     request.location.redirect_code = 200,
-//     request.location.index = "",
-//     request.location.root = "/nfs/homes/kel-baam/Desktop/newV";
-//     request.location.auto_index = "on",
-//     request.location.upload = "/upload",
-//     request.location.allowedUpload = true,
-//     request.location.location_name = "/",
-//     request.location.method.push_back("POST");
-//     request.location.method.push_back("GET");
-//     request.location.method.push_back("DELETE");
-
-//     this->target_url = "/webCuddler/body";
-//     fd = -1;
-//     this->status_code = 200;
-//     this->request.contentLength = 200000000000;
-//     close = true;
-// 	this->targetUri = "";
-//     this->uplod_type = "Chunk";
-//     flag = 0;
-//     this->ihex = 0;
-//     dir = NULL;
-// }
 
 void response::listDirectories()
 {
@@ -144,41 +114,110 @@ void response::listDirectories()
     }
     else if(flag == 10){
         send(fd, "0\r\n\r\n", 5, 0);
-        close = 0;
+        // close = 0;
     }
+}
+
+const std::string	response::setStatus(int status)
+{
+    switch (status)
+	{
+		case 200:
+			return "OK";
+		case 201:
+			return "Created";
+		case 204:
+			return "No Content";
+		case 301:
+			return "Moved Permanently";
+		case 403:
+			return "Forbidden";
+		case 404:
+			return "Not Found";
+		case 405:
+			return "Method Not Allowed";
+		case 500:
+			return "Internal Server Error";
+		case 501:
+			return "Not Implemented";
+		default:
+			return "Internal Server Error";
+	}
+}
+
+const std::string response::ErrorPage() {
+    return ("<html lang=\"en\">\n"
+            "<head>\n"
+            "<meta charset=\"UTF-8\">\n"
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+            "<title>WebServe</title>\n"
+            "<style>\n"
+            "body {\n"
+            "    margin: 0;\n"
+            "    padding: 0;\n"
+            "    height: 90vh;\n"
+            "    background-image: url('https://64.media.tumblr.com/da82730a16d6b909da5d35044a4bafd1/tumblr_mr22e5xg0X1qbaxlqo1_400.gifv');\n"
+            "    background-size: 2200px 1050px;\n"
+            "    background-repeat: no-repeat;\n"
+            "    background-attachment: fixed;\n"
+            "    display: flex;\n"
+            "    justify-content: center;\n"
+            "    align-items: center;\n"
+            "}\n"
+            ".message {\n"
+            "    font-size: 100px;\n"
+            "    font-family: Fancopltasy, sans-serif;\n"
+            "    color: hsl(217, 46%, 37%);\n"
+            "    text-align: center;\n"
+            "    text-shadow: 2px 2px 4px #000000;\n"
+            "    font-weight: bold;\n"
+            "}\n"
+            "</style>\n"
+            "</head>\n"
+            "<body>\n"
+            "<div class=\"message\">" + to_string(status_code) +"</span> "+ setStatus(status_code) +"</div>\n"
+            "</body>\n"
+            "</html>\n");
+}
+
+void response::ErrorHeader()
+{
+	// std::cout << status_code << setStatus(status_code) <<std::endl;
+    const std::string errorPage = ErrorPage();
+        std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
+        header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
+		header.append(to_string(errorPage.length()));
+        header += "\r\n\r\n";
+        header.append(errorPage);
+        send(fd, header.c_str(), header.length(), 0);
+    // close = 0;
+	flag = 30;
 }
 
 void response::handel_error() {
-    if (status_code == 404)
-        send(fd, "HTTP/1.1 404 not found\r\nContent-Type: text/html\r\nContent-length:  19\r\n\r\n<h1>not found</h1>\n", 92, 0);
-    else if (status_code == 403)
-        send(fd, "HTTP/1.1 403 forbeiden\r\nContent-Type: text/html\r\nContent-length:  19\r\n\r\n<h1>forbeiden</h1>\n", 92, 0);
-    else if (status_code == 301)
-        send(fd, "HTTP/1.1 301 moved permanently\r\nContent-Type: text/html\r\nContent-length:  26\r\n\r\n<h1>moved permanently</h1>\n", 108, 0);
-    else if (status_code == 405)
-        send(fd, "HTTP/1.1 405 method not allowed\r\nContent-Type: text/html\r\nContent-length:  27\r\n\r\n<h1>method not allowed</h1>\n", 110, 0);
-    else if (status_code == 500)
-        send(fd, "HTTP/1.1 500 server do\r\nContent-Type: text/html\r\nContent-length:  19\r\n\r\n<h1>server do</h1>\n", 92, 0);
-    else if (status_code == 501)
-        send(fd, "HTTP/1.1 501 not implemented\r\nContent-Type: text/html\r\nContent-length:  24\r\n\r\n<h1>not implemented</h1>\n", 104, 0);
-    else
-        send(fd, "HTTP/1.1 500 server do\r\nContent-Type: text/html\r\nContent-length:  19\r\n\r\n<h1>server do</h1>\n", 92, 0);
-    close = 0;
+    switch(status_code){
+		case 301: ErrorHeader();
+		case 201: ErrorHeader();
+		case 403: ErrorHeader();
+		case 404: ErrorHeader();
+		case 405: ErrorHeader();
+		case 500: ErrorHeader();
+		case 501: ErrorHeader();
+		case 204: ErrorHeader();
+    }
 }
-
-
 
 void    response::methodGet()
 {
-    if (status_code != 200)
-    {
-        handel_error();
-        return;
-    }
     if (flag == 0)
     { 
+        if (status_code != 200)
+        {
+            handel_error();
+            return;
+        }
         targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
-        //  std::cout << "targeruri" <<targetUri <<"\n";
+        std::cout << "targetUri   " << targetUri << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)

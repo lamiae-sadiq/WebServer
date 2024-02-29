@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/22 15:10:07 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/02/29 16:17:14 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 Server::Server()
 {
     error_pages["404"] = "../errorPages/404.html";
-    error_pages["405"] = "../errorPages/404.html";
-    error_pages["301"] = "../errorPages/404.html";
-    error_pages["500"] = "../errorPages/404.html";
-    error_pages["501"] = "../errorPages/404.html";
+    error_pages["405"] = "../errorPages/405.html";
+    error_pages["301"] = "../errorPages/301.html";
+    error_pages["500"] = "../errorPages/500.html";
+    error_pages["501"] = "../errorPages/501.html";
 }
 
 void Server::setServerData(std::string key ,std::vector<std::string> vec)
