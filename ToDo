@@ -13,3 +13,18 @@ redirect_path ======>>>>
 methods ======>>>>POST
 methods ======>>>>GET
 methods ======>>>>DELETE
+
+
+redirect code 299<   >308
+
+
+User-Agent: PostmanRuntime/7.36.1
+Accept: */*
+Postman-Token: 2479d4c2-65eb-4253-84a6-8c74a378e901
+Host: localhost:8080
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 4806339
+Content-Type: video/mp4
+
+

@@ -17,10 +17,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <map>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 typedef struct loc
 {
-	int							max_body_size;
+	unsigned long long							max_body_size;
 	std::string 				root;
 	std::string 				index;
 	std::string 				auto_index;
@@ -47,6 +50,7 @@ class Request
 		int isDone;
 		int status;
 		int countHeaders;
+		bool firstReadOfBody;
 	public:
 		std::string tmpBuff;
 		loc location;
@@ -57,7 +61,14 @@ class Request
 		// {
 		// 	return tmpBuff;
 		// }
-
+		bool getFirstReadBody()
+		{
+			return firstReadOfBody;
+		}
+		void setFirstReadOfBody(bool init)
+		{
+			firstReadOfBody = init;
+		}
 		loc getLocation();
 		void setHeader(std::string &key,std::string &value);
 		std::string getHeader(std::string key);
@@ -70,8 +81,8 @@ class Request
 		void setMethod(std::string initVar);
 		void setUrl(std::string initVar);
 		void setVersion(std::string initVar);
-		int parseHeaders(std::string buff,std::vector<Server> servers);
-		void analyseHeaders(std::string buff);
+		int parseHeaders(std::string buff,std::vector<Server> initServers);
+		int analyseHeaders(std::string buff);
 		void storeRequest(std::string line);
 		void storeHostHeader(std::string line);
 		void matchServer();

@@ -14,7 +14,7 @@ txt;text/plain
 jad;text/vnd.sun.j2me.app-descriptor                 
 wml;text/vnd.wap.wml                                 
 htc;text/x-component                                 
-avif;image/avif                               
+avif;image/avif               
 png;image/png                                        
 svgz;image/svg+xml
 svg;image/svg+xml                                    

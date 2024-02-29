@@ -74,12 +74,12 @@ class response
 		response(Request& initRequest);
 		~response();
 		void	methodGet();
-		void	methodPost(std::string buff);
+		void	methodPost(const char *con, size_t size);
 		void	setFd(int fd)
 		{
-			// if(i == 0)
-     		// 	request.printREquest();
-			// i = 1;
+			if(i == 0)
+     			request.printREquest();
+			i = 1;
 			this->fd = fd;
 		};
 		bool    autoIndexCheck();
@@ -101,6 +101,7 @@ class response
 		std::string getExtension();
 		std::string	getUploadFN();
 		void setRequest(Request initReq);
+
 		int getFlag();
 		int getStatusCode();
 		int getFd();
@@ -113,8 +114,9 @@ class response
 		std::map<std::string, std::string> getMime();
 		void createFile();
 		std::string	generateName();
-		void parsLength(char *con, size_t& index, size_t size);
-		void parseChunk(char *con, size_t& index, size_t size);
+		void parsLength(const char *con, size_t& index, size_t size);
+		void parseChunk(const char *con, size_t& index, size_t size);
 		void	Delete();
 		void init();
+		void executeMethodes(const char *buff,size_t size,int fd);
 };
