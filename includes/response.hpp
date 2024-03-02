@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/29 18:33:40 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/02 14:17:28 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 #include <sstream>
 #include <map>
 #include "Request.hpp"
+#include "Server.hpp"
 
 #define PORT 8080
 
@@ -40,6 +41,8 @@
 #define FORBIDDEN -2
 		static int i = 0;
 
+
+// class server;
 class response
 {
 	private :
@@ -67,11 +70,12 @@ class response
 		std::string		body;
 		size_t chunkSize;
 		bool	lastChunk;
+		std::ifstream 	infile;
 		int ihex;
 	public :
 
 		//response()
-	
+		Server serv;
 		response(Request& initRequest);
 		~response();
 		void	methodGet();
@@ -124,4 +128,6 @@ class response
 		const std::string ErrorPage();
 		const std::string    setStatus(int status);
 		void ErrorHeader();
+		std::string getErrorPage();
+		void    sendErrorPage();
 };

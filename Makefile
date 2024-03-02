@@ -6,7 +6,7 @@
 #    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/02/29 19:15:55 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/03/02 17:24:27 by lsadiq           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ ITALIC	=	'\033[3m'
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-			@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+			@ $(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 			@echo $(GRAY) "Compiled $(NAME)..." $(NONE)
 
 clean :

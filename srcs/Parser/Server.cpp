@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/29 16:17:14 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/02 15:21:14 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,16 @@
 
 Server::Server()
 {
-    error_pages["404"] = "../errorPages/404.html";
-    error_pages["405"] = "../errorPages/405.html";
-    error_pages["301"] = "../errorPages/301.html";
-    error_pages["500"] = "../errorPages/500.html";
-    error_pages["501"] = "../errorPages/501.html";
+    error_pages[404] = "/nfs/homes/lsadiq/Desktop/web/srcs/errorPages/404.html";
+    // error_pages[405] = "../errorPages/405.html";
+    // error_pages[301] = "../errorPages/301.html";
+    // error_pages[500] = "../errorPages/500.html";
+    // error_pages[501] = "../errorPages/501.html";
+}
+
+std::map<int, std::string> Server::getErrorPage()
+{
+    return this->error_pages;
 }
 
 void Server::setServerData(std::string key ,std::vector<std::string> vec)
@@ -30,7 +35,7 @@ void Server::setServerData(std::string key ,std::vector<std::string> vec)
         serverData[key].insert(serverData[key].end(),vec.begin(),vec.end()); 
     }
     else
-        error_pages[vec[0]] = vec[1]; 
+        error_pages[atoi(vec[0].c_str())] = vec[1]; 
 }
 
 void Server::locationAddBack()

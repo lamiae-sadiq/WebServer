@@ -6,13 +6,16 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/29 19:23:48 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/02 17:13:58 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Multiplixer.hpp"
 #include "../../includes/response.hpp"
 #include <algorithm>
+
+#include <csignal>
+
 void Multiplixer::add_event(int epo,int sockfd,epoll_event *event, int flag)
 {
 	if(!flag)
@@ -115,6 +118,7 @@ void Multiplixer::start(std::vector<Server> servers)
 	CreateNetwork(epo,servers);
 	while(1)
 	{
+		signal(SIGPIPE, SIG_IGN);
 		readyFiles = epoll_wait(epo,events,MAX_EVENTS,-1);
 
 		for(size_t i = 0; i < readyFiles;++i)

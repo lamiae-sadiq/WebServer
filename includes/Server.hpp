@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:46:06 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/29 16:20:01 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/02 11:57:07 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@ typedef std::map<std::string,std::vector<std::string> > mapOfVectors;
 class Server
 {
         mapOfVectors serverData;
-        std::map<std::string, std::string> error_pages;
+        std::map<int, std::string> error_pages;
         int countServerData;
         std::vector<Location> locations;
     public:
         Server();
         ~Server(){};
+        std::map<int, std::string> getErrorPage();
         size_t getSizeServerData()
         {
             return serverData.size();

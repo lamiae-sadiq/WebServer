@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/29 19:38:07 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/02 17:20:59 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,11 +169,15 @@ int response::checkType(std::string path)
 
 void response::check_extention(std::string file)
 {
+    fillMime();
     std::string::size_type idx;
     idx = file.rfind('.');
     if (idx != std::string::npos){
         extention = file.substr(idx + 1);
+        std::cout << "extention: " << extention << std::endl;
+        std::cout << _mime[extention] << std::endl;
         fileType =  _mime[extention];
+        std::cout << "fileType: " << fileType << std::endl;
     }
     else
         fileType = "text/plain";
@@ -201,15 +205,18 @@ void    response::sendData()
     if (flag == 2)
         {
             ifile.open(targetUri.c_str());
-            if (!ifile.is_open())
-                throw std::runtime_error("Error: failed to open video ifile");
-            std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " OK\r\n";
-                resHeader += "Content-Type: ";
+            if (ifile.bad())
+                std::cout << "Error: failed to open video ifile" << std::endl;
+            // if (!ifile.is_open())
+                // throw std::runtime_error("Error: failed to open video ifile");
+            std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
+                resHeader += "\r\nContent-Type: ";
                 resHeader += content_type;
                 resHeader +="\r\n";
                 resHeader += "Transfer-Encoding: chunked\r\n";
                 resHeader += "\r\n";
-            send(fd, resHeader.c_str(), resHeader.length(), 0);
+            std::cout << resHeader << std::endl;
+             send(fd, resHeader.c_str(), resHeader.length(), 0);
             flag = 3;
         }
         else if (flag == 3)
@@ -226,7 +233,7 @@ void    response::sendData()
             memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
             memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
             memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-            send(fd, concatenatedSends, chunkHeader.length() + bytesRead + 2, 0);
+            write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
             if (ifile.eof())
                 flag = 4;
         }

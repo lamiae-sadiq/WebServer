@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/29 19:46:42 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/02 17:21:56 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 
 void response::init()
 {
-    request.location.redirect_code = 200,
-    request.location.index = "",
-    request.location.root = "/nfs/homes/lsadiq/Desktop/web/srcs";
-    request.location.auto_index = "on",
-    request.location.upload = "/upload",
-    request.location.allowedUpload = true,
-    request.location.location_name = "/",
-    request.location.method.push_back("POST");
-    request.location.method.push_back("GET");
-    request.location.method.push_back("DELETE");
+    // request.location.redirect_code = 200,
+    // request.location.index = "",
+    // request.location.root = "/nfs/homes/lsadiq/Desktop/web/srcs";
+    // request.location.auto_index = "on",
+    // request.location.upload = "/upload",
+    // request.location.allowedUpload = true,
+    // request.location.location_name = "/",
+    // request.location.method.push_back("POST");
+    // request.location.method.push_back("GET");
+    // request.location.method.push_back("DELETE");
 
     // this->target_url = "/webCuddler/body";
     fd = -1;
@@ -140,6 +140,8 @@ const std::string	response::setStatus(int status)
 			return "Internal Server Error";
 		case 501:
 			return "Not Implemented";
+        case 400:
+            return "Bad request ";
 		default:
 			return "Internal Server Error";
 	}
@@ -180,9 +182,33 @@ const std::string response::ErrorPage() {
             "</html>\n");
 }
 
+std::string response::getErrorPage() {
+    if (serv.getErrorPage().find(status_code) != serv.getErrorPage().end()) {
+        // std::cout << serv.getErrorPage()[status_code] << std::endl;
+        return serv.getErrorPage()[status_code];
+        // std::string headererr = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
+        // headererr.append("\r\nContent-Type: text/html\r\nContent-length:  ");
+        // headererr.append(to_string(serv.getErrorPage()[statusCode].length()));
+        // headererr += "\r\n\r\n";
+        // headererr.append(serv.getErrorPage()[statusCode]);
+    }
+    return "404";
+}
+
+void response::sendErrorPage()
+{
+    targetUri = serv.getErrorPage()[status_code];
+    if(access(targetUri.c_str(), R_OK | W_OK) == 0)
+    {
+        flag = 2;
+        sendData();
+    }
+    else
+        ErrorHeader();
+}
+
 void response::ErrorHeader()
 {
-	// std::cout << status_code << setStatus(status_code) <<std::endl;
     const std::string errorPage = ErrorPage();
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
@@ -190,13 +216,13 @@ void response::ErrorHeader()
         header += "\r\n\r\n";
         header.append(errorPage);
         send(fd, header.c_str(), header.length(), 0);
-    // close = 0;
 	flag = 30;
 }
 
 void response::handel_error() {
     switch(status_code){
 		case 301: ErrorHeader();
+        case 400: ErrorHeader();
 		case 201: ErrorHeader();
 		case 403: ErrorHeader();
 		case 404: ErrorHeader();
@@ -206,6 +232,7 @@ void response::handel_error() {
 		case 204: ErrorHeader();
     }
 }
+
 
 void    response::methodGet()
 {

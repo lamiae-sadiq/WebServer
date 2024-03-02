@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/29 16:34:08 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/01 15:26:15 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,8 @@ void    response::createFile()
     if (request.location.upload[0] == '/')
 		request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1){
-        std::string UplDir = request.location.root + "/" + request.location.upload;
+        // std::string UplDir = request.location.root + "/" + request.location.upload;
+        std::string UplDir = request.location.root +  request.location.upload;
         std::cout << "ROOT "<< request.location.root << std::endl;
 
         std::cout <<"UPLOAD  " <<UplDir << std::endl;
@@ -254,7 +255,7 @@ void    response::createFile()
         check_extention(uploadFileNmae);
         //i need content type to create the file
         content_type = fileType;
-        extention = "jpg";
+        extention = "mp4";
         // std::cout << UplDir +"/" + randName + "." + extention << std::endl;
         upfile.open((UplDir+"/" + randName + "." + extention).c_str());
         if (upfile.is_open() == false) 

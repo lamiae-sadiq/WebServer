@@ -15,7 +15,7 @@ methods ======>>>>GET
 methods ======>>>>DELETE
 
 
-redirect code 299<   >308
+redirect code 299<   >308     
 
 
 User-Agent: PostmanRuntime/7.36.1
@@ -26,5 +26,10 @@ Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
 Content-Length: 4806339
 Content-Type: video/mp4
+
+
+
+
+redirect 
 
 
