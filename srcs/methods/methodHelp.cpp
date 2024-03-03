@@ -215,7 +215,6 @@ void    response::sendData()
                 resHeader +="\r\n";
                 resHeader += "Transfer-Encoding: chunked\r\n";
                 resHeader += "\r\n";
-            std::cout << resHeader << std::endl;
              send(fd, resHeader.c_str(), resHeader.length(), 0);
             flag = 3;
         }

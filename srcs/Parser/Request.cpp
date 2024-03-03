@@ -13,11 +13,21 @@
 #include "../../includes/Request.hpp"
 
 
+
 Request::Request()
 {
+	location.max_body_size = 0;
+	location.redirect_code = 0;
+	location.auto_index = "off";
+	location.index = "";
+	location.allowedUpload = false;
+	location.upload = "";
+	location.location_name = "";
+	location.redirect_path = "";
 	tmpBuff = "";
+	host = "";
+	method = "";
 	countHeaders = 0;
-	isDone = 0;
 	status = 0;
 	uplod_type ="";
 	content_Type ="";
@@ -35,6 +45,7 @@ void Request::setHeader(std::string &key,std::string &value)
 {
 	headers[key] = value;
 }
+
 int Request::getStatus()
 {
 	return status;
@@ -54,44 +65,79 @@ std::string Request::getUrl()
 {
 	return url;
 }
-
+std::string Request::getUploadType()
+{
+	return uplod_type;
+}
 std::string Request::getVersion()
 {
 	return version;
 }
-
+bool Request::getFirstReadBody()
+{
+	return firstReadOfBody;
+}
 size_t Request::getContentLength()
 {
 	return contentLength;
 }
 
-void Request::setMethod(std::string initVar)
-{
-	method = initVar;
-}
 
+void Request::setFirstReadOfBody(bool init)
+{
+	firstReadOfBody = init;
+}
 void Request::setUrl(std::string initVar)
 {
+	if(initVar[0] != '/')
+		throw 400;
 	url = initVar;
 }
 
-void Request::setVersion(std::string initVar)
+
+void Request::checkVersion(std::string &version)
 {
+	std::string versionNum;
+	size_t index ;
+
+	index = version.find("HTTP/");
+	if(index != std::string::npos)
+		versionNum = version.substr(index+5);
+	if(index != 0 || !Utils::isInteger(versionNum) || version.length() <= 5 || std::count(versionNum.begin(),versionNum.end(),'.') > 1)
+		throw 400;	
+	if(versionNum != "1.1")
+		throw 505;
+}
+
+void Request::setVersion(std::string &initVar)
+{
+	checkVersion(initVar);
 	version = initVar;
 }
 
+void Request::checkMethods(std::string method)
+{
+	const char *methods[] ={"GET","POST","DELETE","PUT","PATCH","HEAD","OPTIONS","TRACE","CONNECT"};
+	std::vector<std::string> copyMethods(methods, methods + sizeof(methods) / sizeof(methods[0]));
 
+	if(!std::count(copyMethods.begin(), copyMethods.end(),method))
+		throw 400; //400 bad request
+	if(method != methods[0] && method != methods[1] && method != methods[2])
+		throw 501;
+
+}
+void Request::setMethod(std::string &initVar)
+{
+	checkMethods(initVar);
+	method = initVar;
+}
 void Request::storeRequestLineInfo(std::vector<std::string> vec)
 {
-	// std::cout << vec[0] << std::endl;
-	// if(vec.size() != 3)
-	// 	throw headerError(); // maybe i should send you a notif to know what error you should display
+	if(vec.size() != 3)
+		throw 400; //400
 	setMethod(vec[0]);
-	// unimplemetnted method or bad request
 	setUrl(vec[1]);
-	// check if there is /
 	setVersion(vec[2]);
-	// check if HTTP/1.1
 }
 
 		
@@ -109,11 +155,33 @@ void Request::storeHostHeader(std::string line)
 		host = line;
 }
 
+void Request::checkTransferEncoding(std::string value)
+{
+	Utils::skipSpaces(value);
+	if(value != "chunked")
+		throw 501; //to be checked
+	uplod_type =  "Chunk";
+}
+void Request::checkContentLength(std::string length)
+{
+	Utils::skipSpaces(length);
+	if(!Utils::isInteger(length))
+		throw 400;
+	contentLength = atol(length.c_str());
+	uplod_type ="length";
+}
+
+void	Request::chekHeaderError(std::string key)
+{
+	if(key.find_first_of(" \t")!= std::string::npos)
+		throw 400;
+}
+ 	
 void Request::storeRequest(std::string line)
 {
-	Utils::skipSpaces(line);
 	size_t index = line.find(":");
 	std::string key = line;
+
 	if(!countHeaders)
 	{
 	 	storeRequestLineInfo(Utils::splitString(line,' '));
@@ -125,24 +193,17 @@ void Request::storeRequest(std::string line)
 		key = line.substr(0,index);
 		line = line.substr(index+1);
 	}
+	chekHeaderError(key);
 	if(key == "Host")
 		storeHostHeader(line);
 	else if(key == "Content-Length")
-	{
-		uplod_type ="length";
-		contentLength = atoi(line.c_str());
-	}
-	if(key == "Content-Type")
-	{
+		checkContentLength(line);
+	if(key == "Content-Type") // what should i chek here
 		content_Type = line;
-	}
-	else if(key == "Transfer-Encoding" && line == "chunked") // i should check if is transfer encoding but not chunked
-		uplod_type = "Chunk";
-	// else if(key == )
-	//check headers key : value
+	else if(key == "Transfer-Encoding") // i should check if is transfer encoding but not chunked
+		checkTransferEncoding(line);
 	//setHeader(key,line);
 }
-
 
 
 
@@ -156,7 +217,8 @@ int Request::analyseHeaders(std::string buff)
 	str = requests;
 	if(startBody != std::string::npos)
 		str = std::string(requests,0,startBody + 4);
-	while(index != std::string::npos)
+
+ 	while(index != std::string::npos)
 	{
 		index = str.find("\r\n");
 		if(index != std::string::npos)
@@ -182,31 +244,30 @@ int Request::analyseHeaders(std::string buff)
 	return 0;
 }
 
-std::string Request::checkemptyData(std::vector<std::string> vec,int index)
-{
-	if(!vec.empty())
-	{
-		return vec[index];
-	}
-	return "";
-}
+
 void Request::storeLocation(Server &server, Location iniLocation)
 {
-	// error pages
-	location.redirect_code = atoi(checkemptyData(iniLocation.getLocationData("return"),0).c_str());
-	location.redirect_path = checkemptyData(iniLocation.getLocationData("return"),1);
-	location.max_body_size = atoi(server.getServerData("client_max_body_size")[0].c_str());
-	location.root =	checkemptyData(iniLocation.getLocationData("root"),0);
-	location.index =  checkemptyData(iniLocation.getLocationData("index"),0);
-	location.auto_index = checkemptyData(iniLocation.getLocationData("autoindex"),0);
-	location.upload = checkemptyData(iniLocation.getLocationData("upload"),0);
-	location.location_name =  checkemptyData(iniLocation.getLocationData("location_name"),0);
-	location.method =  iniLocation.getLocationData("http_methods");
+	
+	if(iniLocation.getLocationData("return").size() == 1)
+		location.redirect_code = atoi(iniLocation.getLocationData("return")[0].c_str());
+	if(iniLocation.getLocationData("return").size() == 2)
+		location.redirect_path = iniLocation.getLocationData("return")[1];
+	if(!server.getServerData("client_max_body_size")[0].empty())
+		location.max_body_size = atol(server.getServerData("client_max_body_size")[0].c_str());
+	if(iniLocation.getLocationData("root").size() == 1)
+		location.root =	iniLocation.getLocationData("root")[0];
+	if(iniLocation.getLocationData("index").size() == 1)
+		location.index =  iniLocation.getLocationData("index")[0];
+	if(iniLocation.getLocationData("autoindex").size() == 1)
+		location.auto_index =  iniLocation.getLocationData("autoindex")[0];
+	if(iniLocation.getLocationData("upload").size() == 1)
+		location.upload = iniLocation.getLocationData("upload")[0];
+	if(iniLocation.getLocationData("location_name").size() == 1)
+		location.location_name = iniLocation.getLocationData("location_name")[0];
+	if(iniLocation.getLocationData("http_methods").size() > 0)
+		location.method =  iniLocation.getLocationData("http_methods");
 	if(!(iniLocation.getLocationData("allowedUpload").empty()) &&  iniLocation.getLocationData("allowedUpload")[0] == "on")
 		location.allowedUpload = true;
-	else
-		location.allowedUpload = false;
-
 }
 
 void  Request::printREquest()
@@ -266,13 +327,11 @@ int Request::matchLocation(std::string host,Server server)
 		{
 			locationName = server.getLocations()[j].getLocationData("location_name")[0];
 			countMatcher = LocationLongestPrefix(locationName, url);
-			// std::cout << locationName << "|||" << url << "|||" << countMatcher << "\n";
 			if(countMatcher > 0)
 			{
 				if(countMatcher > maxMatcher)
 				{
 					storeLocation(server,server.getLocations()[j]);
-					std::cout << "stoore done\n";
 					maxMatcher = countMatcher;
 				}
 				break;
@@ -291,19 +350,29 @@ void Request::matchServer()
 	}
 }
 
+
 int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 {
-	if(!status)
+	try
 	{
-		servers = initServers;
-		if(analyseHeaders(buff))
+		if(!status)
 		{
-			// std::cout << "check\n";
-			matchServer();
-			// printREquest();
-			status = 1;
-			return 1;
+			servers = initServers;
+			if(analyseHeaders(buff))
+			{
+				matchServer();
+				if(host.empty())
+					throw 404;
+				printREquest();
+				status = 1;
+				return 1;
+			}
 		}
+	}
+	catch(int statusCode)
+	{
+		status = 1;
+		return statusCode;
 	}
 	return 1;
 }

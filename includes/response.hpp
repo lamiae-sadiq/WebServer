@@ -87,6 +87,11 @@ class response
 			// i = 1;
 			this->fd = fd;
 		};
+		void setStatusCode(int initCode)
+		{
+			status_code = initCode;
+		}
+
 		bool    autoIndexCheck();
 		bool    allowedMethods();
 		bool    checkUpload();

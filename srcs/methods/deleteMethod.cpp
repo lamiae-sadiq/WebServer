@@ -51,8 +51,7 @@ void	response::deleteDir(std::string uri)
 
 void	response::Delete()
 {
-	// this->targetUri = "/nfs/homes/lsadiq/Desktop/web/srcs/upload";
-		std::cout << "targetUri   " << targetUri << std::endl;
+	std::cout << "targetUri   " << targetUri << std::endl;
 	if (access(this->targetUri.c_str(), F_OK) == 0)
 	{
 		if (checkType(targetUri) == FILE)

@@ -113,7 +113,7 @@ void Multiplixer::start(std::vector<Server> servers)
 	int epo;
 	char buff[1024];
 	
-					int k;
+	int code;
 	int byt;
 	CreateNetwork(epo,servers);
 	while(1)
@@ -136,16 +136,19 @@ void Multiplixer::start(std::vector<Server> servers)
 				Request &request = *(requests[socketFd]);
 				if((events[i].events & EPOLLIN ))
 				{
-					byt = read(socketFd,buff,1023);	
-					k = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
-					(void)k;
-
+					byt = read(socketFd,buff,1023);
+					code = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
+				
+					if(code!=1)
+					{	
+						std::cout <<"mult"<< code << "\n";
+						responses[socketFd]->setStatusCode(code);
+					}
 				}
 				if((events[i].events & EPOLLOUT))
 				{
 					if(request.getStatus() == 1)
 					{
-							// responses[socketFd]->methodGet();
 							responses[socketFd]->executeMethodes(buff,byt,socketFd);
 							if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)
 							{
@@ -153,8 +156,11 @@ void Multiplixer::start(std::vector<Server> servers)
 									throw networkError();
 								close(socketFd);
 								std::cout << "respone sent to  " << socketFd << "is done" << std::endl;
+								delete (responses[socketFd]);
+								delete (requests[socketFd]);
 								responses.erase(socketFd);
 								requests.erase(socketFd);
+								// return;
 							}
 					}
 				}

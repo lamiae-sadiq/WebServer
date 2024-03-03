@@ -29,5 +29,6 @@ class Utils
 		static int  countTabulation(std::string &line);
 		static void skipSpaces(std::string &line);
 		static int isWhitSpaces(int a);
+		static bool isInteger(std::string num);
 	
 };

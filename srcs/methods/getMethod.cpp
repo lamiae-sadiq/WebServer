@@ -33,7 +33,7 @@ void response::init()
     // this->request.contentLength = 200000000000;
     close = true;
 	this->targetUri = "";
-    this->uplod_type = "length";
+    // this->uplod_type = "length";
     flag = 0;
     this->ihex = 0;
     lastChunk = false;
@@ -142,6 +142,8 @@ const std::string	response::setStatus(int status)
 			return "Not Implemented";
         case 400:
             return "Bad request ";
+        case 505:
+            return "HTTP Version Not Supported";
 		default:
 			return "Internal Server Error";
 	}
@@ -209,6 +211,7 @@ void response::sendErrorPage()
 
 void response::ErrorHeader()
 {
+    std::cout << "check" << status_code <<"\n";
     const std::string errorPage = ErrorPage();
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nContent-Type: text/html\r\nContent-length:  ");

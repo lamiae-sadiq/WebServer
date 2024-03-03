@@ -14,7 +14,7 @@
 
 Server::Server()
 {
-    error_pages[404] = "/nfs/homes/lsadiq/Desktop/web/srcs/errorPages/404.html";
+    error_pages[404] = "/nfs/homes/kel-baam/Desktop/kel/srcs/errorPages/404.html";
     // error_pages[405] = "../errorPages/405.html";
     // error_pages[301] = "../errorPages/301.html";
     // error_pages[500] = "../errorPages/500.html";
@@ -99,7 +99,7 @@ void Server::checkPortError(std::vector<std::string> port)
     size_t len = port[0].length();
     size_t index = port[0].find_first_not_of("0123456789");
     
-    if(port.size() > 1)
+    if(port.size() != 1)
         throw portError();
     if(index!= std::string::npos ||  len > 5 || port[0][0] == '-' < 0 || atoi(port[0].c_str()) > 65535)
         throw portError();
@@ -110,7 +110,7 @@ void Server::checkHostError(std::vector<std::string> host)
     std::vector<std::string> nums;
     size_t index;
 
-    if(host.size() > 1 || std::count(host[0].begin(),host[0].end(),'.') > 3)
+    if(host.size() != 1 || std::count(host[0].begin(),host[0].end(),'.') > 3)
         throw HostError();
     if(host[0] == "localhost" )
         return;
@@ -126,7 +126,7 @@ void Server::checkHostError(std::vector<std::string> host)
 // check what num in units and ovwrflow
 void Server::checkClientMaxBody(std::vector<std::string> bodySize)
 {
-    if(bodySize.size() > 1 || bodySize[0][0] =='-')
+    if(bodySize.size() != 1 || bodySize[0][0] =='-')
         throw ClientMaxBodyError();
     // for(size_t i = 0; i < bodySize.size();i++)
     // {
@@ -139,19 +139,21 @@ void Server::checkClientMaxBody(std::vector<std::string> bodySize)
 //is i should check forn another valid caracter
 void Server::checkServernameError(std::vector<std::string> serverName)
 {
-    if(serverName.size() > 1)
+    if(serverName.size() != 1)
         throw serverNameError();
 }
 // is should i check this
 
 void Server::checkErrorPages(std::vector<std::string> vec)
 {
-    if(vec.size() > 2)
+    if(vec.size() != 2 ) // negative
         throw errorPages();
+    
 }
 
 void Server::checkServersError(std::string directive, std::vector<std::string> vec,int countTabulation)
 { 
+    (void)countTabulation;
     if(countTabulation != 1)
         throw  ConfigueFileError();
     if(directive == "error_page")

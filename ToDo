@@ -33,3 +33,23 @@ Content-Type: video/mp4
 redirect 
 
 
+
+GET ///// HTTP/1.1 //TO CHECK
+i should skip spaces in the headers or not 
+
+spaces in the key like 
+|hello:                nop|
+|hello : nop|
+|contentlength: nop|
+
+|HTTP/1| ==> HTTP VERSION NOT SUPORTED 505 
+
+he Content-Length header must appear exactly once in a request.
+
+heeelo
+content-lenght 
+
+	
+
+
+if i did localhost:9090/ he display forbidden

@@ -14,14 +14,14 @@
 
 void response::executeMethodes(const char *buff,size_t size,int fd)
 {
+    setFd(fd);
     if (status_code != 200 && flag == 0){
         // handel_error();
+        std::cout << "check error flags" << status_code << "\n";
         getErrorPage();
         sendErrorPage();
         // std::cout << "Error page sent" << std::endl;
-        return;
     }
-    setFd(fd);
     if (request.getMethod() == "GET")
         methodGet();
     else if (request.getMethod() == "DELETE")

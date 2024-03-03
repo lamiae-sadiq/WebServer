@@ -60,7 +60,7 @@ class Server
         {
             const char* what() const throw()
             {
-                return "you have an error in your configue file\n";
+                return "you have an error in your configue fileserver\n";
             }
         };
         class portError:public std::exception 
@@ -116,7 +116,7 @@ class Server
         {
             const char* what() const throw()
             {
-                return "duplicated error \n";
+                return "error pages \n";
             }
         };
 };

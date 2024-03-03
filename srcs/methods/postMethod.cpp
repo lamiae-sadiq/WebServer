@@ -55,7 +55,7 @@ void response::parsLength(const char *con, size_t& index, size_t size)
         upfile.close();
         flag = 201;
         status_code = 201;
-        flag = 0;
+        // flag = 0;
     }
 }
 
@@ -181,7 +181,7 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 201;
-                flag = 0;
+                flag = 201;
                 return;
             }
             index++;
@@ -201,12 +201,12 @@ void    response::methodPost(const char *con, size_t size)
         createFile();
         if (status_code == 403)
             return;
-        if (uplod_type == "Chunk")
+        if (request.getUploadType() == "Chunk")
         {
             flag = 2;
             parseChunk(con, index, size);
         }
-        else if (uplod_type == "length")
+        else if (request.getUploadType() == "length")
         {
             flag = 1;
             parsLength(con, index, size);
@@ -242,6 +242,7 @@ void    response::createFile()
     if (request.location.upload.length() > 1){
         // std::string UplDir = request.location.root + "/" + request.location.upload;
         std::string UplDir = request.location.root +  request.location.upload;
+        std::cout << UplDir <<"\n";
         std::cout << "ROOT "<< request.location.root << std::endl;
 
         std::cout <<"UPLOAD  " <<UplDir << std::endl;
@@ -251,11 +252,11 @@ void    response::createFile()
             status_code = 403;
         }
         std::string randName = generateName();
-        uploadFileNmae = "vedio/mp4";
+        uploadFileNmae = "text/html";
         check_extention(uploadFileNmae);
         //i need content type to create the file
         content_type = fileType;
-        extention = "mp4";
+        extention = "txt";
         // std::cout << UplDir +"/" + randName + "." + extention << std::endl;
         upfile.open((UplDir+"/" + randName + "." + extention).c_str());
         if (upfile.is_open() == false) 

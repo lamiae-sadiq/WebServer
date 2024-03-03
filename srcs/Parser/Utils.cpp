@@ -17,13 +17,15 @@ std::vector<std::string> Utils::splitString(std::string string,int del)
 	std::vector<std::string> vec;
 	std::string tmpString = string;
 	size_t index = 1;
+  
 	while(index !=std::string::npos)
 	{	
 		index = string.find(del);
+    
 		if(index != std::string::npos)
 		{
 			vec.push_back(string.substr(0,index));
-            string = string.substr(index +1);
+      string = string.substr(index +1);
 		}
 	}
 	vec.push_back(string);
@@ -53,6 +55,7 @@ int  Utils::countTabulation(std::string &line)
   int end = 0;
 
   int last = 0;
+
   size_t len = line.length() - 1;
 
   for(size_t i = 0 ; i < len ;i++)
@@ -73,3 +76,14 @@ int  Utils::countTabulation(std::string &line)
 
 
 
+
+
+bool Utils::isInteger(std::string num)
+{
+  for(size_t i = 0; i< num.length();i++)
+  {
+    if(!isdigit(num[i]) && num[i] != '.')
+      return false;
+  }
+  return true;
+}

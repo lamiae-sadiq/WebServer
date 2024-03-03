@@ -47,48 +47,44 @@ class Request
 		std::string version;
 		std::string content_Type;
 		std::string uplod_type;
-		int isDone;
 		int status;
 		int countHeaders;
 		bool firstReadOfBody;
 	public:
+		Request();
+		~Request(){};
 		std::string tmpBuff;
 		loc location;
 		size_t contentLength;
+		int parseHeaders(std::string buff,std::vector<Server> initServers);
+		int analyseHeaders(std::string buff);
+		void storeRequest(std::string line);
+		void storeHostHeader(std::string line);
+		void storeRequestLineInfo(std::vector<std::string> vec);
+		void storeLocation(Server &server,Location iniLocation);
 		int getStatus();
-		Request();
-		// std::string& getTmpBuff()
-		// {
-		// 	return tmpBuff;
-		// }
-		bool getFirstReadBody()
-		{
-			return firstReadOfBody;
-		}
-		void setFirstReadOfBody(bool init)
-		{
-			firstReadOfBody = init;
-		}
+		bool getFirstReadBody();
 		loc getLocation();
-		void setHeader(std::string &key,std::string &value);
 		std::string getHeader(std::string key);
 		std::string getMethod();
 		std::string getUrl();
 		std::string getVersion();
 		size_t getContentLength();
 		std::string getContentType();
-		std::string checkemptyData(std::vector<std::string> vec,int index);
-		void setMethod(std::string initVar);
+		std::string getUploadType();
+		void setFirstReadOfBody(bool init);
+		void setHeader(std::string &key,std::string &value);
+		void setMethod(std::string &initVar);
 		void setUrl(std::string initVar);
-		void setVersion(std::string initVar);
-		int parseHeaders(std::string buff,std::vector<Server> initServers);
-		int analyseHeaders(std::string buff);
-		void storeRequest(std::string line);
-		void storeHostHeader(std::string line);
+		void setVersion(std::string &initVar);
 		void matchServer();
-		void storeRequestLineInfo(std::vector<std::string> vec);
 		int matchLocation(std::string host,Server server);
-		void storeLocation(Server &server,Location iniLocation);
+		void checkemptyData(std::string &value,std::vector<std::string> vec,int index);
+		void checkVersion(std::string &version);
+		void checkMethods(std::string method);
+		void checkTransferEncoding(std::string value);
+		void checkContentLength(std::string length);
+		void chekHeaderError(std::string key);
 		void printREquest();
 		class readError:public std::exception 
         {
