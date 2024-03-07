@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/02 14:17:28 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 03:06:50 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 #define DIRECTORY 0
 #define NOT_FOUND -1
 #define FORBIDDEN -2
-		static int i = 0;
+static int i = 0;
 
 
 // class server;
@@ -65,6 +65,7 @@ class response
 		std::string 	extention;
 		std::string		pathUpload;
 		static			std::map<std::string, std::string> _mime;
+		static			std::map<std::string, std::string> mime_;
 		std::string		uploadFileNmae;
 		std::string		fileType;
 		std::string		body;
@@ -74,7 +75,6 @@ class response
 		int ihex;
 	public :
 
-		//response()
 		Server serv;
 		response(Request& initRequest);
 		~response();
@@ -82,9 +82,6 @@ class response
 		void	methodPost(const char *con, size_t size);
 		void	setFd(int fd)
 		{
-			// if(i == 0)
-     		// 	request.printREquest();
-			// i = 1;
 			this->fd = fd;
 		};
 		void setStatusCode(int initCode)
@@ -101,6 +98,8 @@ class response
 		void    sendData();
 		int 	checkType(std::string path);
 		static	void    fillMime();
+		static	void    fileExtention();
+		std::map<std::string, std::string> getMime_();
 
 		//geters //
 		std::string getTargetUrl();
@@ -130,9 +129,11 @@ class response
 		void	deleteDir(std::string uri);
 		void init();
 		void executeMethodes(const char *buff,size_t size,int fd);
-		const std::string ErrorPage();
+		const std::string HTMLPage();
 		const std::string    setStatus(int status);
 		void ErrorHeader();
 		std::string getErrorPage();
 		void    sendErrorPage();
+		void    allow();
+		void	setHeader();
 };

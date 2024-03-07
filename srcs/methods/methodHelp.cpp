@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/02 17:20:59 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/06 22:59:34 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ std::string response::getName(){
     return name;
 }
 
-std::string response::getContentType(){
-    return content_type;
-}
+// std::string response::getContentType(){
+//     return content_type;
+// }
 
 std::string response::getExtension(){
     return fileType;
@@ -80,6 +80,11 @@ std::map<std::string, std::string> response::getMime() {
     return _mime;
 }
 
+std::map<std::string, std::string> response::getMime_() {
+    return mime_;
+}
+
+
 void    response::fillMime()
 {
     _mime["html"] = "text/html";
@@ -90,7 +95,7 @@ void    response::fillMime()
     _mime["rss"] = "text/xml";
     _mime["gif"] = "image/gif";
     _mime["jpeg"] = "image/jpeg";
-    _mime["jpg"] = "image/jpeg";
+    _mime["jpg"] = "image/jpg";
     _mime["js"] = "application/x-javascript";
     _mime["txt"] = "text/plain";
     _mime["htc"] = "text/x-component";
@@ -174,10 +179,10 @@ void response::check_extention(std::string file)
     idx = file.rfind('.');
     if (idx != std::string::npos){
         extention = file.substr(idx + 1);
-        std::cout << "extention: " << extention << std::endl;
-        std::cout << _mime[extention] << std::endl;
+        // std::cout << "extention: " << extention << std::endl;
+        // std::cout << _mime[extention] << std::endl;
         fileType =  _mime[extention];
-        std::cout << "fileType: " << fileType << std::endl;
+        // std::cout << "fileType: " << fileType << std::endl;
     }
     else
         fileType = "text/plain";
@@ -193,52 +198,19 @@ bool    response::allowedMethods()
 {
     std::vector<std::string>::iterator it = this->request.location.method.begin();
     for(;it != this->request.location.method.end(); it++){
-        if(*it == "GET" || *it == "POST" || *it == "DELETE")
-        // std::cout << *it << std::endl;
-            return true;
+        if(*it == request.getMethod()){
+            // std::cout << "method : " << request.getMethod()<< std::endl;
+                return true;
+        }
     }
     return false;
 }
 
-void    response::sendData()
-{       
-    if (flag == 2)
-        {
-            ifile.open(targetUri.c_str());
-            if (ifile.bad())
-                std::cout << "Error: failed to open video ifile" << std::endl;
-            // if (!ifile.is_open())
-                // throw std::runtime_error("Error: failed to open video ifile");
-            std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
-                resHeader += "\r\nContent-Type: ";
-                resHeader += content_type;
-                resHeader +="\r\n";
-                resHeader += "Transfer-Encoding: chunked\r\n";
-                resHeader += "\r\n";
-             send(fd, resHeader.c_str(), resHeader.length(), 0);
-            flag = 3;
-        }
-        else if (flag == 3)
-        {
-            const int chunkSize = 1024;
-            char buffer[chunkSize];
-            ifile.read(buffer, chunkSize);
-            int bytesRead = ifile.gcount();
-            std::stringstream ss;
-            ss << std::hex << bytesRead;
-            std::string chunkSizeHex = ss.str();
-            std::string chunkHeader = chunkSizeHex + "\r\n";
-            char concatenatedSends[chunkHeader.length() + bytesRead + 2];
-            memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
-            memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
-            memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-            write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
-            if (ifile.eof())
-                flag = 4;
-        }
-        else if (flag == 4) {
-            send(fd, "0\r\n\r\n", 5, 0);
-            ifile.close();
-            flag = 30;
-        }
+void    response::allow()
+{
+    std::vector<std::string>::iterator it = this->request.location.method.begin();
+    for(;it != this->request.location.method.end(); it++){
+            std::cout << *it << std::endl;
+    }
 }
+

@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:40:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/24 16:12:15 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 03:07:44 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,3 +15,14 @@
 #include "response.hpp"
 
 #define CGI 0
+
+
+class Cgi
+{
+    private :
+
+    public :
+        Cgi();
+        ~Cgi();
+        void    setUpEnv();
+};

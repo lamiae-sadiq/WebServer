@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/01 13:22:56 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/04 18:05:17 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,11 @@ size_t Request::getContentLength()
 {
 	return contentLength;
 }
-
+//added
+std::string Request::getContentType()
+{
+	return content_Type;
+}
 
 void Request::setFirstReadOfBody(bool init)
 {
@@ -363,7 +367,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				matchServer();
 				if(host.empty())
 					throw 404;
-				printREquest();
+				// printREquest();
 				status = 1;
 				return 1;
 			}

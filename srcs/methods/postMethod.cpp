@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/01 15:26:15 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/06 12:12:48 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+
+std::map<std::string, std::string> response::mime_;
 
 bool    response::checkUpload()
 {
@@ -53,9 +56,9 @@ void response::parsLength(const char *con, size_t& index, size_t size)
     if (request.contentLength == 0)
     {
         upfile.close();
-        flag = 201;
+        // flag = 201;
         status_code = 201;
-        // flag = 0;
+        flag = 0;
     }
 }
 
@@ -63,11 +66,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 {
     while (index < size)
     {
-        static int pflag = 0;
+        // static int pflag = 0;
         
-        if (pflag != flag)
-            std::cout << "flag : " << flag << std::endl;
-        pflag = flag;
+        // if (pflag != flag)
+        //     std::cout << "flag : " << flag << std::endl;
+        // pflag = flag;
         
         if (flag == 2)
         {
@@ -181,7 +184,7 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             {
                 upfile.close();
                 status_code = 201;
-                flag = 201;
+                flag = 0;
                 return;
             }
             index++;
@@ -193,9 +196,9 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 
 void    response::methodPost(const char *con, size_t size)
 {
-    // if(!allowedMethods())
-    //         status_code = 405;
-    if (flag == 0)
+    if(!allowedMethods())
+            status_code = 405;
+    else if (flag == 0)
     {
         size_t index = 0;
         createFile();
@@ -235,34 +238,79 @@ std::string response::generateName()
 	return (name);
 }
 
-void    response::createFile()
+void    response::fileExtention()
+{
+    mime_[ "text/html"] = "html";
+    mime_[ "text/css"] = "css";
+    mime_[ "text/xml"] =     "xml";
+    mime_[ "image/gif"] =   "gif";
+    mime_[ "image/jpeg"] = "jpeg";
+    mime_[ "image/jpg"] = "jpg";
+    mime_[ "application/x-javascript"] = "js";
+    mime_[ "text/plain"] = "txt";
+    mime_[ "text/x-component"] = "htc";
+    mime_[ "text/mathml"] = "mml";
+    mime_[ "image/png"] = "png";
+    mime_[ "image/x-icon"] = "ico";
+    mime_[ "image/x-jng"] = "jng";
+    mime_[ "image/vnd.wap.wbmp"] =   "wbmp";
+    mime_[ "application/mac-binhex40"] = "hqx";
+    mime_[ "application/pdf"] = "pdf";
+    mime_[ "application/x-cocoa"] = "cco";
+    mime_[ "application/x-java-archive-diff"] = "jardiff";
+    mime_[ "application/x-java-jnlp-file"] = "jnlp";
+    mime_[ "application/x-makeself"] =   "run";
+    mime_[ "application/x-perl"] = "pl";
+    mime_[ "application/x-pilot"] = "prc";
+    mime_[ "application/x-rar-compressed"] = "rar";
+    mime_[ "application/x-redhat-package-manager"] = "rpm";
+    mime_[ "application/x-sea"] = "sea";
+    mime_[ "application/x-shockwave-flash"] = "swf";
+    mime_[ "application/x-stuffit"] = "sit";
+    mime_[ "application/x-tcl"] =    "tcl";
+    mime_[ "application/x-tcl"] =   "tk";
+    mime_[ "application/x-x509-ca-cert"] = "der";
+    mime_[ "application/x-x509-ca-cert"] = "pem";
+    mime_[ "application/x-x509-ca-cert"] = "crt";
+    mime_[ "application/x-xpinstall"] = "xpi";
+    mime_[ "application/octet-stream"] = "msm";
+    mime_[ "audio/mpeg"] = "mp3";
+    mime_[" video/mp4"] = "mp4";
+    mime_[ "audio/x-realaudio"] = "ra";
+    mime_[ "video/mpeg"] = "mpeg";
+    mime_[ "video/mpeg"] = "mpg";
+    mime_[ "video/quicktime"] = "mov";
+    mime_[ "video/x-flv"] = "flv";
+    mime_[ "application/zip"] = "zip";
+    mime_[ "application/octet-stream"] = "deb";
+    mime_[ "application/octet-stream"] = "bin";
+    mime_[ "application/octet-stream"] = "exe";
+    mime_[ "application/octet-stream"] = "dll";
+    mime_[ "application/octet-stream"] = "dmg";
+    mime_[ "application/octet-stream"] = "eot";
+    mime_[ "application/octet-stream"] = "iso";
+    mime_[ "application/octet-stream"] = "img";
+    mime_[ "application/octet-stream"] = "msi";
+    mime_[ "application/octet-stream"] = "msp";
+    mime_[ "video/x-msvideo"] = "avi";
+    mime_[ "video/x-ms-wmv"] = "wmv";
+    mime_[ "video/x-ms-asf"] = "asx";
+    mime_[ "video/x-ms-asf"] =   "asf";
+    mime_[ "video/x-mng"] = "mng";
+}
+void response::createFile()
 {
     if (request.location.upload[0] == '/')
-		request.location.upload.erase(0, 1);
-    if (request.location.upload.length() > 1){
-        // std::string UplDir = request.location.root + "/" + request.location.upload;
-        std::string UplDir = request.location.root +  request.location.upload;
-        std::cout << UplDir <<"\n";
-        std::cout << "ROOT "<< request.location.root << std::endl;
-
-        std::cout <<"UPLOAD  " <<UplDir << std::endl;
-        if(access(UplDir.c_str(), F_OK | W_OK) == -1)
-        {
+        request.location.upload.erase(0, 1);
+    if (request.location.upload.length() > 1) {
+        std::string UplDir = request.location.root + request.location.upload;
+        if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
             perror("Upload Directory");
             status_code = 403;
         }
         std::string randName = generateName();
-        uploadFileNmae = "text/html";
-        check_extention(uploadFileNmae);
-        //i need content type to create the file
-        content_type = fileType;
-        extention = "txt";
-        // std::cout << UplDir +"/" + randName + "." + extention << std::endl;
-        upfile.open((UplDir+"/" + randName + "." + extention).c_str());
-        if (upfile.is_open() == false) 
-        {
-            perror((UplDir + "/" + randName + "." + extention).c_str());
-            status_code = 403;
-        }
+        std::string ileType = request.getContentType();
+        extention = mime_[ileType];
+        upfile.open((UplDir + "/" + randName + "." + extention).c_str());
     }
 }

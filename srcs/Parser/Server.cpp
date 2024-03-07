@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/02 15:21:14 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/06 12:21:08 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 Server::Server()
 {
-    error_pages[404] = "/nfs/homes/kel-baam/Desktop/kel/srcs/errorPages/404.html";
-    // error_pages[405] = "../errorPages/405.html";
-    // error_pages[301] = "../errorPages/301.html";
-    // error_pages[500] = "../errorPages/500.html";
-    // error_pages[501] = "../errorPages/501.html";
+    error_pages[404] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/404.html";
+    error_pages[405] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/405.html";
+    error_pages[301] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/301.html";
+    error_pages[500] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/500.html";
+    error_pages[501] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/501.html";
 }
 
 std::map<int, std::string> Server::getErrorPage()

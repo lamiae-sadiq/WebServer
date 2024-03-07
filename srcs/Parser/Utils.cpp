@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.cpp                                          :+:      :+:    :+:   */
+/*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:55:29 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/22 17:16:10 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/06 11:16:24 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ std::vector<std::string> Utils::splitString(std::string string,int del)
 	std::vector<std::string> vec;
 	std::string tmpString = string;
 	size_t index = 1;
-  
 	while(index !=std::string::npos)
 	{	
 		index = string.find(del);

@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/02/29 19:44:43 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/06 23:01:37 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 
 void	response::deleteDir(std::string uri)
 {
-	// std::cout << "dir2" << std::endl;	
-
 	DIR *dir;
 	struct dirent *entry;
 
@@ -51,8 +49,10 @@ void	response::deleteDir(std::string uri)
 
 void	response::Delete()
 {
-	std::cout << "targetUri   " << targetUri << std::endl;
-	if (access(this->targetUri.c_str(), F_OK) == 0)
+	targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
+	if(!allowedMethods())
+            status_code = 405;
+	else if (access(this->targetUri.c_str(), F_OK) == 0)
 	{
 		if (checkType(targetUri) == FILE)
 		{

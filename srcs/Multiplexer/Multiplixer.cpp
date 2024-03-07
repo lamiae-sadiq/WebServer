@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/02 17:13:58 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/06 11:40:13 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void Multiplixer::creatSockets(int epo,std::vector<Server> servers)
     			perror("setsockopt(SO_REUSEADDR) failed");
 			bindSocket(masterSockfd,atoi(servers[i].getServerData("port")[0].c_str()));
 			listenn = listen(masterSockfd,2);
-			printf("listiining......\n");
+			printf("listening......\n");
 			add_event(epo,masterSockfd,&event,0);
 		}
 		masterSockets[masterSockfd].push_back(servers[i]);
@@ -137,6 +137,16 @@ void Multiplixer::start(std::vector<Server> servers)
 				if((events[i].events & EPOLLIN ))
 				{
 					byt = read(socketFd,buff,1023);
+					if(byt < 0)
+					{
+						if(epoll_ctl(epo,EPOLL_CTL_DEL,socketFd, &events[i]) < 0)
+								throw networkError();
+						close(socketFd);
+						std::cout << "respone sent to  " << socketFd << "is done" << std::endl;
+						responses.erase(socketFd);
+						requests.erase(socketFd);
+						continue;
+					}
 					code = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
 				
 					if(code!=1)

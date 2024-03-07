@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse.cpp                                          :+:      :+:    :+:   */
+/*   Parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:16 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/24 14:15:13 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/06 11:15:16 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ void Parser::analyseLocationData(std::string &line,Server &servers,std::ifstream
       {
         directive = line.substr(0,index);
         line = line.substr(index + 1);
+        Utils::skipSpaces(line);
+        
       }
       if(directive == "location" || directive == "server")
         break;

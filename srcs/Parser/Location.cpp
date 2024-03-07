@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/24 16:05:43 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/06 11:16:36 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,13 @@ void Location::checkAutoindexError(std::vector<std::string> autoindex)
 
 void Location::checkMethodsError(std::vector<std::string> methods)
 {
-    if(methods.size() > 3)
+    // std::cout <<"checkmethoderror" << methods.size() << methods[0] << "|\n";
+    if(methods.size() > 3 || methods.size() < 1)
         throw  httpMethodsError();
     if(std::count(methods.begin(),methods.end(),POST_METHODE) > 1 || 
     std::count(methods.begin(),methods.end(),DELETE_METHODE) > 1 || 
     std::count(methods.begin(),methods.end(),GET_METHODE) > 1)
-            throw  httpMethodsError();
+        throw  httpMethodsError();
     for(size_t i = 0; i < methods.size();i++)
     {
         if(methods[i] != GET_METHODE && methods[i] != POST_METHODE && methods[i] != DELETE_METHODE)
@@ -83,14 +84,14 @@ void Location::checkMethodsError(std::vector<std::string> methods)
 
 void  Location::checkLocationName(std::vector<std::string> location_name)
 {
-    if(location_name.size() > 1 || location_name[0][0] != '/')
+    if(location_name.size() != 1 || location_name[0][0] != '/')
         throw location_nameError();
     //should i check that location_name or not in this step 
 }
 
 void Location::checkUpload(std::vector<std::string> allowedApload)
 {
-    if(allowedApload.size() > 1 || (allowedApload[0] != ON && allowedApload[0] != OFF))
+    if(allowedApload.size() != 1 || (allowedApload[0] != ON && allowedApload[0] != OFF))
         throw uploadError();
 }
 
@@ -99,19 +100,19 @@ void Location::checkIndexError(std::vector<std::string> index)
     //check if is just string or extension???
     // check extension
 
-    if(index.size() > 1)
+    if(index.size() != 1)
         throw indexError();
 }
 void Location::checkReturnError(std::vector<std::string> returnDirective)
 {
-    if(returnDirective.size() > 2)
+    if(returnDirective.size() != 2)
         throw returnError();
     //check if the first  umber 301 and  another one the second one is a path maybe i should check for him too
 }
 
 void Location::checkRootError(std::vector<std::string> root)
 {
-    if(root.size() > 1 || root[0][0] != '/')
+    if(root.size() != 1 || root[0][0] != '/')
         throw rootError();
     //check here / 
 }
