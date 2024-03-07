@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/07 20:23:10 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 00:34:58 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,44 +21,44 @@ std::string to_string(T value) {
 void    response::sendData()
 {       
     if (flag == 2)
-        {
-            ifile.open(targetUri.c_str());
-            if (!ifile.is_open())
-                throw std::runtime_error("Error: failed to open video ifile");
-            std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
-                resHeader += "\r\nContent-Type: ";
-                resHeader += content_type;
-                resHeader +="\r\n";
-                resHeader += "Transfer-Encoding: chunked\r\n";
-                resHeader += "\r\n";
-             send(fd, resHeader.c_str(), resHeader.length(), 0);
-            flag = 3;
+    {
+        ifile.open(targetUri.c_str());
+        if (!ifile.is_open())
+            throw std::runtime_error("Error: failed to open video ifile");
+        std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
+            resHeader += "\r\nContent-Type: ";
+            resHeader += content_type;
+            resHeader +="\r\n";
+            resHeader += "Transfer-Encoding: chunked\r\n";
+            resHeader += "\r\n";
+            send(fd, resHeader.c_str(), resHeader.length(), 0);
+        flag = 3;
+    }
+    if (flag == 3)
+    {
+        const int chunkSize = 1024;
+        char buffer[chunkSize];
+        ifile.read(buffer, chunkSize);
+        int bytesRead = ifile.gcount();
+        std::stringstream ss;
+        ss << std::hex << bytesRead;
+        std::string chunkSizeHex = ss.str();
+        std::string chunkHeader = chunkSizeHex + "\r\n";
+        char concatenatedSends[chunkHeader.length() + bytesRead + 2];
+        memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
+        memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
+        memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
+        write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
+        
+        if (ifile.eof()){
+            flag = 4;
         }
-        else if (flag == 3)
-        {
-            const int chunkSize = 1024;
-            char buffer[chunkSize];
-            ifile.read(buffer, chunkSize);
-            int bytesRead = ifile.gcount();
-            std::stringstream ss;
-            ss << std::hex << bytesRead;
-            std::string chunkSizeHex = ss.str();
-            std::string chunkHeader = chunkSizeHex + "\r\n";
-            char concatenatedSends[chunkHeader.length() + bytesRead + 2];
-            memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
-            memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
-            memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-            write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
-           
-            if (ifile.eof()){
-                flag = 4;
-            }
-        }
-        else if (flag == 4) {
-            send(fd, "0\r\n\r\n", 5, 0);
-            ifile.close();
-            flag = 30;
-        }
+    }
+    if (flag == 4) {
+        send(fd, "0\r\n\r\n", 5, 0);
+        ifile.close();
+        flag = 30;
+    }
 }
 
 const std::string response::HTMLPage() {
@@ -110,12 +110,16 @@ void response::sendErrorPage()
     std::cout << targetUri << std::endl;
     if(access(targetUri.c_str(), R_OK | W_OK) == 0)
     {
-        std::cout << status_code << " -----\n";
         flag = 2;
+        check_extention(targetUri);
+        content_type = fileType;
         sendData();
     }
     else{
-        ErrorHeader();
+        if(status_code >= 400)
+            ErrorHeader();
+        else
+            setHeader();
     }
 }
 

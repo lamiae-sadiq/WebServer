@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/07 19:42:58 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 00:25:08 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -419,7 +419,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				Server server = matchServer();
 				matchLocation(server);
-				printREquest();
+				// printREquest();
 				// exit(1);
 				status = 1;
 				return 1;
