@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.hpp                                          :+:      :+:    :+:   */
+/*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:52:12 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/22 17:04:35 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/06 11:37:29 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,7 @@ class Utils
 		static void skipSpaces(std::string &line);
 		static int isWhitSpaces(int a);
 		static bool isInteger(std::string num);
+		static void strToLower(std::string &str);
+		static bool isHex(char ch);
 	
 };

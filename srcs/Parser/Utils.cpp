@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:55:29 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/06 11:16:24 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 16:08:47 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ std::vector<std::string> Utils::splitString(std::string string,int del)
 	std::vector<std::string> vec;
 	std::string tmpString = string;
 	size_t index = 1;
+  
 	while(index !=std::string::npos)
 	{	
 		index = string.find(del);
@@ -73,9 +74,19 @@ int  Utils::countTabulation(std::string &line)
   return count;
 }
 
+bool Utils::isHex(char ch)
+{
+  std::string characters = "abcdefABCDEF";
+  if(isdigit(ch))
 
-
-
+    return true;
+  for(size_t i = 0; i <characters.length();i++)
+  {
+    if(characters[i] == ch)
+      return true;
+  }
+  return false;
+}
 
 bool Utils::isInteger(std::string num)
 {
@@ -86,3 +97,18 @@ bool Utils::isInteger(std::string num)
   }
   return true;
 }
+void Utils::strToLower(std::string &str)
+{
+  for(size_t i = 0; i< str.length(); i++)
+  {
+    str[i] = tolower(str[i]);
+  }
+}
+
+// int countWords(std::string str)
+// {
+//   for(size_t i = 0; i < str.length();i++)
+//   {
+//     if(str[i])
+//   }
+// }

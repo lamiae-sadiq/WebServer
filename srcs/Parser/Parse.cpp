@@ -3,35 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   Parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:16 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/06 11:15:16 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/06 16:40:19 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Parse.hpp"
 
-
 Parser::Parser()
 {
   locationLen = -1;
   serverLen = -1;
-  
 }
 
 void Parser::serversAddBack()
 {
   Server server;
   servers.push_back(server);
-}
-
-void  Parser::printServersInfo()
-{
-  for(size_t i = 0; i < servers.size();i++)
-  {
-    servers[i].printLOcationINfo();    
-  }
 }
 
 void   Parser::storeServerData(std::string &directive, std::string &line, int countTab,Server &servers)
@@ -60,8 +50,6 @@ void Parser::analyseLocationData(std::string &line,Server &servers,std::ifstream
       {
         directive = line.substr(0,index);
         line = line.substr(index + 1);
-        Utils::skipSpaces(line);
-        
       }
       if(directive == "location" || directive == "server")
         break;
@@ -95,6 +83,15 @@ void Parser::analyseServerData(std::string &line,std::ifstream& readFile,Server 
   }
 }
 
+void Parser::checkFinalData(std::vector<Server> servers)
+{
+  for(size_t i = 0; i < servers.size(); i++)
+  {
+    if(servers[i].isValidServer() ==  false)
+      throw ConfigueFileError();
+  }
+}
+
 void Parser::readFile(std::string line,std::ifstream& readFile)
 {
   while(!readFile.eof())
@@ -113,11 +110,7 @@ void Parser::readFile(std::string line,std::ifstream& readFile)
         analyseLocationData(line,servers[serverLen],readFile);
     }
   }
-  //chack the necassry directive;
-  if(readFile.eof())
-  {
-      printServersInfo();
-  }
+  checkFinalData(servers);
 }
 
 std::vector<Server> Parser::paseConfigueFile(std::string &configueFile)

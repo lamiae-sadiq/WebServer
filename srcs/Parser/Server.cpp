@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/06 12:21:08 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 19:34:54 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 Server::Server()
 {
-    error_pages[404] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/404.html";
-    error_pages[405] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/405.html";
-    error_pages[301] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/301.html";
-    error_pages[500] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/500.html";
-    error_pages[501] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/501.html";
+    error_pages[404] = "/nfs/homes/kel-baam/Desktop/new/srcs/errorPages/404.html";
+    error_pages[405] = "/nfs/homes/kel-baam/Desktop/new/srcs/errorPages/405.html";
+    error_pages[301] = "/nfs/homes/kel-baam/Desktop/new/srcs/errorPages/301.html";
+    error_pages[500] = "/nfs/homes/kel-baam/Desktop/new/srcs/errorPages/500.html";
+    error_pages[501] = "/nfs/homes/kel-baam/Desktop/new/srcs/errorPages/501.html";
 }
 
 std::map<int, std::string> Server::getErrorPage()
@@ -35,7 +35,7 @@ void Server::setServerData(std::string key ,std::vector<std::string> vec)
         serverData[key].insert(serverData[key].end(),vec.begin(),vec.end()); 
     }
     else
-        error_pages[atoi(vec[0].c_str())] = vec[1]; 
+        error_pages[atol(vec[0].c_str())] = vec[1]; 
 }
 
 void Server::locationAddBack()
@@ -48,10 +48,10 @@ std::vector<std::string>  Server::getServerData(std::string key)
 {
     std::vector<std::string> tmp;
     std::map<std::string,std::vector<std::string> >::iterator it;
+    
     it = serverData.find(key);
     if(it!= serverData.end())
         tmp = serverData[key];
-    
     return tmp;
 }
 
@@ -62,30 +62,11 @@ size_t  Server::directiveSize(std::string directive)
 
 Location& Server::operator[](size_t index)
 {
-    if (index >= locations.size()) 
+    if (index >= locations.size() || index < 0) 
     {
         throw std::out_of_range("Index out of range");
     }
     return locations[index];
-}
-
-void Server::printLOcationINfo()
-{
-    // std::cout << "+++++ SERVER DATA +++++\n";
-    // if(!serverData["port"].empty())
-    //     std::cout << "  port"<<serverData["port"][0]<< "\n";
-    // if(!serverData["host"].empty())
-    //     std::cout << "  host"<<serverData["host"][0]<< "\n";
-    // if(!serverData["server_name"].empty())
-    //     std::cout << "  server_name"<<serverData["server_name"][0]<< "\n";
-    // if(!serverData["client_max_body_size"].empty())
-    //     std::cout << "  client_max_body_size"<<serverData["client_max_body_size"][0]<< "\n";
-    // if(!serverData["root"].empty())
-    //     std::cout << "  root"<<serverData["root"][0]<< "\n";
-    for(size_t i = 0 ; i <locations.size();i++)
-    {
-        locations[i].printData();
-    }
 }
 
 std::vector<Location>  Server::getLocations()
@@ -93,7 +74,13 @@ std::vector<Location>  Server::getLocations()
     return locations;
 }
 
-//check overflow
+bool  Server::isValidServer()
+{
+    if(serverData.count("port") == 1 && serverData.count("host") == 1 && serverData.count("server_name") == 1 && serverData.count("client_max_body_size") == 1)
+        return true;
+    return false;
+}
+
 void Server::checkPortError(std::vector<std::string> port)
 {
     size_t len = port[0].length();
@@ -101,7 +88,7 @@ void Server::checkPortError(std::vector<std::string> port)
     
     if(port.size() != 1)
         throw portError();
-    if(index!= std::string::npos ||  len > 5 || port[0][0] == '-' < 0 || atoi(port[0].c_str()) > 65535)
+    if(index!= std::string::npos ||  len > 5 || port[0][0] == '-' < 0 || atol(port[0].c_str()) > 65535)
         throw portError();
 }
 
@@ -117,43 +104,36 @@ void Server::checkHostError(std::vector<std::string> host)
     nums = Utils::splitString(host[0],'.');
     for(size_t i = 0; i < nums.size();i++)
     {
-        // chwck find not of 
         index = nums[i].find_first_not_of("0123456789");
-        if(index!= std::string::npos || atoi(nums[i].c_str()) < 0 || atoi(nums[i].c_str()) > 255)
+        if(index!= std::string::npos || atol(nums[i].c_str()) < 0 || atol(nums[i].c_str()) > 255)
             throw HostError();
     }
 }
-// check what num in units and ovwrflow
+
 void Server::checkClientMaxBody(std::vector<std::string> bodySize)
 {
-    if(bodySize.size() != 1 || bodySize[0][0] =='-')
+    if(bodySize.size() != 1 || bodySize[0].find_first_not_of("0123456789")!= std::string::npos || atol(bodySize[0].c_str()) <=0 )
         throw ClientMaxBodyError();
-    // for(size_t i = 0; i < bodySize.size();i++)
-    // {
-    //     index = bodySize[i].find_first_not_of("0123456789");
-    //     if(index!= std::string::npos)
-    //         throw HostError();
-    // }
 }
 
-//is i should check forn another valid caracter
 void Server::checkServernameError(std::vector<std::string> serverName)
 {
     if(serverName.size() != 1)
         throw serverNameError();
 }
-// is should i check this
 
 void Server::checkErrorPages(std::vector<std::string> vec)
 {
-    if(vec.size() != 2 ) // negative
+    if(vec.size() != 2)
         throw errorPages();
-    
+    if(vec[0].find_first_not_of("0123456789")!= std::string::npos )
+        throw errorPages();
 }
 
 void Server::checkServersError(std::string directive, std::vector<std::string> vec,int countTabulation)
 { 
     (void)countTabulation;
+    
     if(countTabulation != 1)
         throw  ConfigueFileError();
     if(directive == "error_page")
@@ -168,5 +148,4 @@ void Server::checkServersError(std::string directive, std::vector<std::string> v
         checkServernameError(vec);
     else
         throw  ConfigueFileError();
-
 }

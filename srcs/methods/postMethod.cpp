@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/06 12:12:48 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 20:22:44 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,9 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 void    response::methodPost(const char *con, size_t size)
 {
     if(!allowedMethods())
-            status_code = 405;
+    {
+        status_code = 405;
+    }
     else if (flag == 0)
     {
         size_t index = 0;
@@ -275,7 +277,7 @@ void    response::fileExtention()
     mime_[ "application/x-xpinstall"] = "xpi";
     mime_[ "application/octet-stream"] = "msm";
     mime_[ "audio/mpeg"] = "mp3";
-    mime_[" video/mp4"] = "mp4";
+    mime_["video/mp4"] = "mp4";
     mime_[ "audio/x-realaudio"] = "ra";
     mime_[ "video/mpeg"] = "mpeg";
     mime_[ "video/mpeg"] = "mpg";
@@ -304,6 +306,7 @@ void response::createFile()
         request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1) {
         std::string UplDir = request.location.root + request.location.upload;
+        std::cout << UplDir << "\n";
         if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
             perror("Upload Directory");
             status_code = 403;

@@ -51,13 +51,14 @@ class Multiplixer
 		void analyseRequest(char * buff, int &completeRead);
 		void add_event(int epo,int sockfd,epoll_event *event, int flag);
 		void creatSockets(int epo,std::vector<Server> servers);
-		void bindSocket(int fdSocket,int port);
+		void bindSocket(int fdSocket,int port,Server server);
 		void CreateNetwork(int &epo,std::vector<Server> srevers);
 		void readReqeust(int &fd,int &completeRead);
 		void start(std::vector<Server> servers);
 		void storeRequest(std::string line);
 		void storeRequestLineInfo(std::vector<std::string> vec);
-		int acceptNewConnection(int epo,int sockfd,epoll_event *events);
+		void clearSocketFdFRomEpoll(int socketFd,int epo,struct  epoll_event *events,int index);		
+		void acceptNewConnection(int epo,int sockfd,epoll_event *events);
 	  	class networkError:public std::exception 
         {
             const char* what() const throw()

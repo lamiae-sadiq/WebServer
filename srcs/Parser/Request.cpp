@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/04 18:05:17 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 19:42:58 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Request::Request()
 	location.upload = "";
 	location.location_name = "";
 	location.redirect_path = "";
+	contentLength = 0;
 	tmpBuff = "";
 	host = "";
 	method = "";
@@ -43,6 +44,8 @@ loc Request::getLocation()
 
 void Request::setHeader(std::string &key,std::string &value)
 {
+	Utils::skipSpaces(value);
+	// if(Utils::splitString(value,' ') >)
 	headers[key] = value;
 }
 
@@ -81,11 +84,10 @@ size_t Request::getContentLength()
 {
 	return contentLength;
 }
-//added
-std::string Request::getContentType()
-{
-	return content_Type;
+std::string Request::getContentType(){
+    return content_Type;
 }
+
 
 void Request::setFirstReadOfBody(bool init)
 {
@@ -93,9 +95,14 @@ void Request::setFirstReadOfBody(bool init)
 }
 void Request::setUrl(std::string initVar)
 {
+	std::string allowedCharacter ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ._~:/?#[]@!$&'()*+,;=%";
 	if(initVar[0] != '/')
-		throw 400;
-	url = initVar;
+		throw  HttpBadRequest("Bad request");
+	if(initVar.length() > 2048)
+		throw HttpUriTooLong("Uri Too Long");
+	url = decodingUri(initVar);
+	if(url.find_first_not_of(allowedCharacter)!= std::string::npos)
+		throw  HttpBadRequest("Bad request");
 }
 
 
@@ -108,9 +115,9 @@ void Request::checkVersion(std::string &version)
 	if(index != std::string::npos)
 		versionNum = version.substr(index+5);
 	if(index != 0 || !Utils::isInteger(versionNum) || version.length() <= 5 || std::count(versionNum.begin(),versionNum.end(),'.') > 1)
-		throw 400;	
+		throw HttpBadRequest("Bad request");	
 	if(versionNum != "1.1")
-		throw 505;
+		throw  HttpVersionNotSupported("Http Version Not Supported");
 }
 
 void Request::setVersion(std::string &initVar)
@@ -125,30 +132,32 @@ void Request::checkMethods(std::string method)
 	std::vector<std::string> copyMethods(methods, methods + sizeof(methods) / sizeof(methods[0]));
 
 	if(!std::count(copyMethods.begin(), copyMethods.end(),method))
-		throw 400; //400 bad request
+		throw  HttpBadRequest("Bad request");
 	if(method != methods[0] && method != methods[1] && method != methods[2])
-		throw 501;
-
+		throw  HttpNotImplemented("Not Implemented");
 }
 void Request::setMethod(std::string &initVar)
 {
 	checkMethods(initVar);
 	method = initVar;
 }
+
 void Request::storeRequestLineInfo(std::vector<std::string> vec)
 {
 	if(vec.size() != 3)
-		throw 400; //400
+		throw  HttpBadRequest("Bad request");
 	setMethod(vec[0]);
 	setUrl(vec[1]);
 	setVersion(vec[2]);
 }
-
 		
 void Request::storeHostHeader(std::string line)
 {
+	size_t index;
+	if(!host.empty() || line.empty())
+		throw  HttpBadRequest("Bad request");
 	Utils::skipSpaces(line);
-	size_t index = line.find(":");
+	index = line.find(":");
 	std::string port;
 	if(index != std::string::npos)
 	{
@@ -159,33 +168,78 @@ void Request::storeHostHeader(std::string line)
 		host = line;
 }
 
+std::string Request::decodingUri(std::string str)
+{
+    size_t index = 0;
+	char *parse;
+    char ch;
+    std::string tmpStr;
+    std::stringstream ss(str);
+    while(index < str.length())
+    {
+        ss >> ch;
+        if(ch == '%')
+        { 
+			if(Utils::isHex(str[index + 1]) == true && Utils::isHex(str[index +2]) == true)
+			{
+				ch =  std::strtol(str.substr(index + 1,2).c_str(),&parse,16);
+				index+=2;
+				ss.ignore(2);
+			}
+        }
+            index++;
+        tmpStr.push_back(ch);
+    }
+	return tmpStr;
+}
+
 void Request::checkTransferEncoding(std::string value)
 {
 	Utils::skipSpaces(value);
 	if(value != "chunked")
-		throw 501; //to be checked
+		throw HttpNotImplemented("Not Implemented"); //to be checked
+	if(uplod_type == "length")
+		throw HttpBadRequest("Bad request");
 	uplod_type =  "Chunk";
 }
+
 void Request::checkContentLength(std::string length)
 {
+
 	Utils::skipSpaces(length);
 	if(!Utils::isInteger(length))
-		throw 400;
+		throw  HttpBadRequest("Bad request");
 	contentLength = atol(length.c_str());
 	uplod_type ="length";
 }
 
+
 void	Request::chekHeaderError(std::string key)
 {
 	if(key.find_first_of(" \t")!= std::string::npos)
-		throw 400;
+		throw HttpBadRequest("Bad request");
+	if(key == "host" && headers.count("host") == 1)
+		throw HttpBadRequest("Bad request");
+	if(key == "content-length" && headers.count("content-length") == 1)
+		throw HttpBadRequest("Bad request");
+	if(key == "transfer-encoding" &&  headers.count("transfer-encoding") == 1)
+		throw HttpBadRequest("Bad request");
 }
- 	
+void Request::checkContentType(std::string &contetType)
+{
+	Utils::skipSpaces(contetType);
+	if(contetType.find("boundary=") != std::string::npos)
+		throw  HttpNotImplemented("Not Implemented");
+	
+	content_Type = contetType;
+}
+
 void Request::storeRequest(std::string line)
 {
 	size_t index = line.find(":");
 	std::string key = line;
-
+	if(countHeaders)
+		Utils::strToLower(line);
 	if(!countHeaders)
 	{
 	 	storeRequestLineInfo(Utils::splitString(line,' '));
@@ -198,49 +252,34 @@ void Request::storeRequest(std::string line)
 		line = line.substr(index+1);
 	}
 	chekHeaderError(key);
-	if(key == "Host")
-		storeHostHeader(line);
-	else if(key == "Content-Length")
-		checkContentLength(line);
-	if(key == "Content-Type") // what should i chek here
-		content_Type = line;
-	else if(key == "Transfer-Encoding") // i should check if is transfer encoding but not chunked
-		checkTransferEncoding(line);
-	//setHeader(key,line);
+	setHeader(key,line);
 }
-
-
 
 int Request::analyseHeaders(std::string buff)
 {
 	size_t index = 1;
-
-	std::string requests,str;
+	std::string requests;
 	requests = tmpBuff + buff;
-	size_t startBody = requests.find("\r\n\r\n");
-	str = requests;
-	if(startBody != std::string::npos)
-		str = std::string(requests,0,startBody + 4);
 
  	while(index != std::string::npos)
 	{
-		index = str.find("\r\n");
+		index = requests.find("\r\n");
 		if(index != std::string::npos)
-		{
-			if(!str.find("\r\n") && startBody!= std::string::npos)
+		{	
+			if(!index)
 			{
-				tmpBuff = std::string(buff, startBody + 4);
+				tmpBuff = std::string(requests, index+2);
 				return 1;
 			}
 			else
 			{
-				storeRequest(str.substr(0,index));
-				str = str.substr(index + 2);
+				storeRequest(requests.substr(0,index));
+				requests = requests.substr(index + 2);
 			}
 		}
-		else if(!str.empty())
+		else if(!requests.empty())
 		{
-			tmpBuff = str;
+			tmpBuff = requests;
 		}
 		else
 			tmpBuff = "";
@@ -277,26 +316,27 @@ void Request::storeLocation(Server &server, Location iniLocation)
 void  Request::printREquest()
 {
 	std::cout << "request info======\n";
-	std::cout <<"version======>" <<version << "\n";
-	std::cout << "url=======>" << url << "\n";
-	std::cout << "content_Type======>" << content_Type << "\n";
-	std::cout << "uplod_type======>" << uplod_type << "\n";
-	std::cout << "content length======>" << contentLength << "\n";
-	std::cout << "max_body_size ======>>>>" <<  location.max_body_size <<"\n";
-	std::cout << "root ======>>>>" <<  location.root<<"\n";
-	std::cout << "index ======>>>>" <<  location.index<<"\n";
-	std::cout << "auto_index ======>>>>" <<  location.auto_index<<"\n";
-	std::cout << "upload ======>>>>" <<  location.upload<<"\n";
-	std::cout << "location_name ======>>>>" <<  location.location_name<<"\n";
-	std::cout << "allowedUpload ======>>>>" <<  location.allowedUpload<<"\n";
-	std::cout << "redirect_path ======>>>>" << location.redirect_path<<"\n";
-	std::cout << "redirect_code ======>>>>" << location.redirect_code<<"\n";
-
+	std::cout <<"version======>|" <<version << "|\n";
+	std::cout << "url=======>|" << url << "|\n";
+	std::cout << "content_Type======>|" << content_Type << "|\n";
+	std::cout << "uplod_type======>|" << uplod_type << "|\n";
+	std::cout << "content length======>|" << contentLength << "|\n";
+	std::cout << "max_body_size ======>>>>|" <<  location.max_body_size <<"|\n";
+	std::cout << "root ======>>>>|" <<  location.root<<"|\n";
+	std::cout << "index ======>>>>|" <<  location.index<<"|\n";
+	std::cout << "auto_index ======>>>>|" <<  location.auto_index<<"|\n";
+	std::cout << "upload ======>>>>|" <<  location.upload<<"|\n";
+	std::cout << "location_name ======>>>>|" <<  location.location_name<<"|\n";
+	std::cout << "allowedUpload ======>>>>|" <<  location.allowedUpload<<"|\n";
+	std::cout << "redirect_path ======>>>>|" << location.redirect_path<<"|\n";
+	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
 	for(size_t i = 0;i < location.method.size();i++)
 	{
-		std::cout << "methods ======>>>>" <<  location.method[i] << "\n";
+		std::cout << "methods ======>>>>|" <<  location.method[i] << "|\n";
 	}
 }
+
+
 
 int LocationLongestPrefix(std::string locationName,std::string Url)
 {
@@ -319,41 +359,53 @@ int LocationLongestPrefix(std::string locationName,std::string Url)
 	}
 	return countMatchingCharacter;
 }
-int Request::matchLocation(std::string host,Server server)
+
+void Request::matchLocation(Server currentServer)
 {
 	size_t maxMatcher= 0;
 	size_t countMatcher;
 	std::string locationName;
 
-	if(host == server.getServerData("server_name")[0])
+	for(size_t j = 0; j < currentServer.getLocations().size();j++)
 	{
-		for(size_t j = 0; j < server.getLocations().size();j++)
+		locationName = currentServer.getLocations()[j].getLocationData("location_name")[0];
+		countMatcher = LocationLongestPrefix(locationName, url);
+		if(countMatcher > 0)
 		{
-			locationName = server.getLocations()[j].getLocationData("location_name")[0];
-			countMatcher = LocationLongestPrefix(locationName, url);
-			if(countMatcher > 0)
+			if(countMatcher > maxMatcher)
 			{
-				if(countMatcher > maxMatcher)
-				{
-					storeLocation(server,server.getLocations()[j]);
-					maxMatcher = countMatcher;
-				}
-				break;
+				storeLocation(currentServer,currentServer.getLocations()[j]);
+				maxMatcher = countMatcher;
 			}
+				break;
 		}
-		return 1;
-	}
-	return 0;
-}
-void Request::matchServer()
-{
-	for(size_t i =0; i<servers.size();i++)
-	{
-		if(matchLocation(host, servers[i]))
-			break;
 	}
 }
 
+Server Request::matchServer()
+{
+
+	for(size_t i =0; i<servers.size();i++)
+	{
+		if(host == servers[i].getServerData("server_name")[0])
+			return servers[i];
+	}
+	return servers[0];
+}
+
+void Request::checkStoreData()
+{
+	if(headers["host"].empty())
+		throw HttpBadRequest("Bad request");
+	if(headers.find("content-length")!= headers.end())
+		checkContentLength(headers["content-length"]);
+	if(headers.find("content-type")!= headers.end())
+		checkContentType(headers["content-type"]);
+	if(headers.find("transfer-encoding") != headers.end())
+		checkTransferEncoding(headers["transfer-encoding"]);
+	if(uplod_type.empty() && method == "POST")
+		throw HttpBadRequest("Bad request");
+}
 
 int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 {
@@ -364,19 +416,20 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 			servers = initServers;
 			if(analyseHeaders(buff))
 			{
-				matchServer();
-				if(host.empty())
-					throw 404;
-				// printREquest();
+				checkStoreData();
+				Server server = matchServer();
+				matchLocation(server);
+				printREquest();
+				// exit(1);
 				status = 1;
 				return 1;
 			}
 		}
 	}
-	catch(int statusCode)
+	catch(HttpException& e)
 	{
 		status = 1;
-		return statusCode;
+		return e.getStatusCode();
 	}
 	return 1;
 }

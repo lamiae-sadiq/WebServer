@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/04 16:43:34 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 11:53:40 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include "HttpException.hpp"
+#include <iostream>
+#include <sstream>
 typedef struct loc
 {
 	unsigned long long							max_body_size;
@@ -77,8 +79,8 @@ class Request
 		void setMethod(std::string &initVar);
 		void setUrl(std::string initVar);
 		void setVersion(std::string &initVar);
-		void matchServer();
-		int matchLocation(std::string host,Server server);
+		Server matchServer();
+		void matchLocation(Server currentServer);
 		void checkemptyData(std::string &value,std::vector<std::string> vec,int index);
 		void checkVersion(std::string &version);
 		void checkMethods(std::string method);
@@ -86,6 +88,10 @@ class Request
 		void checkContentLength(std::string length);
 		void chekHeaderError(std::string key);
 		void printREquest();
+		void checkContentType(std::string &contetType);
+		std::string decodingUri(std::string str);	
+		void checkStoreData();	
+		void storeContentLength(std::string length);
 		class readError:public std::exception 
         {
             const char* what() const throw()

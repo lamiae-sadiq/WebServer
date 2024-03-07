@@ -41,6 +41,10 @@ class Server
         {
             return serverData.size();
         }
+        int getCountServerData()
+        {
+            return countServerData;
+        }
         void setServerData(std::string key ,std::vector<std::string> vec);
         std::vector<std::string> getServerData(std::string key);
         void        printLOcationINfo();
@@ -55,12 +59,14 @@ class Server
         static void checkClientMaxBody(std::vector<std::string> bodySize);
         static void checkServersError(std::string directive, std::vector<std::string> vec,int countSpaces);
         std::vector<Location> getLocations();
+        bool isValidServer();
         Location& operator[](size_t index);
+
         class ConfigueFileError:public std::exception 
         {
             const char* what() const throw()
             {
-                return "you have an error in your configue fileserver\n";
+                return "you have an error in your configue file\n";
             }
         };
         class portError:public std::exception 

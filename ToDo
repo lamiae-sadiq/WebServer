@@ -60,3 +60,12 @@ if i did localhost:9090/ he display forbidden
 set-up the env of cgi
 //////////////////////////////
 
+
+Server::Server()
+{
+    error_pages[404] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/404.html";
+    error_pages[405] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/405.html";
+    error_pages[301] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/301.html";
+    error_pages[500] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/500.html";
+    error_pages[501] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/501.html";
+}

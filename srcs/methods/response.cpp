@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/06 23:38:20 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 20:23:10 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,10 @@ void    response::sendData()
             memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
             memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
             write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
-            if (ifile.eof())
+           
+            if (ifile.eof()){
                 flag = 4;
+            }
         }
         else if (flag == 4) {
             send(fd, "0\r\n\r\n", 5, 0);
@@ -96,6 +98,7 @@ const std::string response::HTMLPage() {
 
 std::string response::getErrorPage() {
     if (serv.getErrorPage().find(status_code) != serv.getErrorPage().end()) {
+        // std::cout << serv.getErrorPage()[status_code] << "00000\n";
         return serv.getErrorPage()[status_code];
     }
     return "404";
@@ -104,13 +107,15 @@ std::string response::getErrorPage() {
 void response::sendErrorPage()
 {
     targetUri = serv.getErrorPage()[status_code];
+    std::cout << targetUri << std::endl;
     if(access(targetUri.c_str(), R_OK | W_OK) == 0)
     {
+        std::cout << status_code << " -----\n";
         flag = 2;
         sendData();
     }
     else{
-        setHeader();
+        ErrorHeader();
     }
 }
 
@@ -218,6 +223,7 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
         getErrorPage();
         sendErrorPage();
     }
+
     if (request.getMethod() == "GET")
         methodGet();
     else if (request.getMethod() == "DELETE")

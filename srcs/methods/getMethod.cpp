@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/06 23:39:03 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/07 20:22:23 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,6 @@ void    response::methodGet()
     {
         if (!request.location.redirect_path.empty())
         {
-            std::cout << "return \n";
             target_url = request.location.redirect_path;
             status_code = 301;
             return;

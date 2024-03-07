@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Parse.hpp                                          :+:      :+:    :+:   */
+/*   parse.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:18 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/06 11:13:54 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/02/22 11:45:59 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Parser
         void checkLocationError(std::string directive, std::vector<std::string> vec,Server &server);
         std::vector<std::string> splitString(std::string &string,int del);
         void analyseServerData(std::string& line,std::ifstream& readFile,Server& server);
+        void checkFinalData(std::vector<Server> servers);
     public:
         static std::vector<Server> paseConfigueFile(std::string &configueFile);
         class ConfigueFileError:public std::exception 
