@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:05 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/02/24 15:24:20 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 14:59:32 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string.h>
@@ -24,12 +23,17 @@
 #include <fcntl.h> 
 #include <errno.h>
 #include <vector>
-#include "./Utils.hpp"
+#include <algorithm>
+#include <csignal>
+#include <sys/types.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <map>
+#include "./Utils.hpp"
 #include "./response.hpp"
 #include "./Request.hpp"
 #define MAX_EVENTS 50
-// #define PORT 9000
+
 
 static std::string tmpBuff;
 class Multiplixer
@@ -59,6 +63,7 @@ class Multiplixer
 		void storeRequestLineInfo(std::vector<std::string> vec);
 		void clearSocketFdFRomEpoll(int socketFd,int epo,struct  epoll_event *events,int index);		
 		void acceptNewConnection(int epo,int sockfd,epoll_event *events);
+		void closeMasterSocket();
 	  	class networkError:public std::exception 
         {
             const char* what() const throw()
@@ -78,6 +83,20 @@ class Multiplixer
             const char* what() const throw()
             {
                 return "error in request header\n";
+            }
+        };
+		class getAddressError:public std::exception 
+        {
+            const char* what() const throw()
+            {
+                return "error in getAddressinfo\n";
+            }
+        };
+		class invalidBind:public std::exception 
+        {
+            const char* what() const throw()
+            {
+                return "invalid bind\n";
             }
         };
 };

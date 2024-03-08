@@ -3,28 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/07 23:49:51 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/08 14:58:40 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Multiplixer.hpp"
-#include "../../includes/response.hpp"
-#include <algorithm>
 
-#include <csignal>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 void setNonBlocking(int &sockfd) {
     int flags = fcntl(sockfd, F_GETFL, 0);
     if (flags == -1) {
@@ -46,43 +34,58 @@ void Multiplixer::add_event(int epo,int sockfd,epoll_event *event, int flag)
 	event->data.fd = sockfd;
 	int epo_ctl= epoll_ctl(epo,EPOLL_CTL_ADD,sockfd,event);
 	if(epo_ctl < 0)
+	{
+		closeMasterSocket();
 		throw networkError();
+	}
 }
 
 void Multiplixer::bindSocket(int fdSocket,int port,Server server)
 {
 	struct sockaddr_in address;
-	struct addrinfo info,*res,*p;
-	(void)server;
-    memset(&info, 0, sizeof info);
+	struct addrinfo info,*listOfAdresses,*p;
+	
+    memset(&info, 0, sizeof(info));
 	info.ai_family = AF_INET;
-	int status = getaddrinfo(server.getServerData("host")[0].c_str(),NULL,&info,&res);
-	if(status != 0)
+	int getAddressInfo = getaddrinfo(server.getServerData("host")[0].c_str(),NULL,&info,&listOfAdresses);
+	if(getAddressInfo != 0)
 	{
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
-		exit(0);
+		closeMasterSocket();
+		throw getAddressError();
 	}
-	for(p = res;p!=NULL;p=p->ai_next)
+	for(p = listOfAdresses; p!=NULL; p=p->ai_next)
 	{
 		if (p->ai_family == AF_INET)
 		{
 			address = (*(struct sockaddr_in *)p->ai_addr);
-			printf("IPv4 Address: %s\n", inet_ntoa(address.sin_addr));
+			// printf("IPv4 Address: %s\n", inet_ntoa(address.sin_addr));
 			break;
 		}
 	}
+	freeaddrinfo(listOfAdresses);
 	address.sin_family = AF_INET; 
 	address.sin_port = htons(port);
-	int bb= bind(fdSocket, (struct sockaddr *)&address,sizeof(address)) ;
-	if( bb < 0)
+	int bindStatus= bind(fdSocket, (struct sockaddr *)&address,sizeof(address));
+	if( bindStatus < 0)
 	{
+		closeMasterSocket();
 		throw networkError();
 	}
+}
+
+void Multiplixer::closeMasterSocket()
+{
+	std::map<int, std::vector<Server> >::iterator it = masterSockets.begin();
+	for(it = masterSockets.begin(); it != masterSockets.end();it++)
+	{
+		close(it->first);
+	}	
 }
 
 int Multiplixer::checkMasterSocketPort(Server server)
 {
 	std::map<int, std::vector<Server> >::iterator it = masterSockets.begin();
+	int isValid = 0;
 	if(masterSockets.size() > 0)
 	{
 		for(it = masterSockets.begin(); it != masterSockets.end();it++)
@@ -90,11 +93,17 @@ int Multiplixer::checkMasterSocketPort(Server server)
 			for(size_t i = 0; i < it->second.size()  ;i++)
 			{
 				if((it->second)[i].getServerData("port")[0] == server.getServerData("port")[0] &&
+				 (it->second[i]).getServerData("host")[0] == server.getServerData("host")[0] && (it->second[i]).getServerData("server_name")[0] == server.getServerData("server_name")[0])
+					{
+						closeMasterSocket();
+						throw invalidBind();
+					}
+				if((it->second)[i].getServerData("port")[0] == server.getServerData("port")[0] &&
 				 (it->second[i]).getServerData("host")[0] == server.getServerData("host")[0])
-				 {
-					return it->first;
-				 }
+					isValid = 1;
 			}
+			if(isValid)
+				return it->first;
 		}
 	}
 	return -1;
@@ -108,22 +117,25 @@ void Multiplixer::creatSockets(int epo,std::vector<Server> servers)
 	int a = 1;
 	for(size_t i = 0; i < servers.size();i++)
 	{
-		//TODO check servers that have same names AND SAME PORT
 		masterSockfd = checkMasterSocketPort(servers[i]);
 		if(masterSockfd == -1)
 		{	
 			masterSockfd = socket(AF_INET,SOCK_STREAM,0);
 			if(masterSockfd < 0)
+			{
+				closeMasterSocket();
 				throw networkError();
+			}
 			if (setsockopt(masterSockfd, SOL_SOCKET, SO_REUSEADDR,&a, sizeof(int)) < 0)
     			perror("setsockopt(SO_REUSEADDR) failed");
 			bindSocket(masterSockfd,atoi(servers[i].getServerData("port")[0].c_str()),servers[i]);
 			listenn = listen(masterSockfd,2);
-			printf("lestiining......\n");
+			printf("listiining......\n");
 			add_event(epo,masterSockfd,&event,0);
 		}
 		masterSockets[masterSockfd].push_back(servers[i]);
 	}
+	
 }
 
 void Multiplixer::CreateNetwork(int &epo,std::vector<Server> servers)
@@ -154,7 +166,7 @@ void  Multiplixer::acceptNewConnection(int epo,int sockfd,epoll_event *events)
 void Multiplixer::clearSocketFdFRomEpoll(int socketFd,int epo,struct  epoll_event *events,int index)
 {
 	if(epoll_ctl(epo,EPOLL_CTL_DEL,socketFd, &events[index]) < 0)
-									throw networkError();
+		throw networkError();
 	close(socketFd);
 	std::cout << "respone sent to  "  << socketFd << "|||is done" << std::endl;
 	delete (responses[socketFd]);
@@ -197,15 +209,12 @@ void Multiplixer::start(std::vector<Server> servers)
 					}
 					code = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
 					if(code!=1)
-					{
 						responses[socketFd]->setStatusCode(code);
-					}
 				}
 				if((events[i].events & EPOLLOUT))
 				{
 					if(request.getStatus() == 1)
 					{
-						// std::cout << "start response\n";
 						responses[socketFd]->executeMethodes(buff,byt,socketFd);
 						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)
 							clearSocketFdFRomEpoll(socketFd, epo, events,i);
@@ -214,6 +223,6 @@ void Multiplixer::start(std::vector<Server> servers)
 			}
 		}
 	}
+	closeMasterSocket();
+	close(epo);
 }
-
-

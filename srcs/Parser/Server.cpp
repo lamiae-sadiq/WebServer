@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/08 00:29:13 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/08 14:51:14 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 Server::Server()
 {
-    error_pages[404] = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/srcs/errorPages/404.html";
-    error_pages[405] = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/srcs/errorPages/405.html";
-    error_pages[301] = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/srcs/errorPages/301.html";
-    error_pages[500] = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/srcs/errorPages/500.html";
-    error_pages[501] = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/srcs/errorPages/501.html";
+    error_pages[404] = "/nfs/homes/kel-baam/del/srcs/errorPages/404.html";
+    error_pages[405] = "/nfs/homes/kel-baam/del/srcs/errorPages/405.html";
+    error_pages[301] = "/nfs/homes/kel-baam/del/srcs/errorPages/301.html";
+    error_pages[500] = "/nfs/homes/kel-baam/del/srcs/errorPages/500.html";
+    error_pages[501] = "/nfs/homes/kel-baam/del/srcs/errorPages/501.html";
 }
 
 std::map<int, std::string> Server::getErrorPage()
