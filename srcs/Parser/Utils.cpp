@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:55:29 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/07 16:08:47 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 17:38:23 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,27 @@ std::vector<std::string> Utils::splitString(std::string string,int del)
 
 int  Utils::isWhitSpaces(int a)
 {
-  return (a == ' ' || a == '\n'  || a =='\t');
+  return (a == ' ' || a =='\t');
 }
 
 void  Utils::skipSpaces(std::string &line)
 {
-  size_t i;
-  for( i = 0;i < line.length();i++)
+  size_t start;
+  size_t end;
+  size_t len = line.length() - 1;
+  int count = 0;
+  for(start = 0;start < line.length();start++)
   {
-    if(!isWhitSpaces(line[i]))
+    if(!isWhitSpaces(line[start]))
       break;
   }
-  line = line.substr(i); 
+  for(end = len ; end >=0; end--)
+  {
+    if(!isWhitSpaces(line[end]))
+      break;
+    count++;
+  }
+  line = line.substr(start,len - start - count + 1); 
 }
 
 //also in the end

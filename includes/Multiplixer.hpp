@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:05 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/08 14:59:32 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 15:07:50 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,16 +53,16 @@ class Multiplixer
 		~Multiplixer(){};
 		int checkMasterSocketPort(Server server);
 		void analyseRequest(char * buff, int &completeRead);
-		void add_event(int epo,int sockfd,epoll_event *event, int flag);
+		void add_event(int epoll_instance,int sockfd,epoll_event *event, int flag);
 		void creatSockets(int epo,std::vector<Server> servers);
 		void bindSocket(int fdSocket,int port,Server server);
-		void CreateNetwork(int &epo,std::vector<Server> srevers);
+		void CreateNetwork(int &epoll_instance,std::vector<Server> srevers);
 		void readReqeust(int &fd,int &completeRead);
 		void start(std::vector<Server> servers);
 		void storeRequest(std::string line);
 		void storeRequestLineInfo(std::vector<std::string> vec);
-		void clearSocketFdFRomEpoll(int socketFd,int epo,struct  epoll_event *events,int index);		
-		void acceptNewConnection(int epo,int sockfd,epoll_event *events);
+		void clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct  epoll_event *events,int index);		
+		void acceptNewConnection(int epoll_instance,int sockfd,epoll_event *events);
 		void closeMasterSocket();
 	  	class networkError:public std::exception 
         {
@@ -97,6 +97,13 @@ class Multiplixer
             const char* what() const throw()
             {
                 return "invalid bind\n";
+            }
+        };
+		class acceptError:public std::exception 
+        {
+            const char* what() const throw()
+            {
+                return "error in accepting client\n";
             }
         };
 };

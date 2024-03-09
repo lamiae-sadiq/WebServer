@@ -30,28 +30,6 @@ Content-Type: video/mp4
 
 
 
-redirect 
-
-
-
-GET ///// HTTP/1.1 //TO CHECK
-i should skip spaces in the headers or not 
-
-spaces in the key like 
-|hello:                nop|
-|hello : nop|
-|contentlength: nop|
-
-|HTTP/1| ==> HTTP VERSION NOT SUPORTED 505 
-
-he Content-Length header must appear exactly once in a request.
-
-heeelo
-content-lenght 
-
-	
-
-
 if i did localhost:9090/ he display forbidden
 
 
@@ -60,12 +38,11 @@ if i did localhost:9090/ he display forbidden
 set-up the env of cgi
 //////////////////////////////
 
+CHECK  TIMEOUT
 
-Server::Server()
-{
-    error_pages[404] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/404.html";
-    error_pages[405] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/405.html";
-    error_pages[301] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/301.html";
-    error_pages[500] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/500.html";
-    error_pages[501] = "/nfs/homes/lsadiq/Desktop/last/srcs/errorPages/501.html";
-}
+
+Informational responses (100 – 199)
+Successful responses (200 – 299)
+Redirection messages (300 – 399)
+Client error responses (400 – 499)
+Server error responses (500 – 599)

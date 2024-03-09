@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/08 14:51:14 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 17:08:31 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,9 @@ void Server::checkServernameError(std::vector<std::string> serverName)
 
 void Server::checkErrorPages(std::vector<std::string> vec)
 {
-    if(vec.size() != 2)
+    char *ptr;
+    long long errorNum = strtoll(vec[0].c_str(),&ptr,10);
+    if(vec.size() != 2 || errorNum < 400 || errorNum > 599)
         throw errorPages();
     if(vec[0].find_first_not_of("0123456789")!= std::string::npos )
         throw errorPages();

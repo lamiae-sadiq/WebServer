@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/06 16:39:48 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:17:03 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ std::vector<std::string> Location::getLocationData(std::string key)
 void Location::checkMembershipInLocation(std::string directive)
 {
     if(directive != "index" && directive !="autoindex" && directive != "http_methods" && directive != "return" &&
-     directive!= "root" && directive != "location_name" && directive != "error_page" && directive != "upload" && directive!= "allowedUpload")
+     directive!= "root" && directive != "location_name" && directive != "error_page" && directive != "upload" &&
+      directive!= "allowedUpload" && directive != "cgi")
         throw directiveError();
 }
 
@@ -66,13 +67,14 @@ void  Location::checkLocationName(std::vector<std::string> location_name)
 {
     if(location_name.size() != 1 || location_name[0][0] != '/')
         throw location_nameError();
-    //should i check that location_name or not in this step 
 }
+
 void Location::checkUpload(std::vector<std::string> upload)
 {
     if(upload.size() != 1)
         throw uploadError();
 }
+
 void Location::checkAllowedUpload(std::vector<std::string> allowedApload)
 {
     if(allowedApload.size() != 1 || (allowedApload[0] != ON && allowedApload[0] != OFF))
@@ -98,7 +100,13 @@ void Location::checkRootError(std::vector<std::string> root)
     if(root.size() != 1 || root[0][0] != '/' || root[0][len]!= '/')
         throw rootError();
 }
+//check errors here
 
+void Location::checkCgiError(std::vector<std::string> vec)
+{
+    if(vec.size() != 2)
+        throw cgiError();
+}
 
 void Location::checkLocationError(std::string directive,std::vector<std::string> vec,int countSpaces)
  {
@@ -121,4 +129,7 @@ void Location::checkLocationError(std::string directive,std::vector<std::string>
         checkReturnError(vec);
     else if(directive == "root")
         checkRootError(vec);
+    else if(directive == "cgi")
+        checkCgiError(vec);
+    ///cgi errors
 }

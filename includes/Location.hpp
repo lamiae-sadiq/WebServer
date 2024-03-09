@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 09:07:35 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/06 16:13:02 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:15:28 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class Location
                 static void checkReturnError(std::vector<std::string> returnDirective);
                 static void checkRootError(std::vector<std::string> root);
                 static void checkUpload(std::vector<std::string> upload);
+                static void checkCgiError(std::vector<std::string> vec);
                 ~Location();
                 class autoindexError:public std::exception 
                 {
@@ -106,6 +107,13 @@ class Location
                         const char* what() const throw()
                         {
                                 return "return error \n";
+                        }
+                };
+                class cgiError:public std::exception 
+                {
+                        const char* what() const throw()
+                        {
+                                return "cgi error \n";
                         }
                 };
 };

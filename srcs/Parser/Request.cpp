@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/08 00:25:08 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/09 20:42:38 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ Request::Request()
 	content_Type ="";
 	version ="";
 	url ="";
+	query ="";
 	firstReadOfBody = true;
 };
 
@@ -45,7 +46,8 @@ loc Request::getLocation()
 void Request::setHeader(std::string &key,std::string &value)
 {
 	Utils::skipSpaces(value);
-	// if(Utils::splitString(value,' ') >)
+	if(key == "host" && value.empty())
+		throw HttpBadRequest("Bad request");
 	headers[key] = value;
 }
 
@@ -54,6 +56,10 @@ int Request::getStatus()
 	return status;
 }
 
+std::string Request::getCookies()
+{
+	return cookies;
+}
 std::string Request::getHeader(std::string key)
 {
 	return headers[key];
@@ -93,18 +99,26 @@ void Request::setFirstReadOfBody(bool init)
 {
 	firstReadOfBody = init;
 }
+
 void Request::setUrl(std::string initVar)
 {
+	size_t index;
+	
 	std::string allowedCharacter ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ._~:/?#[]@!$&'()*+,;=%";
 	if(initVar[0] != '/')
 		throw  HttpBadRequest("Bad request");
 	if(initVar.length() > 2048)
 		throw HttpUriTooLong("Uri Too Long");
 	url = decodingUri(initVar);
+	index = url.find("?");
 	if(url.find_first_not_of(allowedCharacter)!= std::string::npos)
 		throw  HttpBadRequest("Bad request");
+	if (index != std::string::npos)
+	{
+		query = url.substr(index + 1);
+		url = url.substr(0, index);
+	}
 }
-
 
 void Request::checkVersion(std::string &version)
 {
@@ -136,6 +150,7 @@ void Request::checkMethods(std::string method)
 	if(method != methods[0] && method != methods[1] && method != methods[2])
 		throw  HttpNotImplemented("Not Implemented");
 }
+
 void Request::setMethod(std::string &initVar)
 {
 	checkMethods(initVar);
@@ -166,6 +181,7 @@ void Request::storeHostHeader(std::string line)
 	}
 	else
 		host = line;
+	std::cout << "||" << host <<"||\n";
 }
 
 std::string Request::decodingUri(std::string str)
@@ -198,7 +214,7 @@ void Request::checkTransferEncoding(std::string value)
 	Utils::skipSpaces(value);
 	if(value != "chunked")
 		throw HttpNotImplemented("Not Implemented"); //to be checked
-	if(uplod_type == "length")
+	if(uplod_type == "length" || value.empty())
 		throw HttpBadRequest("Bad request");
 	uplod_type =  "Chunk";
 }
@@ -207,7 +223,7 @@ void Request::checkContentLength(std::string length)
 {
 
 	Utils::skipSpaces(length);
-	if(!Utils::isInteger(length))
+	if(!Utils::isInteger(length) || length.empty())
 		throw  HttpBadRequest("Bad request");
 	contentLength = atol(length.c_str());
 	uplod_type ="length";
@@ -230,7 +246,9 @@ void Request::checkContentType(std::string &contetType)
 	Utils::skipSpaces(contetType);
 	if(contetType.find("boundary=") != std::string::npos)
 		throw  HttpNotImplemented("Not Implemented");
-	
+	if(contetType.empty())
+		throw HttpBadRequest("Bad request");
+		
 	content_Type = contetType;
 }
 
@@ -311,6 +329,9 @@ void Request::storeLocation(Server &server, Location iniLocation)
 		location.method =  iniLocation.getLocationData("http_methods");
 	if(!(iniLocation.getLocationData("allowedUpload").empty()) &&  iniLocation.getLocationData("allowedUpload")[0] == "on")
 		location.allowedUpload = true;
+	if(iniLocation.getLocationData("cgi").size() > 0)
+		location.cgi[iniLocation.getLocationData("cgi")[0]] = iniLocation.getLocationData("cgi")[1];
+		
 }
 
 void  Request::printREquest()
@@ -330,9 +351,16 @@ void  Request::printREquest()
 	std::cout << "allowedUpload ======>>>>|" <<  location.allowedUpload<<"|\n";
 	std::cout << "redirect_path ======>>>>|" << location.redirect_path<<"|\n";
 	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
+	
 	for(size_t i = 0;i < location.method.size();i++)
 	{
 		std::cout << "methods ======>>>>|" <<  location.method[i] << "|\n";
+	}
+	std::map<std::string, std::string>::iterator it = location.cgi.begin();
+	while(it != location.cgi.end())
+	{
+		std::cout << (it->first) <<" " << (it->second) << "\n";
+		it++;
 	}
 }
 
@@ -387,6 +415,7 @@ Server Request::matchServer()
 
 	for(size_t i =0; i<servers.size();i++)
 	{
+		std::cout << "host|" << host << "|"<<"|" << servers[i].getServerData("server_name")[0] <<"|\n";
 		if(host == servers[i].getServerData("server_name")[0])
 			return servers[i];
 	}
@@ -395,8 +424,8 @@ Server Request::matchServer()
 
 void Request::checkStoreData()
 {
-	if(headers["host"].empty())
-		throw HttpBadRequest("Bad request");
+	if(headers.find("host")!= headers.end())
+		storeHostHeader(headers["host"]);
 	if(headers.find("content-length")!= headers.end())
 		checkContentLength(headers["content-length"]);
 	if(headers.find("content-type")!= headers.end())
@@ -405,6 +434,11 @@ void Request::checkStoreData()
 		checkTransferEncoding(headers["transfer-encoding"]);
 	if(uplod_type.empty() && method == "POST")
 		throw HttpBadRequest("Bad request");
+	if(headers.find("cookie")!= headers.end())
+	{
+		Utils::skipSpaces(headers["cookie"]);
+		cookies = headers["cookie"];
+	}
 }
 
 int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
@@ -419,8 +453,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				Server server = matchServer();
 				matchLocation(server);
-				// printREquest();
-				// exit(1);
+				printREquest();
 				status = 1;
 				return 1;
 			}

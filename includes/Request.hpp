@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/07 11:53:40 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:42:19 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include "HttpException.hpp"
 #include <iostream>
 #include <sstream>
+
 typedef struct loc
 {
 	unsigned long long							max_body_size;
@@ -35,6 +36,7 @@ typedef struct loc
 	std::vector<std::string> 	method;
 	int							redirect_code;
 	std::string 				redirect_path;
+	std::map<std::string,std::string> cgi;
 	
 }loc;
 
@@ -52,6 +54,9 @@ class Request
 		int status;
 		int countHeaders;
 		bool firstReadOfBody;
+		std::string query;
+		std::string cookies;
+		
 	public:
 		Request();
 		~Request(){};
@@ -92,6 +97,7 @@ class Request
 		std::string decodingUri(std::string str);	
 		void checkStoreData();	
 		void storeContentLength(std::string length);
+		std::string getCookies();
 		class readError:public std::exception 
         {
             const char* what() const throw()

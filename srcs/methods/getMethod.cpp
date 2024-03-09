@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/07 20:22:23 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:43:02 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ const std::string	response::setStatus(int status)
 			return "Forbidden";
 		case 404:
 			return "Not Found";
+        case 408:
+            return "Request Timeout";
 		case 405:
 			return "Method Not Allowed";
 		case 500:
@@ -82,8 +84,6 @@ void    response::methodGet()
         }
         targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
         std::cout << "targetUri   " << targetUri << std::endl;
-        // std::cout << "location " << request.location.location_name << std::endl;
-        // std::cout << "url " << request.getUrl() << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)
