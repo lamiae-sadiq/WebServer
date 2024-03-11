@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/07 03:06:50 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/11 15:34:55 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 #include <map>
 #include "Request.hpp"
 #include "Server.hpp"
+#include "cgi.hpp"
 
 #define PORT 8080
 
@@ -40,9 +41,12 @@
 #define NOT_FOUND -1
 #define FORBIDDEN -2
 static int i = 0;
+#define CGI 0
 
 
 // class server;
+// class Cgi;
+
 class response
 {
 	private :
@@ -53,7 +57,7 @@ class response
 		Request         &request;
 		std::ofstream 	upfile;
 		std::string 	chunkSizeStr;
-		bool 			close;
+		// bool 			close;
 		DIR* 			dir;
 		int 			flag;
 		int 			status_code ;
@@ -69,15 +73,25 @@ class response
 		std::string		uploadFileNmae;
 		std::string		fileType;
 		std::string		body;
-		size_t chunkSize;
-		bool	lastChunk;
+		size_t 			chunkSize;
+		bool			lastChunk;
 		std::ifstream 	infile;
-		int ihex;
+		int 			ihex;
+		///////////////////////////////////////
+		//cgi
+		char** 									env;
+		std::map<std::string, std::string>		cgiHeader;
+		std::map<std::string, std::string>		_cgiMap;
+		int										_fd;
+		int 									pid;
+		int 									cgiOutfile;
 	public :
-
+		// Cgi _cgi;
 		Server serv;
 		response(Request& initRequest);
 		~response();
+		response();
+		
 		void	methodGet();
 		void	methodPost(const char *con, size_t size);
 		void	setFd(int fd)
@@ -136,4 +150,9 @@ class response
 		void    sendErrorPage();
 		void    allow();
 		void	setHeader();
+		/////////////////cgi///////////////
+		void		setEnv();
+        void		executePHP(std::string &file);
+        void		executePython(std::string &file);
+        char**		getEnv();
 };

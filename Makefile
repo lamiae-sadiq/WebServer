@@ -6,7 +6,7 @@
 #    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/03/02 17:24:27 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/03/10 00:56:05 by lsadiq           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ SRCS =  Parse.cpp Server.cpp Utils.cpp Location.cpp  Request.cpp
 
 P_SRCS	= 	$(addprefix srcs/Parser/,$(SRCS))
 
-SRC = getMethod.cpp methodHelp.cpp postMethod.cpp deleteMethod.cpp response.cpp
+SRC = getMethod.cpp methodHelp.cpp postMethod.cpp deleteMethod.cpp response.cpp cgi.cpp
 
 M_SRCS	=	$(addprefix srcs/methods/,$(SRC))
 

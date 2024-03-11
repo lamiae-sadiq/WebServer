@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/09 20:42:38 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/11 16:10:38 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,11 @@ int Request::getStatus()
 	return status;
 }
 
+std::string Request::getUri()
+{
+	return uri;
+}
+
 std::string Request::getCookies()
 {
 	return cookies;
@@ -92,6 +97,10 @@ size_t Request::getContentLength()
 }
 std::string Request::getContentType(){
     return content_Type;
+}
+std::string Request::getQueryString()
+{
+	return query;
 }
 
 
@@ -453,7 +462,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				Server server = matchServer();
 				matchLocation(server);
-				printREquest();
+				// printREquest();
 				status = 1;
 				return 1;
 			}

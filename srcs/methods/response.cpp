@@ -6,11 +6,13 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/08 00:34:58 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/11 15:32:40 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/response.hpp"
+
+
 
 template <typename T>
 std::string to_string(T value) {
@@ -32,6 +34,7 @@ void    response::sendData()
             resHeader += "Transfer-Encoding: chunked\r\n";
             resHeader += "\r\n";
             send(fd, resHeader.c_str(), resHeader.length(), 0);
+            // if (sd < 0)
         flag = 3;
     }
     if (flag == 3)
@@ -157,7 +160,7 @@ void response::setHeader()
         flag = 30;
     }
 }
-
+/// recheck
 void response::listDirectories()
 {
     std::string html;

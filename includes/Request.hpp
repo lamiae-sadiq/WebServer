@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/09 20:42:19 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/10 02:53:31 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class Request
 		bool firstReadOfBody;
 		std::string query;
 		std::string cookies;
+		std::string uri;
 		
 	public:
 		Request();
@@ -98,6 +99,8 @@ class Request
 		void checkStoreData();	
 		void storeContentLength(std::string length);
 		std::string getCookies();
+		std::string getQueryString();
+		std::string getUri();
 		class readError:public std::exception 
         {
             const char* what() const throw()

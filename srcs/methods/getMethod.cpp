@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/09 20:43:02 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/11 18:22:32 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/response.hpp"
 #include "../../includes/Request.hpp"
+#include "../../includes/cgi.hpp"
 
 
 void response::init()
@@ -19,20 +20,22 @@ void response::init()
     fd = -1;
     this->status_code = 200;
 	this->targetUri = "";
-    close = true;
+    // close = true;
+    // this->_cgiMap = request.location.cgi;
     flag = 0;
     this->ihex = 0;
     lastChunk = false;
     dir = NULL;
     fileExtention();
+    // setEnv();
+    // getEnv();
 }
-
-
 
 response::response(Request& initRequest):request(initRequest)
 {
 	init();
 }
+
 
 std::map<std::string, std::string> response::_mime;
 response::~response(){}
@@ -83,6 +86,7 @@ void    response::methodGet()
             return;
         }
         targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
+        request.getUri() = targetUri;
         std::cout << "targetUri   " << targetUri << std::endl;
         if(!allowedMethods())
             status_code = 405;
@@ -90,12 +94,30 @@ void    response::methodGet()
         {
             if(access(this->targetUri.c_str(), R_OK) == 0)
             {
+                    std::cout <<"--------------\n";
                 if(checkType(targetUri) == FILE)
                 {
                     check_extention(targetUri);
-                    content_type = fileType;
-                    flag = 2;
-                    return;
+                    std::cout << extention << std::endl;
+                    if(extention == "php" || extention == "py")
+                    {
+                        if (!request.location.cgi.empty())
+                        {
+                            // std::cout << "dkhelt \n";
+                            if (extention == "php")
+                                executePHP(targetUri);
+                            else
+                                executePython(targetUri);
+                            content_type = "text/html";
+                            flag = 2;
+                            return;
+                        }
+                    }
+                    else{
+                        content_type = fileType;
+                        flag = 2;
+                        return;
+                    }
                 }
                 if (checkType(targetUri) == DIRECTORY)
                 {
@@ -137,7 +159,6 @@ void    response::methodGet()
             std::cout << "targetUri doesn't exist" << std::endl;
             status_code = 404;
         }
-
     }
     else if (flag >= 2 && flag <= 4)
         sendData();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   methodHelp.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/07 19:01:13 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:35:55 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ int response::getFd(){
     return fd;
 }
 
-bool response::getClose(){
-    return close;
-}
+// bool response::getClose(){
+//     return close;
+// }
 
 std::ifstream& response::getIfile() {
     return ifile;
