@@ -1,42 +1,4 @@
-version======>HTTP/1.1
-url=======>/
-content_Type======>
-uplod_type======>length
-max_body_size ======>>>>0
-root ======>>>>
-index ======>>>>
-auto_index ======>>>>on
-upload ======>>>>/upload
-location_name ======>>>>/
-allowedUpload ======>>>>1
-redirect_path ======>>>>
-methods ======>>>>POST
-methods ======>>>>GET
-methods ======>>>>DELETE
 
-
-redirect code 299<   >308     
-
-
-User-Agent: PostmanRuntime/7.36.1
-Accept: */*
-Postman-Token: 2479d4c2-65eb-4253-84a6-8c74a378e901
-Host: localhost:8080
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 4806339
-Content-Type: video/mp4
-
-
-
-
-if i did localhost:9090/ he display forbidden
-
-
-
-///////tomorrow //////////////
-set-up the env of cgi
-//////////////////////////////
 
 CHECK  TIMEOUT
 
@@ -46,3 +8,7 @@ Successful responses (200 – 299)
 Redirection messages (300 – 399)
 Client error responses (400 – 499)
 Server error responses (500 – 599)
+
+index chech if is exist or not 
+error pages in the configue file doesn't work
+check max body size

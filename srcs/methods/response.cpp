@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/11 15:32:40 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/12 15:53:58 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,11 +226,17 @@ void response::listDirectories()
 void response::executeMethodes(const char *buff,size_t size,int fd)
 {
     setFd(fd);
-    if (status_code != 200 && flag == 0){
+    if (status_code != 200 && flag == 0)
+    {
         getErrorPage();
         sendErrorPage();
     }
-
+    if(status_code == 408)
+    {
+        getErrorPage();
+        sendErrorPage();
+     // timeout for post there is an issue whit condition of flag == 0
+    }
     if (request.getMethod() == "GET")
         methodGet();
     else if (request.getMethod() == "DELETE")

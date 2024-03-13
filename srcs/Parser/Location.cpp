@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/09 20:17:03 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/12 16:09:31 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,12 @@ void Location::checkAutoindexError(std::vector<std::string> autoindex)
     if(autoindex[0] != ON && autoindex[0] != OFF)
         throw autoindexError();
 }
-
+bool Location::isValidLocation()
+{
+    if(locationData.count("location_name") == 1 && locationData.count("root") == 1)
+        return true;
+    return false;
+}
 void Location::checkMethodsError(std::vector<std::string> methods)
 {
     if(methods.size() > 3 || methods.size() < 1)

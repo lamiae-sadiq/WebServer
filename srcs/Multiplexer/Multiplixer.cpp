@@ -6,27 +6,22 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/09 19:57:37 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/12 15:53:26 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Multiplixer.hpp"
 
 
-void setNonBlocking(int &sockfd) {
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    if (flags == -1) {
-        perror("fcntl");
-        exit(EXIT_FAILURE);
-    }
-    if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        perror("fcntl");
-        exit(EXIT_FAILURE);
-    }
-}
-void Multiplixer::add_event(int epoll_instance,int sockfd, epoll_event *event, int flag)
+void Multiplixer::setNonBlocking(int &sockfd) 
 {
-	// setNonBlocking(sockfd)
+    if(fcntl(sockfd, F_SETFL, O_NONBLOCK, FD_CLOEXEC)== -1)
+        throw fcntlError();
+}
+
+void Multiplixer::addFdToEpoll(int epoll_instance,int sockfd, epoll_event *event, int flag)
+{
+	setNonBlocking(sockfd);
 	if(!flag)
 		event->events = EPOLLIN;
 	else
@@ -58,7 +53,6 @@ void Multiplixer::bindSocket(int fdSocket,int port,Server server)
 		if (p->ai_family == AF_INET)
 		{
 			address = (*(struct sockaddr_in *)p->ai_addr);
-			//printf("IPv4 Address: %s\n", inet_ntoa(address.sin_addr));
 			break;
 		}
 	}
@@ -131,7 +125,7 @@ void Multiplixer::creatSockets(int epoll_instance,std::vector<Server> servers)
 			bindSocket(masterSockfd,atoi(servers[i].getServerData("port")[0].c_str()),servers[i]);
 			listenn = listen(masterSockfd,2);
 			printf("listiining......\n");
-			add_event(epoll_instance,masterSockfd,&event,0);
+			addFdToEpoll(epoll_instance,masterSockfd,&event,0);
 		}
 		masterSockets[masterSockfd].push_back(servers[i]);
 	}
@@ -139,7 +133,7 @@ void Multiplixer::creatSockets(int epoll_instance,std::vector<Server> servers)
 
 void Multiplixer::CreateNetwork(int &epoll_instance,std::vector<Server> servers)
 {
-	epoll_instance = epoll_create(100);
+	epoll_instance = epoll_create(EXPECTEDFDS);
 	if(epoll_instance < 0)
 	{
 		close(epoll_instance);
@@ -158,11 +152,12 @@ void  Multiplixer::acceptNewConnection(int epoll_instance,int sockfd,epoll_event
 	if(newSockfd < 0)
 		throw acceptError();
 	matchServers[newSockfd] = masterSockets[sockfd];
-	add_event(epoll_instance,newSockfd,events,1);
+	addFdToEpoll(epoll_instance,newSockfd,events,1);
 	requests[newSockfd] = new Request();
 	Request &request = *(requests[newSockfd]);
 	responses[newSockfd] = new response(request);
-
+    // responses[newSockfd]->setFd(newSockfd);
+	gettimeofday(&request.start_time, NULL);
 }
 
 void Multiplixer::clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct  epoll_event *events,int index)
@@ -170,10 +165,38 @@ void Multiplixer::clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct 
 	if(epoll_ctl(epoll_instance,EPOLL_CTL_DEL,socketFd, &events[index]) < 0)
 		throw networkError();
 	close(socketFd);
-	// delete (responses[socketFd]);
-	// delete (requests[socketFd]);
+	response *tmp_res = responses[socketFd];
+	Request *tmp_req = requests[socketFd];
+
+	std::cout << "send response\n";
 	responses.erase(socketFd);
 	requests.erase(socketFd);
+	delete(tmp_req);
+	delete(tmp_res);
+}
+
+void  Multiplixer::restartTime(Request &request)
+{
+	request.start_time.tv_sec = 0;
+    request.start_time.tv_usec = 0;
+	request.end_time.tv_sec = 0;
+    request.end_time.tv_usec = 0;
+	gettimeofday(&request.start_time, NULL);
+}
+
+bool Multiplixer::isTimedout(response *response,Request &request)
+{
+	gettimeofday(&request.end_time, NULL);
+	int time = (request.end_time.tv_sec - request.start_time.tv_sec) * 1000000LL +
+    (request.end_time.tv_usec - request.start_time.tv_usec);
+	if( time >   10000000LL)
+	{
+		response->setStatusCode(408);
+		request.setStatus(1);
+		std::cout << "done\n";
+		return true;
+	}
+	return false;
 }
 
 void Multiplixer::start(std::vector<Server> servers)
@@ -200,14 +223,15 @@ void Multiplixer::start(std::vector<Server> servers)
 			{
 				int socketFd = events[i].data.fd;
 				Request &request = *(requests[socketFd]);
-				if((events[i].events & EPOLLIN))
+				if(!isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN) )
 				{
-					byt = recv(socketFd,buff,1024, 0);
+					byt = recv(socketFd,buff,1023, 0);
 					if(byt <= 0)
 					{
 						clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 						continue;
 					}
+					restartTime(request);
 					code = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
 					if(code != 1)
 						responses[socketFd]->setStatusCode(code);
@@ -217,7 +241,7 @@ void Multiplixer::start(std::vector<Server> servers)
 					if(request.getStatus() == 1)
 					{
 						responses[socketFd]->executeMethodes(buff,byt,socketFd);
-						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)
+						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)// set a flag when we done 
 							clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 					}
 				}

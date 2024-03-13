@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/11 16:10:38 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/13 12:13:20 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ Request::Request()
 	firstReadOfBody = true;
 };
 
-loc Request::getLocation()
+loc Request::getLocation()const
 {
 	return this->location;
 }
@@ -51,56 +51,56 @@ void Request::setHeader(std::string &key,std::string &value)
 	headers[key] = value;
 }
 
-int Request::getStatus()
+int Request::getStatus()const
 {
 	return status;
 }
-
-std::string Request::getUri()
+std::string  Request::getQueryString()const
+{
+	return query;
+}
+std::string Request::getCookies()const
+{
+	return cookies;
+}
+std::string Request::getUri()const
 {
 	return uri;
 }
 
-std::string Request::getCookies()
-{
-	return cookies;
-}
-std::string Request::getHeader(std::string key)
+std::string Request::getHeader(std::string &key)
 {
 	return headers[key];
 }
 
-std::string Request::getMethod()
+std::string Request::getMethod()const
 {
 	return method;
 }
 
-std::string Request::getUrl()
+std::string Request::getUrl()const
 {
 	return url;
 }
-std::string Request::getUploadType()
+std::string Request::getUploadType()const
 {
 	return uplod_type;
 }
-std::string Request::getVersion()
+std::string Request::getVersion()const
 {
 	return version;
 }
-bool Request::getFirstReadBody()
+bool Request::getFirstReadBody()const
 {
 	return firstReadOfBody;
 }
-size_t Request::getContentLength()
+size_t Request::getContentLength()const
 {
 	return contentLength;
 }
-std::string Request::getContentType(){
-    return content_Type;
-}
-std::string Request::getQueryString()
+std::string Request::getContentType()const
 {
-	return query;
+    return content_Type;
 }
 
 
@@ -153,7 +153,7 @@ void Request::checkMethods(std::string method)
 {
 	const char *methods[] ={"GET","POST","DELETE","PUT","PATCH","HEAD","OPTIONS","TRACE","CONNECT"};
 	std::vector<std::string> copyMethods(methods, methods + sizeof(methods) / sizeof(methods[0]));
-
+	
 	if(!std::count(copyMethods.begin(), copyMethods.end(),method))
 		throw  HttpBadRequest("Bad request");
 	if(method != methods[0] && method != methods[1] && method != methods[2])
@@ -162,8 +162,8 @@ void Request::checkMethods(std::string method)
 
 void Request::setMethod(std::string &initVar)
 {
-	checkMethods(initVar);
 	method = initVar;
+	checkMethods(initVar);
 }
 
 void Request::storeRequestLineInfo(std::vector<std::string> vec)
@@ -190,7 +190,6 @@ void Request::storeHostHeader(std::string line)
 	}
 	else
 		host = line;
-	std::cout << "||" << host <<"||\n";
 }
 
 std::string Request::decodingUri(std::string str)
@@ -230,11 +229,16 @@ void Request::checkTransferEncoding(std::string value)
 
 void Request::checkContentLength(std::string length)
 {
-
+	long long int len;
+	
 	Utils::skipSpaces(length);
+	len = Utils::stringToLongLong(length);
+	
 	if(!Utils::isInteger(length) || length.empty())
 		throw  HttpBadRequest("Bad request");
-	contentLength = atol(length.c_str());
+	if(!Utils::checkOverflowError(length,len))
+		throw Utils::numberOverflow();
+	contentLength = len;
 	uplod_type ="length";
 }
 
@@ -250,6 +254,7 @@ void	Request::chekHeaderError(std::string key)
 	if(key == "transfer-encoding" &&  headers.count("transfer-encoding") == 1)
 		throw HttpBadRequest("Bad request");
 }
+
 void Request::checkContentType(std::string &contetType)
 {
 	Utils::skipSpaces(contetType);
@@ -287,7 +292,6 @@ int Request::analyseHeaders(std::string buff)
 	size_t index = 1;
 	std::string requests;
 	requests = tmpBuff + buff;
-
  	while(index != std::string::npos)
 	{
 		index = requests.find("\r\n");
@@ -317,13 +321,12 @@ int Request::analyseHeaders(std::string buff)
 
 void Request::storeLocation(Server &server, Location iniLocation)
 {
-	
 	if(iniLocation.getLocationData("return").size() == 1)
 		location.redirect_code = atoi(iniLocation.getLocationData("return")[0].c_str());
 	if(iniLocation.getLocationData("return").size() == 2)
 		location.redirect_path = iniLocation.getLocationData("return")[1];
 	if(!server.getServerData("client_max_body_size")[0].empty())
-		location.max_body_size = atol(server.getServerData("client_max_body_size")[0].c_str());
+		location.max_body_size = Utils::stringToLongLong(server.getServerData("client_max_body_size")[0].c_str());
 	if(iniLocation.getLocationData("root").size() == 1)
 		location.root =	iniLocation.getLocationData("root")[0];
 	if(iniLocation.getLocationData("index").size() == 1)
@@ -340,7 +343,6 @@ void Request::storeLocation(Server &server, Location iniLocation)
 		location.allowedUpload = true;
 	if(iniLocation.getLocationData("cgi").size() > 0)
 		location.cgi[iniLocation.getLocationData("cgi")[0]] = iniLocation.getLocationData("cgi")[1];
-		
 }
 
 void  Request::printREquest()
@@ -414,17 +416,16 @@ void Request::matchLocation(Server currentServer)
 				storeLocation(currentServer,currentServer.getLocations()[j]);
 				maxMatcher = countMatcher;
 			}
-				break;
+			break;
 		}
 	}
 }
 
 Server Request::matchServer()
 {
-
 	for(size_t i =0; i<servers.size();i++)
 	{
-		std::cout << "host|" << host << "|"<<"|" << servers[i].getServerData("server_name")[0] <<"|\n";
+		// std::cout << "host|" << host << "|"<<"|" << servers[i].getServerData("server_name")[0] <<"|\n";
 		if(host == servers[i].getServerData("server_name")[0])
 			return servers[i];
 	}
@@ -441,7 +442,7 @@ void Request::checkStoreData()
 		checkContentType(headers["content-type"]);
 	if(headers.find("transfer-encoding") != headers.end())
 		checkTransferEncoding(headers["transfer-encoding"]);
-	if(uplod_type.empty() && method == "POST")
+	if(method == "POST" && (uplod_type.empty() || content_Type.empty()) )
 		throw HttpBadRequest("Bad request");
 	if(headers.find("cookie")!= headers.end())
 	{
@@ -462,7 +463,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				Server server = matchServer();
 				matchLocation(server);
-				// printREquest();
+				printREquest();
 				status = 1;
 				return 1;
 			}

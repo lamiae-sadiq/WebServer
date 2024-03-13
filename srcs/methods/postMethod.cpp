@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/07 20:22:44 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/12 13:49:57 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,12 +66,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 {
     while (index < size)
     {
-        // static int pflag = 0;
-        
-        // if (pflag != flag)
-        //     std::cout << "flag : " << flag << std::endl;
-        // pflag = flag;
-        
         if (flag == 2)
         {
             while (index < size && ihex < 20)
