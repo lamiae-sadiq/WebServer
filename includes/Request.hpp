@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/16 17:54:38 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/16 21:40:46 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,30 +57,33 @@ class Request
 		std::string query;
 		std::string cookies;
 		std::string uri;
-		bool		 _isCgi;
+		bool _isCgi;
 		
 	public:
+		struct timeval start_time, end_time;
 		Request();
 		~Request(){};
 		std::string tmpBuff;
 		loc location;
-		size_t contentLength;
+		long long int contentLength;
 		int parseHeaders(std::string buff,std::vector<Server> initServers);
 		int analyseHeaders(std::string buff);
 		void storeRequest(std::string line);
 		void storeHostHeader(std::string line);
 		void storeRequestLineInfo(std::vector<std::string> vec);
 		void storeLocation(Server &server,Location iniLocation);
-		int getStatus();
-		bool getFirstReadBody();
-		loc getLocation();
-		std::string getHeader(std::string key);
-		std::string getMethod();
-		std::string getUrl();
-		std::string getVersion();
-		size_t getContentLength();
-		std::string getContentType();
-		std::string getUploadType();
+		int getStatus()const;
+		void setStatus(int init);
+		bool getFirstReadBody()const;
+		loc getLocation()const;
+		bool getIsCgi();
+		std::string getHeader(std::string &key);
+		std::string getMethod()const;
+		std::string getUrl()const;
+		std::string getVersion()const;
+		size_t getContentLength()const;
+		std::string getContentType()const;
+		std::string getUploadType()const;
 		void setFirstReadOfBody(bool init);
 		void setHeader(std::string &key,std::string &value);
 		void setMethod(std::string &initVar);
@@ -88,7 +91,6 @@ class Request
 		void setVersion(std::string &initVar);
 		Server matchServer();
 		void matchLocation(Server currentServer);
-		void checkemptyData(std::string &value,std::vector<std::string> vec,int index);
 		void checkVersion(std::string &version);
 		void checkMethods(std::string method);
 		void checkTransferEncoding(std::string value);
@@ -98,10 +100,9 @@ class Request
 		void checkContentType(std::string &contetType);
 		std::string decodingUri(std::string str);	
 		void checkStoreData();	
-		void storeContentLength(std::string length);
-		std::string getCookies();
-		std::string getQueryString();
-		std::string getUri();
+		std::string getCookies()const;
+		std::string getUri()const;
+		std::string getQueryString()const;
 		class readError:public std::exception 
         {
             const char* what() const throw()

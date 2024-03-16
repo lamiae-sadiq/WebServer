@@ -3,30 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/14 21:09:20 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/16 21:58:09 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Multiplixer.hpp"
 
-
-void setNonBlocking(int &sockfd) {
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    if (flags == -1) {
-        perror("fcntl");
-        exit(EXIT_FAILURE);
-    }
-    if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        perror("fcntl");
-        exit(EXIT_FAILURE);
-    }
-}
-void Multiplixer::add_event(int epoll_instance,int sockfd, epoll_event *event, int flag)
+Multiplixer::Multiplixer()
 {
-	// setNonBlocking(sockfd)
+	tmpBuff="";
+	count = 0;
+}
+
+void Multiplixer::setNonBlocking(int &sockfd) 
+{
+    if(fcntl(sockfd, F_SETFL, O_NONBLOCK, FD_CLOEXEC)== -1)
+        throw Exception("Error: fcntl function failed\n");
+}
+
+void Multiplixer::addFdToEpoll(int epoll_instance,int sockfd, epoll_event *event, int flag)
+{
+	setNonBlocking(sockfd);
 	if(!flag)
 		event->events = EPOLLIN;
 	else
@@ -36,40 +36,38 @@ void Multiplixer::add_event(int epoll_instance,int sockfd, epoll_event *event, i
 	if(epo_ctl < 0)
 	{
 		closeMasterSocket();
-		throw networkError();
+        throw Exception("Error: epoll_ctl failed\n");
 	}
 }
 
-void Multiplixer::bindSocket(int fdSocket,int port,Server server)
+void Multiplixer::bindSocket(int fdSocket,std::string port,Server server)
 {
 	struct sockaddr_in address;
 	struct addrinfo info,*listOfAdresses,*p;
 	
     memset(&info, 0, sizeof(info));
 	info.ai_family = AF_INET;
-	int getAddressInfo = getaddrinfo(server.getServerData("host")[0].c_str(),NULL,&info,&listOfAdresses);
+	int getAddressInfo = getaddrinfo(server.getServerData("host")[0].c_str(),port.c_str(),&info,&listOfAdresses);
 	if(getAddressInfo != 0)
 	{
 		closeMasterSocket();
-		throw getAddressError();
+        throw Exception(gai_strerror(getAddressInfo));
 	}
 	for(p = listOfAdresses; p!=NULL; p=p->ai_next)
 	{
 		if (p->ai_family == AF_INET)
 		{
 			address = (*(struct sockaddr_in *)p->ai_addr);
-			//printf("IPv4 Address: %s\n", inet_ntoa(address.sin_addr));
 			break;
 		}
 	}
 	freeaddrinfo(listOfAdresses);
 	address.sin_family = AF_INET; 
-	address.sin_port = htons(port);
 	int bindStatus = bind(fdSocket, (struct sockaddr *)&address,sizeof(address));
 	if( bindStatus < 0)
 	{
 		closeMasterSocket();
-		throw networkError();
+        throw Exception("Error: bind failed\n");
 	}
 }
 
@@ -96,7 +94,7 @@ int Multiplixer::checkMasterSocketPort(Server server)
 				 (it->second[i]).getServerData("host")[0] == server.getServerData("host")[0] && (it->second[i]).getServerData("server_name")[0] == server.getServerData("server_name")[0])
 					{
 						closeMasterSocket();
-						throw invalidBind();
+        				throw Exception("Error: bind failed\n");//change it
 					}
 				if((it->second)[i].getServerData("port")[0] == server.getServerData("port")[0] &&
 				 (it->second[i]).getServerData("host")[0] == server.getServerData("host")[0])
@@ -124,14 +122,14 @@ void Multiplixer::creatSockets(int epoll_instance,std::vector<Server> servers)
 			if(masterSockfd < 0)
 			{
 				closeMasterSocket();
-				throw networkError();
+        		throw Exception("Error: creat socket failed\n");
 			}
 			if (setsockopt(masterSockfd, SOL_SOCKET, SO_REUSEADDR,&a, sizeof(int)) < 0)
-    			perror("setsockopt(SO_REUSEADDR) failed");//throw error here
-			bindSocket(masterSockfd,atoi(servers[i].getServerData("port")[0].c_str()),servers[i]);
+        		throw Exception("Error: setsockopt failed\n");
+			bindSocket(masterSockfd,servers[i].getServerData("port")[0],servers[i]);
 			listenn = listen(masterSockfd,2);
-			printf("listening......\n");
-			add_event(epoll_instance,masterSockfd,&event,0);
+			printf("listiining......\n");
+			addFdToEpoll(epoll_instance,masterSockfd,&event,0);
 		}
 		masterSockets[masterSockfd].push_back(servers[i]);
 	}
@@ -139,11 +137,11 @@ void Multiplixer::creatSockets(int epoll_instance,std::vector<Server> servers)
 
 void Multiplixer::CreateNetwork(int &epoll_instance,std::vector<Server> servers)
 {
-	epoll_instance = epoll_create(100);
+	epoll_instance = epoll_create(EXPECTEDFDS);
 	if(epoll_instance < 0)
 	{
 		close(epoll_instance);
-		throw networkError();
+        throw Exception("Error: epoll_create failed\n");
 	}
 	creatSockets(epoll_instance,servers);
 }
@@ -156,24 +154,52 @@ void  Multiplixer::acceptNewConnection(int epoll_instance,int sockfd,epoll_event
 	
 	newSockfd = accept(sockfd,(struct sockaddr *)&client_add,&add_len);
 	if(newSockfd < 0)
-		throw acceptError();
+        throw Exception("Error: accept failed\n");
 	matchServers[newSockfd] = masterSockets[sockfd];
-	add_event(epoll_instance,newSockfd,events,1);
+	addFdToEpoll(epoll_instance,newSockfd,events,1);
 	requests[newSockfd] = new Request();
 	Request &request = *(requests[newSockfd]);
 	responses[newSockfd] = new response(request);
-
+    responses[newSockfd]->setFd(newSockfd);
+	gettimeofday(&request.start_time, NULL);
 }
 
 void Multiplixer::clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct  epoll_event *events,int index)
 {
 	if(epoll_ctl(epoll_instance,EPOLL_CTL_DEL,socketFd, &events[index]) < 0)
-		throw networkError();
+        throw Exception("Error: epoll_ctl failed\n");
 	close(socketFd);
-	// delete (responses[socketFd]);
-	// delete (requests[socketFd]);
+	response *tmp_res = responses[socketFd];
+	Request *tmp_req = requests[socketFd];
+
+	std::cout << "send response\n";
 	responses.erase(socketFd);
 	requests.erase(socketFd);
+	delete(tmp_req);
+	delete(tmp_res);
+}
+
+void  Multiplixer::restartTime(Request &request)
+{
+	request.start_time.tv_sec = 0;
+    request.start_time.tv_usec = 0;
+	request.end_time.tv_sec = 0;
+    request.end_time.tv_usec = 0;
+	gettimeofday(&request.start_time, NULL);
+}
+
+bool Multiplixer::isTimedout(response *response,Request &request)
+{
+	gettimeofday(&request.end_time, NULL);
+	int time = (request.end_time.tv_sec - request.start_time.tv_sec) * 1000000LL +
+    (request.end_time.tv_usec - request.start_time.tv_usec);
+	if( time >   20000000LL)
+	{
+		response->setStatusCode(408);
+		request.setStatus(1);
+		return true;
+	}
+	return false;
 }
 
 void Multiplixer::start(std::vector<Server> servers)
@@ -181,7 +207,7 @@ void Multiplixer::start(std::vector<Server> servers)
 	epoll_event events[MAX_EVENTS];
 	size_t readyFiles;
 	int epoll_instance;
-	char buff[1024];
+	char buff[2048];
 	int code;
 	int byt;
 	
@@ -200,14 +226,15 @@ void Multiplixer::start(std::vector<Server> servers)
 			{
 				int socketFd = events[i].data.fd;
 				Request &request = *(requests[socketFd]);
-				if((events[i].events & EPOLLIN))
+				if(!isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN) )
 				{
-					byt = recv(socketFd,buff,1024, 0);
+					byt = recv(socketFd,buff,2048, 0);
 					if(byt <= 0)
 					{
 						clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 						continue;
 					}
+					restartTime(request);
 					code = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
 					if(code != 1)
 						responses[socketFd]->setStatusCode(code);
@@ -217,7 +244,7 @@ void Multiplixer::start(std::vector<Server> servers)
 					if(request.getStatus() == 1)
 					{
 						responses[socketFd]->executeMethodes(buff,byt,socketFd);
-						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)
+						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)// set a flag when we done 
 							clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 					}
 				}

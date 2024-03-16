@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 21:13:14 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/05 21:13:23 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/16 14:47:13 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,12 @@ class HttpException:public  std::exception
         const char* msg;
         int statusCode;
     public:
-        HttpException(const char* init,int code):msg(init),statusCode(code){};
-
+        HttpException(const char* init,int code);
+        HttpException(const char* init);
         int getStatusCode()
         {
             return statusCode;
         }
-
         const char* what() const throw()
         {
                 return msg;
@@ -36,22 +35,28 @@ class HttpException:public  std::exception
 class HttpBadRequest:public HttpException
 {
     public:
-        HttpBadRequest(const char *msg):HttpException(msg,400){};
+        HttpBadRequest(const char *msg);
 };
 
 class HttpVersionNotSupported:public HttpException
 {
     public:
-        HttpVersionNotSupported(const char *msg):HttpException(msg,505){};      
+        HttpVersionNotSupported(const char *msg);     
 };
 
 class HttpNotImplemented:public HttpException
 {
     public:
-        HttpNotImplemented(const char *msg):HttpException(msg,501){};  
+        HttpNotImplemented(const char *msg);
 };
 class HttpUriTooLong:public HttpException
 {
     public:
-        HttpUriTooLong(const char *msg):HttpException(msg,414){};
+        HttpUriTooLong(const char *msg);
+};
+
+class HttpLengthRequired:public HttpException
+{
+    public:
+        HttpLengthRequired(const char *msg);
 };

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/15 21:39:45 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/16 21:59:41 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,8 +227,9 @@ void response::listDirectories()
 
 void response::executeMethodes(const char *buff,size_t size,int fd)
 {
-    setFd(fd);
-    if (status_code != 200 && flag == 0){
+    (void)fd;
+    
+    if ((status_code != 200 && flag == 0) || status_code == 408){
         getErrorPage();
         sendErrorPage();
     }

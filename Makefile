@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+         #
+#    By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/03/13 14:01:43 by lsadiq           ###   ########.fr        #
+#    Updated: 2024/03/16 21:31:26 by kel-baam         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ MULT = Multiplixer.cpp
 
 M_MULT = $(addprefix srcs/Multiplexer/,$(MULT))
 
-SRCS =  Parse.cpp Server.cpp Utils.cpp Location.cpp  Request.cpp
+SRCS =  Parse.cpp Server.cpp Utils.cpp Location.cpp  Request.cpp HttpException.cpp
 
 P_SRCS	= 	$(addprefix srcs/Parser/,$(SRCS))
 

@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:55:29 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/08 17:38:23 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/13 21:36:02 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ std::vector<std::string> Utils::splitString(std::string string,int del)
   
 	while(index !=std::string::npos)
 	{	
+    
 		index = string.find(del);
     
 		if(index != std::string::npos)
@@ -114,10 +115,23 @@ void Utils::strToLower(std::string &str)
   }
 }
 
-// int countWords(std::string str)
-// {
-//   for(size_t i = 0; i < str.length();i++)
-//   {
-//     if(str[i])
-//   }
-// }
+long long int  Utils::stringToLongLong(std::string str)
+{
+    long long int num;
+    std::stringstream ToLong;
+    ToLong << str ;
+    ToLong >> num;
+    return num;
+}
+
+bool  Utils::checkOverflowError(std::string originNum, long long int currentNum)
+{
+    std::stringstream ToString;
+    std::string currentString;
+
+    ToString << currentNum;
+    ToString >> currentString;
+    if(currentString != originNum)
+        return false;
+    return true;
+}
