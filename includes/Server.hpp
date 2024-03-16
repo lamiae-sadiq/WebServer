@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:46:06 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/11 14:26:08 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/02 11:57:07 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Server
         void        printLOcationINfo();
         size_t      directiveSize(std::string directive);
         bool        isValidBodySize(std::string size);
+        void        checkServersError();
         void        locationAddBack();
         static void checkErrorPages(std::vector<std::string> vec);
         static void checkServernameError(std::vector<std::string> serverName);
@@ -59,7 +60,6 @@ class Server
         static void checkServersError(std::string directive, std::vector<std::string> vec,int countSpaces);
         std::vector<Location> getLocations();
         bool isValidServer();
-        bool isValidLocations();
         Location& operator[](size_t index);
 
         class ConfigueFileError:public std::exception 

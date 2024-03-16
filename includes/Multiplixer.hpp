@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:05 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/11 14:27:29 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 15:07:50 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <sys/time.h>
 #include <map>
 #include "./Utils.hpp"
 #include "./response.hpp"
 #include "./Request.hpp"
 #define MAX_EVENTS 50
-#define EXPECTEDFDS 1000
+
+
 static std::string tmpBuff;
 class Multiplixer
 {
@@ -52,17 +52,18 @@ class Multiplixer
 		}
 		~Multiplixer(){};
 		int checkMasterSocketPort(Server server);
-		void addFdToEpoll(int epoll_instance,int sockfd,epoll_event *event, int flag);
+		void analyseRequest(char * buff, int &completeRead);
+		void add_event(int epoll_instance,int sockfd,epoll_event *event, int flag);
 		void creatSockets(int epo,std::vector<Server> servers);
 		void bindSocket(int fdSocket,int port,Server server);
 		void CreateNetwork(int &epoll_instance,std::vector<Server> srevers);
+		void readReqeust(int &fd,int &completeRead);
 		void start(std::vector<Server> servers);
+		void storeRequest(std::string line);
+		void storeRequestLineInfo(std::vector<std::string> vec);
 		void clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct  epoll_event *events,int index);		
 		void acceptNewConnection(int epoll_instance,int sockfd,epoll_event *events);
 		void closeMasterSocket();
-        void  restartTime(Request &request);
-        bool isTimedout(response *response,Request &request);
-        void setNonBlocking(int &sockfd);
 	  	class networkError:public std::exception 
         {
             const char* what() const throw()
@@ -103,13 +104,6 @@ class Multiplixer
             const char* what() const throw()
             {
                 return "error in accepting client\n";
-            }
-        };
-        class fcntlError:public std::exception 
-        {
-            const char* what() const throw()
-            {
-                return "fcntl error\n";
             }
         };
 };

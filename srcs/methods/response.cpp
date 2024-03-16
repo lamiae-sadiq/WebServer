@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/12 15:53:58 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/15 21:39:45 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/response.hpp"
-
-
 
 template <typename T>
 std::string to_string(T value) {
@@ -34,7 +32,6 @@ void    response::sendData()
             resHeader += "Transfer-Encoding: chunked\r\n";
             resHeader += "\r\n";
             send(fd, resHeader.c_str(), resHeader.length(), 0);
-            // if (sd < 0)
         flag = 3;
     }
     if (flag == 3)
@@ -61,6 +58,7 @@ void    response::sendData()
         send(fd, "0\r\n\r\n", 5, 0);
         ifile.close();
         flag = 30;
+        // std::cout << "File sent" << std::endl;
     }
 }
 
@@ -129,13 +127,16 @@ void response::sendErrorPage()
 void response::ErrorHeader()
 {
     const std::string errorPage = HTMLPage();
+    std::cout << "method : " << request.getMethod() << std::endl;
     std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
     header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
     header.append(to_string(errorPage.length()));
     header += "\r\n\r\n";
-    header.append(errorPage);
+    if (request.getMethod() != "HEAD") {
+        header.append(errorPage);
+    }
     send(fd, header.c_str(), header.length(), 0);
-	flag = 30;
+    flag = 30;
 }
 
 void response::setHeader()
@@ -150,6 +151,7 @@ void response::setHeader()
     }
     if (status_code >= 200 && status_code <= 204)
     {
+        std::cout << "------------------" << status_code << std::endl;
         const std::string responsePage = HTMLPage();
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
@@ -226,16 +228,9 @@ void response::listDirectories()
 void response::executeMethodes(const char *buff,size_t size,int fd)
 {
     setFd(fd);
-    if (status_code != 200 && flag == 0)
-    {
+    if (status_code != 200 && flag == 0){
         getErrorPage();
         sendErrorPage();
-    }
-    if(status_code == 408)
-    {
-        getErrorPage();
-        sendErrorPage();
-     // timeout for post there is an issue whit condition of flag == 0
     }
     if (request.getMethod() == "GET")
         methodGet();

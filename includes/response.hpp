@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/11 15:34:55 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/16 17:21:49 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 #include "Request.hpp"
 #include "Server.hpp"
 #include "cgi.hpp"
+#include <ctime>
 
 #define PORT 8080
 
@@ -40,7 +41,7 @@
 #define DIRECTORY 0
 #define NOT_FOUND -1
 #define FORBIDDEN -2
-static int i = 0;
+// static int i = 0;
 #define CGI 0
 
 
@@ -84,9 +85,16 @@ class response
 		std::map<std::string, std::string>		_cgiMap;
 		int										_fd;
 		int 									pid;
+		std::string path;
 		int 									cgiOutfile;
+		std::map<std::string , std::string>	_cgiHeader;
+		bool									_cgiStarted;
+		bool									_cgiEnded;
+		std::clock_t							cgiStartTime;
+		std::string								uplfile;
+		bool									_isCgi;
 	public :
-		// Cgi _cgi;
+		std::ifstream cinfile;
 		Server serv;
 		response(Request& initRequest);
 		~response();
@@ -153,6 +161,18 @@ class response
 		/////////////////cgi///////////////
 		void		setEnv();
         void		executePHP(std::string &file);
-        void		executePython(std::string &file);
+        void		executePython();
         char**		getEnv();
+		void		cgiSendResponse();
+		void		setCgiHeader();
+		void		parsecgiFile();
+		void		handelCGI();
+		bool		_cgiProcess();
+		void    	Post();
+		template <typename T>
+		std::string to_string(T value) {
+			std::ostringstream os;
+			os << value;
+			return os.str();
+		}
 };

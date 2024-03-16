@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/12 13:49:57 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/16 18:04:21 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ std::string	response::getUploadFN(){
 bool passheader(const char *con, size_t& index, size_t size)
 {
     (void)size;
+    (void)index;
     // con[size] = '\0';
     if (strstr(con, "\r\n\r\n") != NULL)
     {
@@ -66,6 +67,12 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 {
     while (index < size)
     {
+        // static int pflag = 0;
+        
+        // if (pflag != flag)
+        //     std::cout << "flag : " << flag << std::endl;
+        // pflag = flag;
+        
         if (flag == 2)
         {
             while (index < size && ihex < 20)
@@ -190,10 +197,24 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 
 void    response::methodPost(const char *con, size_t size)
 {
+    (void) con;
+    (void) size;
+    targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
+    // std::cout << "targetUri   " << targetUri << std::endl;
     if(!allowedMethods())
     {
         status_code = 405;
     }
+    // if (checkType(targetUri) == FILE) {
+    //     check_extention(targetUri);
+    //     // std::cout << extention << std::endl;
+    //     if(extention == "php" || extention == "py")
+    //     {
+    //         // std::cout << "CGI\n";
+    //         handelCGI();
+    //         // return;
+    //     }
+    // }
     else if (flag == 0)
     {
         size_t index = 0;
@@ -296,6 +317,7 @@ void    response::fileExtention()
 }
 void response::createFile()
 {
+    std::cout << "__________post ___________" << std::endl;
     if (request.location.upload[0] == '/')
         request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1) {
@@ -308,6 +330,10 @@ void response::createFile()
         std::string randName = generateName();
         std::string ileType = request.getContentType();
         extention = mime_[ileType];
+        // uplfile = randName + "." + extention;
+        
         upfile.open((UplDir + "/" + randName + "." + extention).c_str());
     }
 }
+
+

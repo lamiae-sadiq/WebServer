@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 09:07:35 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/11 14:25:17 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:15:28 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class Location
                 void printData();
                 static void   checkMembershipInLocation(std::string directive);
                 static void checkLocationError(std::string directive,std::vector<std::string> vec,int countSpaces);
+                static bool isValidPath(std::string location_name);
                 static void checkAutoindexError(std::vector<std::string> autoindex);
                 static void checkMethodsError(std::vector<std::string> methods); 
                 static void  checkLocationName(std::vector<std::string> location_name);   
@@ -44,7 +45,6 @@ class Location
                 static void checkRootError(std::vector<std::string> root);
                 static void checkUpload(std::vector<std::string> upload);
                 static void checkCgiError(std::vector<std::string> vec);
-                bool isValidLocation();
                 ~Location();
                 class autoindexError:public std::exception 
                 {

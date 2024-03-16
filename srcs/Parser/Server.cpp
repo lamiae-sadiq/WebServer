@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/13 12:06:51 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/08 17:08:31 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,7 @@ void Server::setServerData(std::string key ,std::vector<std::string> vec)
         serverData[key].insert(serverData[key].end(),vec.begin(),vec.end()); 
     }
     else
-        error_pages[Utils::stringToLongLong(vec[0].c_str())] = vec[1]; 
-}
-
-bool  Server::isValidLocations()
-{
-    for(size_t i = 0; i < this->getLocations().size();i++)
-    {
-        if(!this->getLocations()[i].isValidLocation())
-            return false;
-    }
-    return true;
+        error_pages[atol(vec[0].c_str())] = vec[1]; 
 }
 
 void Server::locationAddBack()
@@ -95,12 +85,10 @@ void Server::checkPortError(std::vector<std::string> port)
 {
     size_t len = port[0].length();
     size_t index = port[0].find_first_not_of("0123456789");
-    long long int portNum = Utils::stringToLongLong(port[0]);
-    if(!Utils::checkOverflowError(port[0],portNum))
-		throw Utils::numberOverflow();
+    
     if(port.size() != 1)
         throw portError();
-    if(index!= std::string::npos ||  len > 5 || port[0][0] == '-' < 0 || portNum > 65535)
+    if(index!= std::string::npos ||  len > 5 || port[0][0] == '-' < 0 || atol(port[0].c_str()) > 65535)
         throw portError();
 }
 
@@ -108,8 +96,7 @@ void Server::checkHostError(std::vector<std::string> host)
 {
     std::vector<std::string> nums;
     size_t index;
-    long long int hostNum;
-    
+
     if(host.size() != 1 || std::count(host[0].begin(),host[0].end(),'.') > 3)
         throw HostError();
     if(host[0] == "localhost" )
@@ -118,22 +105,14 @@ void Server::checkHostError(std::vector<std::string> host)
     for(size_t i = 0; i < nums.size();i++)
     {
         index = nums[i].find_first_not_of("0123456789");
-        hostNum = Utils::stringToLongLong(nums[i]);
-        if(!Utils::checkOverflowError(nums[i],hostNum))
-		    throw Utils::numberOverflow();
-        if(index!= std::string::npos || hostNum < 0 || hostNum > 255)
+        if(index!= std::string::npos || atol(nums[i].c_str()) < 0 || atol(nums[i].c_str()) > 255)
             throw HostError();
     }
 }
 
 void Server::checkClientMaxBody(std::vector<std::string> bodySize)
 {
-    long long int maxSize = Utils::stringToLongLong(bodySize[0].c_str());
-    if(!Utils::checkOverflowError(bodySize[0],maxSize))
-		throw Utils::numberOverflow();
-    if(maxSize <= 0)
-        throw ClientMaxBodyError();
-    if(bodySize.size() != 1 || bodySize[0].find_first_not_of("0123456789")!= std::string::npos)
+    if(bodySize.size() != 1 || bodySize[0].find_first_not_of("0123456789")!= std::string::npos || atol(bodySize[0].c_str()) <=0 )
         throw ClientMaxBodyError();
 }
 
@@ -145,9 +124,8 @@ void Server::checkServernameError(std::vector<std::string> serverName)
 
 void Server::checkErrorPages(std::vector<std::string> vec)
 {
-    long long errorNum = Utils::stringToLongLong(vec[0].c_str());
-    if(!Utils::checkOverflowError(vec[0], errorNum))
-		throw Utils::numberOverflow();
+    char *ptr;
+    long long errorNum = strtoll(vec[0].c_str(),&ptr,10);
     if(vec.size() != 2 || errorNum < 400 || errorNum > 599)
         throw errorPages();
     if(vec[0].find_first_not_of("0123456789")!= std::string::npos )

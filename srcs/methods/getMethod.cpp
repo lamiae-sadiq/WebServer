@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/11 18:22:32 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/16 17:21:32 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ void response::init()
     fd = -1;
     this->status_code = 200;
 	this->targetUri = "";
+    _cgiStarted = false;
+    _cgiEnded = false;
+    _isCgi  = false;
     // close = true;
     // this->_cgiMap = request.location.cgi;
     flag = 0;
@@ -27,8 +30,6 @@ void response::init()
     lastChunk = false;
     dir = NULL;
     fileExtention();
-    // setEnv();
-    // getEnv();
 }
 
 response::response(Request& initRequest):request(initRequest)
@@ -70,6 +71,8 @@ const std::string	response::setStatus(int status)
             return "Bad request ";
         case 505:
             return "HTTP Version Not Supported";
+        case 504:
+            return "Gateway Timeout";
 		default:
 			return "Internal Server Error";
 	}
@@ -86,32 +89,24 @@ void    response::methodGet()
             return;
         }
         targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
-        request.getUri() = targetUri;
-        std::cout << "targetUri   " << targetUri << std::endl;
+        // request.getUri() = targetUri;
+        // std::cout << "targetUri   " << request.getUri() << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)
         {
             if(access(this->targetUri.c_str(), R_OK) == 0)
             {
-                    std::cout <<"--------------\n";
+                    // std::cout <<"--------------\n";
                 if(checkType(targetUri) == FILE)
                 {
                     check_extention(targetUri);
-                    std::cout << extention << std::endl;
+                    // std::cout << extention << std::endl;
                     if(extention == "php" || extention == "py")
                     {
-                        if (!request.location.cgi.empty())
-                        {
-                            // std::cout << "dkhelt \n";
-                            if (extention == "php")
-                                executePHP(targetUri);
-                            else
-                                executePython(targetUri);
-                            content_type = "text/html";
-                            flag = 2;
-                            return;
-                        }
+                        // std::cout << "CGI\n";
+                        handelCGI();
+                        return;
                     }
                     else{
                         content_type = fileType;
@@ -165,3 +160,4 @@ void    response::methodGet()
     else if (flag >= 6 && flag <= 10)
         listDirectories();
 }
+ 

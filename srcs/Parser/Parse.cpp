@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:16 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/12 15:55:39 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/06 16:40:19 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void Parser::analyseServerData(std::string &line,std::ifstream& readFile,Server 
       directive = line;
       if(index != std::string::npos)
       {
-        directive = line.substr(0,index);
+        directive = line.substr(0,index);//leaks
         line = line.substr(index + 1);
       }
       if(directive != "location")
@@ -87,7 +87,7 @@ void Parser::checkFinalData(std::vector<Server> servers)
 {
   for(size_t i = 0; i < servers.size(); i++)
   {
-    if(!servers[i].isValidServer() || !servers[i].isValidLocations())
+    if(servers[i].isValidServer() ==  false)
       throw ConfigueFileError();
   }
 }
