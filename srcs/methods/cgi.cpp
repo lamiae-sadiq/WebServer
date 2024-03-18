@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/16 18:01:08 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/18 00:16:20 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,21 @@
 #include "../../includes/Request.hpp"
 #include "sys/wait.h"
 #include <fcntl.h>
+#include <sys/stat.h>
 
 void response::setEnv()
 {
 	// Set environment variables for CGI
-	
+
 	std::string cgiEnv;
 	cgiHeader["CONTENT_TYPE"] = request.getContentType();
-	cgiHeader["CONTENT_LENGTH"] = request.getContentLength();
+	if (request.getMethod() == "POST")
+	{
+		struct stat datafile;
+		stat(uplfile.c_str(), &datafile);
+		cgiHeader["CONTENT_LENGTH"] = to_string(datafile.st_size);
+	}
+
 	cgiHeader["GATEWAY_INTERFACE"] = "CGI";
 	cgiHeader["REQUEST_METHOD"] = request.getMethod();
 	cgiHeader["QUERY_STRING"] = request.getQueryString();
@@ -32,8 +39,8 @@ void response::setEnv()
 	cgiHeader["PATH_TRANSLATED"] = targetUri;
 	cgiHeader["SERVER_PROTOCOL"] = "HTTP/1.1";
 	cgiHeader["REDIRECT_STATUS"] = "200";
-	
-	env = new char* [cgiHeader.size() + 1];
+
+	env = new char *[cgiHeader.size() + 1];
 	int i = 0;
 	for (std::map<std::string, std::string>::iterator it = cgiHeader.begin(); it != cgiHeader.end(); ++it)
 	{
@@ -45,8 +52,7 @@ void response::setEnv()
 	env[i] = NULL;
 }
 
-
-char** response::getEnv()
+char **response::getEnv()
 {
 	int i = 0;
 	while (env[i] != NULL)
@@ -57,33 +63,30 @@ char** response::getEnv()
 	return env;
 }
 
-void response::executePHP(std::string &file)
+void response::executePHP()
 {
-	(void)file;
-	// int status;
 	std::cout << "___________PHP_______\n";
 	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
 	it = request.location.cgi.find("php");
 	if (it != request.location.cgi.end())
 	{
-		cgiStartTime = std::clock();
+		// cgiStartTime = std::clock();
+		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/" + randName;
+		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
 		pid = fork();
-		if(pid == 0)
+		if (pid == 0)
 		{
 			setEnv();
 			// getEnv();
 			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
-			if (request.getMethod() == "POST"){
-				std::cout << "POSTTT\n";
-				freopen(path.c_str(), "r", stdout);
-			}
-			else
+			if (request.getMethod() == "POST")
 			{
-				std::cout << "GET\n";
-				freopen(path.c_str(), "w", stdout);
+				freopen(uplfile.c_str(), "r", stdin);
+				remove(uplfile.c_str());
 			}
+			std::cout << "GET\n";
+			freopen(path.c_str(), "w", stdout);
 			char *av[3];
 			av[0] = strdup(it->second.c_str());
 			av[1] = strdup(targetUri.c_str());
@@ -94,14 +97,11 @@ void response::executePHP(std::string &file)
 		else
 		{
 			_cgiStarted = true;
-			// waitpid(pid, NULL, 0);
-				// cgiSendResponse();
-			// }
 		}
 	}
 }
 
-bool	response::_cgiProcess()
+bool response::_cgiProcess()
 {
 	if (_cgiEnded)
 		return true;
@@ -111,17 +111,19 @@ bool	response::_cgiProcess()
 		status_code = 500;
 		_cgiEnded = true;
 		std::cout << "___________CGIEnded_______3\n";
-		return true;	
+		return true;
 	}
 	else
 	{
 		int wait = waitpid(pid, &status, WNOHANG);
-		std::clock_t now = std::clock();
-		// std::cout << "waitpid = "<< wait << std::endl;
-		if(wait == 0){
-			// std::cout << "hehe\n";
-			// std::cout <<"time = " << static_cast<double>(now - cgiStartTime) / CLOCKS_PER_SEC << std::endl;
-			if (static_cast<double>(now - cgiStartTime) / CLOCKS_PER_SEC > 1)
+
+		if (wait == 0)
+		{
+			long long now = time(NULL);
+
+			request.setCGIRun();
+			// std::cout << " time = " << (now -  cgiStartTime_1) <<std::endl;
+			if ((now -  cgiStartTime) > 10)
 			{
 				std::cout << "time out \n";
 				kill(pid, SIGKILL);
@@ -137,8 +139,6 @@ bool	response::_cgiProcess()
 		{
 			if (WIFEXITED(status))
 				status_code = 200;
-			else
-				status_code = 500;
 			_cgiEnded = true;
 			std::cout << "___________CGIEnded_______1\n";
 			return true;
@@ -153,24 +153,30 @@ bool	response::_cgiProcess()
 	return false;
 }
 
-void	response::handelCGI()
+void response::handelCGI()
 {
-	// std::cout << "___________CGIHandeler_______\n";
 	if (!_cgiStarted)
 	{
 		if (request.location.cgi.find("php") != request.location.cgi.end())
-			executePHP(targetUri);
+			executePHP();
 		else
 			executePython();
 	}
 	if (!_cgiProcess())
 		return;
-	if(_cgiEnded)
+	if (_cgiEnded)
 	{
+		std::cout << " status " << status_code << std::endl;
+		std::cout << "___________CGIHandeler_______11111111111 \n";
 		if (status_code == 500)
 		{
 			remove(path.c_str());
 			status_code = 500;
+		}
+		else if (status_code == 504)
+		{
+			remove(path.c_str());
+			status_code = 504;
 		}
 		else if (status_code == 408)
 		{
@@ -181,11 +187,10 @@ void	response::handelCGI()
 		{
 			std::cout << "___________CGIEnded_______\n";
 			cgiSendResponse();
-			return ;
+			return;
 		}
 	}
 }
-
 
 void response::executePython()
 {
@@ -194,28 +199,37 @@ void response::executePython()
 	it = request.location.cgi.find("py");
 	if (it != request.location.cgi.end())
 	{
+		// cgiStartTime = std::clock();
+		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webserv/" + randName;
+		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
 		pid = fork();
-		if(pid == 0)
+		if (pid == 0)
 		{
 			setEnv();
+			// getEnv();
+			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
+			if (request.getMethod() == "POST")
+			{
+				freopen(uplfile.c_str(), "r", stdin);
+				remove(uplfile.c_str());
+			}
+			std::cout << "GET\n";
 			freopen(path.c_str(), "w", stdout);
 			char *av[3];
 			av[0] = strdup(it->second.c_str());
 			av[1] = strdup(targetUri.c_str());
 			av[2] = NULL;
-			execve(it->second.c_str(), av, NULL);
+			execve(it->second.c_str(), av, env);
 			exit(0);
 		}
 		else
 		{
-			// waitpid( pid, NULL,0);
-			// cgiSendResponse();
 			_cgiStarted = true;
 		}
 	}
 }
+
 void response::parsecgiFile()
 {
 	cinfile.open(path.c_str());
@@ -224,7 +238,7 @@ void response::parsecgiFile()
 		std::string line;
 		while (getline(cinfile, line))
 		{
-			if ( line == "\n" || line == "\r\n" |line == "\r" || line == "")
+			if (line == "\n" || line == "\r\n" | line == "\r" || line == "")
 				break;
 			size_t pos = line.find(':');
 			if (pos != std::string::npos)
@@ -239,24 +253,41 @@ void response::parsecgiFile()
 		status_code = 404;
 }
 
-
-void	response::cgiSendResponse()
+void response::cgiSendResponse()
 {
-	// std::cout << status_code << std::endl;
 	parsecgiFile();
 	std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
-	resHeader += "\r\nContent-Type:" + _cgiHeader["Content-Type"];
-	resHeader += "\n\r\n";
+	resHeader += "\r\nContent-Type:" + _cgiHeader["Content-type"];
+	resHeader +="\r\n";
+	resHeader += "Transfer-Encoding: chunked\r\n";
+	resHeader += "\r\n";
+	std::cout << resHeader ;
 	send(fd, resHeader.c_str(), resHeader.length(), 0);
-	char buffer[1024];
-	while (!cinfile.eof()) {
-		cinfile.read(buffer, sizeof(buffer));
-		int  bytes = cinfile.gcount();
-		if (bytes > 0) {
-			send(fd, buffer, bytes, 0);
+	flag = 3;
+	if (flag == 3)
+	{
+		const int chunkSize = 1024;
+		char buffer[chunkSize];
+		cinfile.read(buffer, chunkSize);
+		int bytesRead = cinfile.gcount();
+		std::stringstream ss;
+		ss << std::hex << bytesRead;
+		std::string chunkSizeHex = ss.str();
+		std::string chunkHeader = chunkSizeHex + "\r\n";
+		char concatenatedSends[chunkHeader.length() + bytesRead + 2];
+		memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
+		memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
+		memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
+		write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
+		if (cinfile.eof()){
+			flag = 4;
 		}
 	}
-	remove(path.c_str());
-	cinfile.close();
-	flag = 30;
+    if (flag == 4) {
+		std::cout << "oooooo\n";
+        send(fd, "0\r\n\r\n", 5, 0);
+		remove(path.c_str());
+		cinfile.close();
+        flag = 30;
+    }
 }

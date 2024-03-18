@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/16 21:40:46 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:05:39 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ class Request
 		std::string cookies;
 		std::string uri;
 		bool _isCgi;
+		bool _cgiRuning;
 		
 	public:
 		struct timeval start_time, end_time;
@@ -76,7 +77,15 @@ class Request
 		void setStatus(int init);
 		bool getFirstReadBody()const;
 		loc getLocation()const;
-		bool getIsCgi();
+		void	setCGIRun();
+		bool getCgiRuning()
+		{
+			return _cgiRuning;
+		}
+		bool getIsCgi()
+		{
+			return _isCgi;
+		};
 		std::string getHeader(std::string &key);
 		std::string getMethod()const;
 		std::string getUrl()const;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/16 21:59:41 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/17 22:37:53 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ void    response::sendData()
         if (!ifile.is_open())
             throw std::runtime_error("Error: failed to open video ifile");
         std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
-            resHeader += "\r\nContent-Type: ";
-            resHeader += content_type;
-            resHeader +="\r\n";
-            resHeader += "Transfer-Encoding: chunked\r\n";
-            resHeader += "\r\n";
-            send(fd, resHeader.c_str(), resHeader.length(), 0);
+        resHeader += "\r\nContent-Type: ";
+        resHeader += content_type;
+        resHeader +="\r\n";
+        resHeader += "Transfer-Encoding: chunked\r\n";
+        resHeader += "\r\n";
+        send(fd, resHeader.c_str(), resHeader.length(), 0);
         flag = 3;
     }
     if (flag == 3)
@@ -58,7 +58,6 @@ void    response::sendData()
         send(fd, "0\r\n\r\n", 5, 0);
         ifile.close();
         flag = 30;
-        // std::cout << "File sent" << std::endl;
     }
 }
 
@@ -229,9 +228,10 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
 {
     (void)fd;
     
-    if ((status_code != 200 && flag == 0) || status_code == 408){
+    if (status_code != 200) {
         getErrorPage();
         sendErrorPage();
+        std::cout << " ==================> Heere " << status_code << std::endl;
     }
     if (request.getMethod() == "GET")
         methodGet();
@@ -239,13 +239,21 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
         Delete();
     else if (request.getMethod() == "POST")
     {
-        if(request.getFirstReadBody())
-        {
-            methodPost(request.tmpBuff.c_str(),request.tmpBuff.size());
-            request.setFirstReadOfBody(false);
+        if (!postDone) {
+            if(request.getFirstReadBody())
+            {
+                methodPost(request.tmpBuff.c_str(),request.tmpBuff.size());
+                request.setFirstReadOfBody(false);
+            }
+            else
+                methodPost(buff, size);
+        } else {
+            // std::cout << "post\n";
+            if (_isCgi) {
+                handelCGI();
+            }
         }
-        else
-            methodPost(buff, size);
+
     }
     else
         status_code = 405;

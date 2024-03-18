@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/16 17:21:32 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/17 16:05:25 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,15 @@ void response::init()
 	this->targetUri = "";
     _cgiStarted = false;
     _cgiEnded = false;
-    _isCgi  = false;
+    _isCgi = false;
+    // _isCgi  = false;
     // close = true;
     // this->_cgiMap = request.location.cgi;
     flag = 0;
     this->ihex = 0;
     lastChunk = false;
     dir = NULL;
+    postDone = false;
     fileExtention();
 }
 
@@ -105,6 +107,7 @@ void    response::methodGet()
                     if(extention == "php" || extention == "py")
                     {
                         // std::cout << "CGI\n";
+                        _isCgi = true;
                         handelCGI();
                         return;
                     }

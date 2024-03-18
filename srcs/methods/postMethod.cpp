@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/16 18:04:21 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/17 16:57:04 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,12 @@ void response::parsLength(const char *con, size_t& index, size_t size)
     {
         upfile.close();
         // flag = 201;
-        status_code = 201;
+        // handelCGI();
+        if (!_isCgi){
+            // std::cout << "99999999999999"<< std::endl;
+            status_code = 201;
+        }
+        postDone = true;
         flag = 0;
     }
 }
@@ -184,7 +189,9 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             if (lastChunk)
             {
                 upfile.close();
-                status_code = 201;
+                if (!_isCgi)
+                    status_code = 201;
+                postDone = true;
                 flag = 0;
                 return;
             }
@@ -200,23 +207,18 @@ void    response::methodPost(const char *con, size_t size)
     (void) con;
     (void) size;
     targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
-    // std::cout << "targetUri   " << targetUri << std::endl;
     if(!allowedMethods())
     {
         status_code = 405;
     }
-    // if (checkType(targetUri) == FILE) {
-    //     check_extention(targetUri);
-    //     // std::cout << extention << std::endl;
-    //     if(extention == "php" || extention == "py")
-    //     {
-    //         // std::cout << "CGI\n";
-    //         handelCGI();
-    //         // return;
-    //     }
-    // }
     else if (flag == 0)
     {
+        if(checkType(targetUri) == FILE)
+        {
+            check_extention(targetUri);
+            if(extention == "php" || extention == "py")
+                _isCgi = true;
+        }
         size_t index = 0;
         createFile();
         if (status_code == 403)
@@ -230,6 +232,8 @@ void    response::methodPost(const char *con, size_t size)
         {
             flag = 1;
             parsLength(con, index, size);
+            // handelCGI();
+            std::cout << "----------------------------------------------\n";
         }
         else
             status_code = 400;
@@ -317,7 +321,7 @@ void    response::fileExtention()
 }
 void response::createFile()
 {
-    std::cout << "__________post ___________" << std::endl;
+    std::cout << "__________create ___________" << std::endl;
     if (request.location.upload[0] == '/')
         request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1) {
@@ -330,9 +334,8 @@ void response::createFile()
         std::string randName = generateName();
         std::string ileType = request.getContentType();
         extention = mime_[ileType];
-        // uplfile = randName + "." + extention;
-        
-        upfile.open((UplDir + "/" + randName + "." + extention).c_str());
+        uplfile = UplDir + "/" + randName + "." + extention ;
+        upfile.open((uplfile).c_str());
     }
 }
 

@@ -1,8 +1,9 @@
 <?php
+
+
 // Retrieve form data
 $username = $_POST["username"];
 $emailaddress = $_POST["emailaddress"];
-
 // Print HTTP header
 header("Content-type:text/html\r\n\r\n");
 
@@ -18,5 +19,5 @@ echo "<p>Email Address: $emailaddress</p>";
 echo "</body>";
 echo "</html>";
 
-phpinfo();
+// phpinfo();
 ?>
