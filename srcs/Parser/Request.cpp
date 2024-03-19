@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/17 16:00:22 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 15:47:23 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,12 @@ Request::Request()
 	_cgiRuning = false;
 };
 
+Request::~Request(){};
+
 void	Request::setCGIRun()
 {
 	this->_cgiRuning = true;
 }
-
 
 loc Request::getLocation()const
 {
@@ -58,6 +59,7 @@ void Request::setHeader(std::string &key,std::string &value)
 	Utils::skipSpaces(value);
 	if(key == "host" && value.empty())
 		throw HttpBadRequest("Bad request");
+	// std::cout << key <<"||" << value <<"\n";
 	headers[key] = value;
 }
 
@@ -112,7 +114,14 @@ std::string Request::getContentType()const
 {
     return content_Type;
 }
-
+bool Request::getCgiRuning()
+{
+	return _cgiRuning;
+}
+bool Request::getIsCgi()
+{
+	return _isCgi;
+};
 
 void Request::setFirstReadOfBody(bool init)
 {
@@ -123,11 +132,12 @@ void Request::setUrl(std::string initVar)
 {
 	size_t index;
 	
-	std::string allowedCharacter ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ._~:/?#[]@!$&'()*+,;=%";
+	std::string allowedCharacter ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%";
 	if(initVar[0] != '/')
 		throw  HttpBadRequest("Bad request");
 	if(initVar.length() > 2048)
 		throw HttpUriTooLong("Uri Too Long");
+	// std::cout <<"================>" << initVar << "\n";
 	url = decodingUri(initVar);
 	index = url.find("?");
 	if(url.find_first_not_of(allowedCharacter)!= std::string::npos)
@@ -337,6 +347,9 @@ void Request::storeLocation(Server &server, Location iniLocation)
 		location.redirect_path = iniLocation.getLocationData("return")[1];
 	if(!server.getServerData("client_max_body_size")[0].empty())
 		location.max_body_size = Utils::stringToLongLong(server.getServerData("client_max_body_size")[0].c_str());
+	// std::cout << "whhhhy==>" << server.getErrorPage().size() <<"\n";
+	if(server.getErrorPage().size() > 0)
+		location.error_pages = server.getErrorPage();
 	if(iniLocation.getLocationData("root").size() == 1)
 		location.root =	iniLocation.getLocationData("root")[0];
 	if(iniLocation.getLocationData("index").size() == 1)
@@ -351,11 +364,10 @@ void Request::storeLocation(Server &server, Location iniLocation)
 		location.method =  iniLocation.getLocationData("http_methods");
 	if(!(iniLocation.getLocationData("allowedUpload").empty()) &&  iniLocation.getLocationData("allowedUpload")[0] == "on")
 		location.allowedUpload = true;
-	if(iniLocation.getLocationData("cgi").size() > 0)
-	{
-		_isCgi = true;
-		location.cgi[iniLocation.getLocationData("cgi")[0]] = iniLocation.getLocationData("cgi")[1];
-	}
+	if(iniLocation.getLocationData("php").size() > 0)
+		location.cgi["php"] = iniLocation.getLocationData("php")[0];
+	if(iniLocation.getLocationData("py").size() > 0)
+		location.cgi["py"] = iniLocation.getLocationData("py")[0];
 }
 
 void  Request::printREquest()
@@ -376,6 +388,13 @@ void  Request::printREquest()
 	std::cout << "redirect_path ======>>>>|" << location.redirect_path<<"|\n";
 	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
 	std::cout << "cooookies====>|" << cookies << "|\n";
+	std::cout << "eror pages siize==>" << location.error_pages.size() << "\n";
+	std::map<int, std::string>::iterator itt = location.error_pages.begin();
+	while(itt != location.error_pages.end())
+	{
+		std::cout <<  "error pages ================>" << itt->second<<"\n";
+		itt++;
+	}
 	for(size_t i = 0;i < location.method.size();i++)
 	{
 		std::cout << "methods ======>>>>|" <<  location.method[i] << "|\n";
@@ -392,15 +411,17 @@ void  Request::printREquest()
 
 int LocationLongestPrefix(std::string locationName,std::string Url)
 {
-	int countMatchingCharacter = 0;
+	int countMatchingCharacter;
 	size_t lenLocation = locationName.length();
 	size_t lenUrl = Url.length();
 	size_t maxLen = std::max(lenLocation,lenUrl);
-
+	countMatchingCharacter = 0;
+	
 	if(locationName == "/")
 		return 1;
 	for(size_t i = 0;i < maxLen;i++)
 	{
+		
 		if(locationName[i] != Url[i])
 		{
 			if( Url[i] =='/')
@@ -412,33 +433,60 @@ int LocationLongestPrefix(std::string locationName,std::string Url)
 	return countMatchingCharacter;
 }
 
+
+void Request::getREalPath()
+{
+	std::string targetUri;
+	std::string toString;
+	char *realPath;
+	
+	targetUri = location.root + url.substr(location.location_name.size());
+	realPath = realpath(targetUri.c_str(),NULL);
+	if(realPath)
+	{	toString = realPath;
+		toString +="/";
+		if(toString.find(location.root) != 0)
+			throw HttpForbidden("Forbidden\n");
+	}
+}
+
 void Request::matchLocation(Server currentServer)
 {
-	size_t maxMatcher= 0;
-	size_t countMatcher;
 	std::string locationName;
-
-	for(size_t j = 0; j < currentServer.getLocations().size();j++)
+	std::string tmpUrl;
+	size_t indexSlach;
+	bool isMatched;
+	
+	isMatched = false;
+	tmpUrl = url;
+	while(!isMatched)
 	{
-		locationName = currentServer.getLocations()[j].getLocationData("location_name")[0];
-		countMatcher = LocationLongestPrefix(locationName, url);
-		if(countMatcher > 0)
+		for(size_t j = 0; j < currentServer.getLocations().size();j++)
 		{
-			if(countMatcher > maxMatcher)
+			locationName = currentServer.getLocations()[j].getLocationData("location_name")[0];
+			if(locationName == tmpUrl)
 			{
 				storeLocation(currentServer,currentServer.getLocations()[j]);
-				maxMatcher = countMatcher;
+				isMatched = true;
+				break;
 			}
-			break;
 		}
+		if(tmpUrl[tmpUrl.size() - 1] == '/')
+			tmpUrl = tmpUrl.substr(0,tmpUrl.size() - 1);
+		else
+		{
+			indexSlach =  tmpUrl.find_last_of("/");
+			if(indexSlach != std::string::npos)
+				tmpUrl = tmpUrl.substr(0,indexSlach + 1);
+		}	
 	}
+	getREalPath();
 }
 
 Server Request::matchServer()
 {
 	for(size_t i =0; i<servers.size();i++)
 	{
-		// std::cout << "host|" << host << "|"<<"|" << servers[i].getServerData("server_name")[0] <<"|\n";
 		if(servers[i].getServerData("server_name").size() > 0 && host == servers[i].getServerData("server_name")[0])
 			return servers[i];
 	}
@@ -478,7 +526,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				Server server = matchServer();
 				matchLocation(server);
-				// printREquest();
+				// printREquest();e
 				status = 1;
 				return 1;
 			}

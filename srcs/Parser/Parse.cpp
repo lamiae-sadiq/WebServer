@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:16 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/15 14:21:52 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/19 12:44:10 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ Parser::Parser()
   locationLen = -1;
   serverLen = -1;
 }
+
+Parser::~Parser(){};
 
 void Parser::serversAddBack()
 {
@@ -52,7 +54,7 @@ void Parser::analyseLocationData(std::string &line,Server &servers,std::ifstream
         line = line.substr(index + 1);
       }
       if((directive == "location" && countTab != 1) || (directive == "server" && countTab != 0))
-        throw ConfigueFileError();
+        throw Exception("you have error in configue file\n");      
       if(directive == "location" || directive == "server")
         break;
       Location::checkLocationError(directive,Utils::splitString(line,' '),countTab);
@@ -61,7 +63,7 @@ void Parser::analyseLocationData(std::string &line,Server &servers,std::ifstream
         for(size_t i = 0;i < servers.getLocations().size() - 1;i++)
         {
           if(servers.getLocations()[i].getLocationData("location_name")[0] == line)
-            throw ConfigueFileError();
+            throw Exception("you have error in configue file\n");        
         }
       }
       servers[locationLen].setLocationData(directive,Utils::splitString(line,' '));
@@ -90,8 +92,8 @@ void Parser::analyseServerData(std::string &line,std::ifstream& readFile,Server 
       if(directive != "location")
         storeServerData(directive, line,countTab,server);
       if(directive == "location" && countTab != 1)
-        throw ConfigueFileError();
-    }
+        throw Exception("you have error in configue file\n");    
+      }
   }
 }
 
@@ -100,7 +102,7 @@ void Parser::checkFinalData(std::vector<Server> servers)
   for(size_t i = 0; i < servers.size(); i++)
   {
     if(!servers[i].isValidServer())
-      throw ConfigueFileError();
+      throw Exception("you have error in configue file\n");   
     servers[i].isValidLocations();
   }
 }
@@ -109,7 +111,7 @@ void Parser::readFile(std::string line,std::ifstream& readFile)
 {
   std::getline(readFile,line);
   if(line != "server")
-    throw ConfigueFileError();
+    throw Exception("you have error in configue file\n"); 
   while(!readFile.eof())
   {
     if(line == "server")
@@ -139,7 +141,7 @@ std::vector<Server> Parser::paseConfigueFile(std::string &configueFile)
   if(readFile.is_open())
     parser.readFile(line,readFile);
   else
-    throw ConfigueFileError();
+    throw Exception("you have error in configue file\n"); 
   return parser.servers;
 }
 

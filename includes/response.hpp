@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/18 23:48:24 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 12:41:44 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class response
 		Request         &request;
 		std::ofstream 	upfile;
 		std::string 	chunkSizeStr;
+		long long int   totalChunkedLength;
 		// bool 			close;
 		DIR* 			dir;
 		int 			flag;
@@ -105,15 +106,8 @@ class response
 		
 		void	methodGet();
 		void	methodPost(const char *con, size_t size);
-		void	setFd(int fd)
-		{
-			this->fd = fd;
-		};
-		void setStatusCode(int initCode)
-		{
-			status_code = initCode;
-		}
-
+		void	setFd(int fd);
+		void setStatusCode(int initCode);
 		bool    autoIndexCheck();
 		bool    allowedMethods();
 		bool    checkUpload();
@@ -172,6 +166,7 @@ class response
 		void		handelCGI();
 		bool		_cgiProcess();
 		void    	Post();
+		bool isLargeContent(long long int len);
 		template <typename T>
 		std::string to_string(T value) {
 			std::ostringstream os;

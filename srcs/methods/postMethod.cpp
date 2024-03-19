@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 01:38:30 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 12:31:39 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,13 @@ void response::parsLength(const char *con, size_t& index, size_t size)
 
 void    response::parseChunk(const char *con, size_t& index, size_t size)
 {
+    totalChunkedLength +=size;
+    
+    if(isLargeContent(totalChunkedLength))
+        return;
     while (index < size)
     {
-        // static int pflag = 0;
-        
-        // if (pflag != flag)
-        //     std::cout << "flag : " << flag << std::endl;
-        // pflag = flag;
-        
+
         if (flag == 2)
         {
             while (index < size && ihex < 20)
@@ -252,6 +251,16 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
     }
     
 }
+bool response::isLargeContent(long long int len)
+{
+    if(len > request.location.max_body_size)
+    {
+        status_code = 413;
+        //remove file
+        return true;
+    }
+    return false;
+}
 
 void    response::methodPost(const char *con, size_t size)
 {
@@ -280,6 +289,8 @@ void    response::methodPost(const char *con, size_t size)
         }
         else if (request.getUploadType() == "length")
         {
+            if(isLargeContent(request.contentLength))
+                return;
             flag = 1;
             parsLength(con, index, size);
         }

@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/16 13:56:58 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/19 01:56:54 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 Server::Server()
 {
-    error_pages[404] = "/nfs/homes/kel-baam/del/srcs/errorPages/404.html";
-    error_pages[405] = "/nfs/homes/kel-baam/del/srcs/errorPages/405.html";
-    error_pages[301] = "/nfs/homes/kel-baam/del/srcs/errorPages/301.html";
-    error_pages[500] = "/nfs/homes/kel-baam/del/srcs/errorPages/500.html";
-    error_pages[501] = "/nfs/homes/kel-baam/del/srcs/errorPages/501.html";
+    // error_pages[404] = "/nfs/homes/kel-baam/oof/srcs/errorPages/404.html";
+    // error_pages[405] = "/nfs/homes/kel-baam/oof/srcs/errorPages/405.html";
+    // error_pages[301] = "/nfs/homes/kel-baam/oof/srcs/errorPages/301.html";
+    // error_pages[500] = "/nfs/homes/kel-baam/oof/srcs/errorPages/500.html";
+    // error_pages[501] = "/nfs/homes/kel-baam/oof/srcs/errorPages/501.html";
 }
 Server::~Server(){};
 
@@ -29,6 +29,8 @@ std::map<int, std::string> Server::getErrorPage()
 
 void Server::setServerData(std::string key ,std::vector<std::string> vec)
 {
+    if(key == "host" && vec[0] == "localhost")
+        vec[0] = "127.0.0.1";
     if(key != "error_page")
     {
         if(serverData.count(key) >= 1)
@@ -96,37 +98,21 @@ bool  Server::isValidServer()
 
 void Server::checkPortError(std::vector<std::string> port)
 {
-    size_t len = port[0].length();
-    size_t index = port[0].find_first_not_of("0123456789");
     long long int portNum = Utils::stringToLongLong(port[0]);
     if(port.size() != 1)
         throw Exception("Error: port is incorrect");
     if(!Utils::checkOverflowError(port[0],portNum))
       	throw Exception("Error: port is incorrect");
-    if(index!= std::string::npos ||  len > 5 || port[0][0] == '-' < 0 || portNum > 65535)
+    if(portNum > 65535)
         throw  Exception("Error: port is incorrect");
 }
 
 void Server::checkHostError(std::vector<std::string> host)
 {
-    std::vector<std::string> nums;
-    size_t index;
-    long long int hostNum;
-    
-    if(host.size() != 1 || std::count(host[0].begin(),host[0].end(),'.') > 3)
+    if(host.size() != 1)
         throw Exception("Error: host is incorrect\n");
-    if(host[0] == "localhost" )
-        return;
-    nums = Utils::splitString(host[0],'.');
-    for(size_t i = 0; i < nums.size();i++)
-    {
-        index = nums[i].find_first_not_of("0123456789");
-        hostNum = Utils::stringToLongLong(nums[i]);
-        if(index!= std::string::npos || hostNum < 0 || hostNum > 255)
-            throw Exception("Error: host is incorrect\n");
-        if(!Utils::checkOverflowError(nums[i],hostNum))
-            throw Exception("Error: host is incorrect\n");
-    }
+    if(host[0] =="localhost")
+        host[0] ="127.0.0.1";
 }
 
 void Server::checkClientMaxBody(std::vector<std::string> bodySize)

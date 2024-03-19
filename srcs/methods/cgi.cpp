@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 01:22:50 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 15:46:47 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,11 @@ void response::setEnv()
 	}
 	cgiHeader["GATEWAY_INTERFACE"] = "CGI";
 	cgiHeader["REQUEST_METHOD"] = request.getMethod();
+	
 	cgiHeader["QUERY_STRING"] = request.getQueryString();
 	cgiHeader["PATH_INFO"] = request.getUrl();
 	cgiHeader["HTTP_COOKIE"] = request.getCookies();
+	// std::cout <<"coookies"<< cgiHeader["HTTP_COOKIE"] << "=======" <<  request.getCookies() <<"\n";
 	cgiHeader["SCRIPT_NAME"] = request.getUrl();
 	cgiHeader["SCRIPT_FILENAME"] = targetUri;
 	cgiHeader["PATH_TRANSLATED"] = targetUri;
@@ -62,6 +64,7 @@ char **response::getEnv()
 
 void response::executePHP()
 {
+	setEnv();
 	std::cout << "___________PHP_______\n";
 	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
 	it = request.location.cgi.find("php");
@@ -69,11 +72,10 @@ void response::executePHP()
 	{
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
+		path = "/nfs/homes/kel-baam/Desktop/newOne/" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
-			setEnv();
 			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
@@ -189,13 +191,13 @@ void response::executePython()
 	it = request.location.cgi.find("py");
 	if (it != request.location.cgi.end())
 	{
+		setEnv();/////////////////////////////////////////////////////////////////////////////////
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
 		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
-			setEnv();
 			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
@@ -225,7 +227,7 @@ void response::parsecgiFile()
 		std::string line;
 		while (getline(cinfile, line))
 		{
-			if (line == "\n" || line == "\r\n" | line == "\r" || line == "")
+			if (line == "\n" || line == "\r\n" || line == "\r" || line == "")
 				break;
 			size_t pos = line.find(':');
 			if (pos != std::string::npos)
@@ -263,8 +265,10 @@ void response::cgiSendResponse()
 		resHeader += _cgiHeader["Location"] + "\r\n";
 	}
 	resHeader += "Transfer-Encoding: chunked\r\n";
+	if(_cgiHeader.find("Set-Cookie")!=_cgiHeader.end())
+		resHeader += "Set-Cookie:" + _cgiHeader["Set-Cookie"] + "\r\n";
 	resHeader += "\r\n";
-	std::cout << resHeader;
+	// std::cout << resHeader;
 	int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
 	if(i < 0){
 		SIGPIPE;

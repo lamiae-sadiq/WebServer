@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:18 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/11 14:25:45 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/19 12:37:01 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ class Parser
         std::vector<Server> servers;
         int locationLen;
         int serverLen;
+        
         Parser();
+        ~Parser();
         void readFile(std::string line, std::ifstream &readFile);
         void serversAddBack();
         void printServersInfo();
@@ -39,15 +41,7 @@ class Parser
         std::vector<std::string> splitString(std::string &string,int del);
         void analyseServerData(std::string& line,std::ifstream& readFile,Server& server);
         void checkFinalData(std::vector<Server> servers);
-       
     public:
         static std::vector<Server> paseConfigueFile(std::string &configueFile);
-        class ConfigueFileError:public std::exception 
-        {
-            const char* what() const throw()
-            {
-                return "you have an error in your configue file\n";
-            }
-        };
 };
 

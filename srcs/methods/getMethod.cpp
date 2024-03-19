@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 01:37:31 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 14:00:36 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void    response::methodGet()
         }
         targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
         // request.getUri() = targetUri;
-        std::cout << "targetUri   " << targetUri << std::endl;
+        //  std::cout << "targetUri   " << targetUri << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)
@@ -137,7 +137,6 @@ void    response::methodGet()
                     }
                     else{
                         status_code = 403;
-                        std::cout << "is it here \n";
                     }
                     return ;
                 }

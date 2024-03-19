@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 01:23:14 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 15:47:08 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,16 @@ std::string to_string(T value) {
     os << value;
     return os.str();
 }
+
+void response::setFd(int fd)
+{
+	this->fd = fd;
+};
+void  response::setStatusCode(int initCode)
+{
+	status_code = initCode;
+}
+
 void    response::sendData()
 {       
     if (flag == 2)
@@ -107,18 +117,17 @@ const std::string response::HTMLPage() {
             "</html>\n");
 }
 
-std::string response::getErrorPage() {
-    if (serv.getErrorPage().find(status_code) != serv.getErrorPage().end()) {
-        // std::cout << serv.getErrorPage()[status_code] << "00000\n";
-        return serv.getErrorPage()[status_code];
-    }
+std::string response::getErrorPage() 
+{
+    if (request.location.error_pages.find(status_code) != request.location.error_pages.end())
+        return request.location.error_pages[status_code];
     return "404";
 }
 
 void response::sendErrorPage()
 {
-    targetUri = serv.getErrorPage()[status_code];
-    std::cout << targetUri << std::endl;
+    targetUri = getErrorPage();
+
     if(access(targetUri.c_str(), R_OK | W_OK) == 0)
     {
         flag = 2;
@@ -126,13 +135,15 @@ void response::sendErrorPage()
         content_type = fileType;
         sendData();
     }
-    else{
+    else
+    {
         if(status_code >= 400)
             ErrorHeader();
         else
             setHeader();
     }
 }
+
 
 void response::ErrorHeader()
 {
@@ -271,11 +282,8 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
 {
     (void)fd;
     
-    if (status_code != 200) {
-        std::cout << status_code << std::endl;
-        getErrorPage();
+    if (status_code != 200)
         sendErrorPage();
-    }
     if (request.getMethod() == "GET")
         methodGet();
     else if (request.getMethod() == "DELETE")

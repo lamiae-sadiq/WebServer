@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 21:13:14 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/16 14:47:13 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/19 12:40:15 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,8 @@ class HttpException:public  std::exception
     public:
         HttpException(const char* init,int code);
         HttpException(const char* init);
-        int getStatusCode()
-        {
-            return statusCode;
-        }
-        const char* what() const throw()
-        {
-                return msg;
-        }
+        int getStatusCode();
+        const char* what() const throw();
 };
 
 class HttpBadRequest:public HttpException
@@ -49,6 +43,7 @@ class HttpNotImplemented:public HttpException
     public:
         HttpNotImplemented(const char *msg);
 };
+
 class HttpUriTooLong:public HttpException
 {
     public:
@@ -59,4 +54,10 @@ class HttpLengthRequired:public HttpException
 {
     public:
         HttpLengthRequired(const char *msg);
+};
+
+class HttpForbidden:public HttpException
+{
+    public:
+        HttpForbidden(const char *msg);
 };

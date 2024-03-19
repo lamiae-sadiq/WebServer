@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:52:12 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/15 22:03:04 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/19 12:38:44 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,4 @@ class Utils
 		static bool isHex(char ch);	
 		static long long int  stringToLongLong(std::string str);
 		static bool  checkOverflowError(std::string originNum, long long int currentNum);
-		class numberOverflow:public std::exception 
-        {
-            const char* what() const throw()
-            {
-                return "the number overflowed\n";
-            }
-        };
 };

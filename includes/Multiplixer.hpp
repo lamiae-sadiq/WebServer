@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:05 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/16 15:32:39 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/19 12:34:50 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class Multiplixer
 		std::map<int,Request*>  requests;
 	public:
 		Multiplixer();
-		~Multiplixer(){};
+		~Multiplixer();
 		int checkMasterSocketPort(Server server);
 		void addFdToEpoll(int epoll_instance,int sockfd,epoll_event *event, int flag);
 		void creatSockets(int epo,std::vector<Server> servers);

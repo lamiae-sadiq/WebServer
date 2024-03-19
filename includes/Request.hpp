@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/17 01:05:39 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 15:34:24 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 
 typedef struct loc
 {
-	unsigned long long							max_body_size;
+	long long int				max_body_size;
 	std::string 				root;
 	std::string 				index;
 	std::string 				auto_index;
@@ -37,13 +37,13 @@ typedef struct loc
 	int							redirect_code;
 	std::string 				redirect_path;
 	std::map<std::string,std::string> cgi;
+	std::map<int,std::string> error_pages;
 	
 }loc;
 
 class Request
 {
 	private:
-		std::map<std::string,std::string> headers;
 		std::vector<Server> servers;
 		std::string host;
 		std::string method;
@@ -61,9 +61,10 @@ class Request
 		bool _cgiRuning;
 		
 	public:
+		std::map<std::string,std::string> headers;
 		struct timeval start_time, end_time;
 		Request();
-		~Request(){};
+		~Request();
 		std::string tmpBuff;
 		loc location;
 		long long int contentLength;
@@ -78,14 +79,8 @@ class Request
 		bool getFirstReadBody()const;
 		loc getLocation()const;
 		void	setCGIRun();
-		bool getCgiRuning()
-		{
-			return _cgiRuning;
-		}
-		bool getIsCgi()
-		{
-			return _isCgi;
-		};
+		bool getCgiRuning();
+		bool getIsCgi();
 		std::string getHeader(std::string &key);
 		std::string getMethod()const;
 		std::string getUrl()const;
@@ -112,19 +107,6 @@ class Request
 		std::string getCookies()const;
 		std::string getUri()const;
 		std::string getQueryString()const;
-		class readError:public std::exception 
-        {
-            const char* what() const throw()
-            {
-                return "error in reading\n";
-            }
-        };
-		class headerError:public std::exception 
-        {
-            const char* what() const throw()
-            {
-                return "error in request header\n";
-            }
-        };
+		void getREalPath();
 };
 
