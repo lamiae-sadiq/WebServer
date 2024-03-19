@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/17 16:05:25 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 01:37:31 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void response::init()
     flag = 0;
     this->ihex = 0;
     lastChunk = false;
+    // _isStatus = false;
     dir = NULL;
     postDone = false;
     fileExtention();
@@ -92,21 +93,18 @@ void    response::methodGet()
         }
         targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
         // request.getUri() = targetUri;
-        // std::cout << "targetUri   " << request.getUri() << std::endl;
+        std::cout << "targetUri   " << targetUri << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)
         {
             if(access(this->targetUri.c_str(), R_OK) == 0)
             {
-                    // std::cout <<"--------------\n";
                 if(checkType(targetUri) == FILE)
                 {
                     check_extention(targetUri);
-                    // std::cout << extention << std::endl;
                     if(extention == "php" || extention == "py")
                     {
-                        // std::cout << "CGI\n";
                         _isCgi = true;
                         handelCGI();
                         return;

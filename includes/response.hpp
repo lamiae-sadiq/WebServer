@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/17 22:07:13 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/18 23:48:24 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,15 @@ class response
 		int 									pid;
 		std::string path;
 		int 									cgiOutfile;
-		std::map<std::string , std::string>	_cgiHeader;
+		std::map<std::string, std::string>		_cgiHeader;
 		bool									_cgiStarted;
 		bool									_cgiEnded;
-		long long							cgiStartTime;
+		long long								cgiStartTime;
 		// long long 								cgiStartTime_1;
 		std::string								uplfile;
 		bool									_isCgi;
-
+		bool									_isStatus;
+		std::ofstream							_cgiFile;
 		/*=========================*/
 		bool									postDone;
 	public :

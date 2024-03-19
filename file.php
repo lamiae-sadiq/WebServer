@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+ifgfhghh ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Check if name and email are provided
     if (isset($_POST["cookie_name"]) && isset($_POST["cookie_value"]))
     {

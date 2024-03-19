@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/17 22:37:53 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 01:23:14 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,11 @@ void    response::sendData()
         resHeader +="\r\n";
         resHeader += "Transfer-Encoding: chunked\r\n";
         resHeader += "\r\n";
-        send(fd, resHeader.c_str(), resHeader.length(), 0);
+        int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+        }
         flag = 3;
     }
     if (flag == 3)
@@ -48,14 +52,21 @@ void    response::sendData()
         memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
         memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
         memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-        write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
-        
+        int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+        }
         if (ifile.eof()){
             flag = 4;
         }
     }
     if (flag == 4) {
-        send(fd, "0\r\n\r\n", 5, 0);
+        int i = send(fd, "0\r\n\r\n", 5, 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+	    }
         ifile.close();
         flag = 30;
     }
@@ -134,7 +145,11 @@ void response::ErrorHeader()
     if (request.getMethod() != "HEAD") {
         header.append(errorPage);
     }
-    send(fd, header.c_str(), header.length(), 0);
+    int i = send(fd, header.c_str(), header.length(), 0);
+    if(i < 0){
+		SIGPIPE;
+		flag = 30;
+	}
     flag = 30;
 }
 
@@ -145,7 +160,11 @@ void response::setHeader()
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nLocation: " + target_url);
         header += "\r\n\r\n";
-        send(fd, header.c_str(), header.length(), 0);
+        int i = send(fd, header.c_str(), header.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+	    }
         flag = 30;
     }
     if (status_code >= 200 && status_code <= 204)
@@ -157,7 +176,11 @@ void response::setHeader()
         header.append(to_string(responsePage.length()));
         header += "\r\n\r\n";
         header.append(responsePage);
-        send(fd, header.c_str(), header.length(), 0);
+        int i = send(fd, header.c_str(), header.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+        }
         flag = 30;
     }
 }
@@ -167,7 +190,11 @@ void response::listDirectories()
     std::string html;
     if(flag == 6){
         std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n";
-        send(fd, header.c_str(), header.length(), 0);
+        int i = send(fd, header.c_str(), header.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+        }
         flag = 7;
     }
     else if(flag == 7){
@@ -178,9 +205,13 @@ void response::listDirectories()
         html.append("</h1>\n<hr>\n<ul>\n");
         std::stringstream ss;
         ss << std::hex << html.length() << "\r\n";
-        send(fd, ss.str().c_str(), ss.str().length(), 0);
         html.append("\r\n");
-        send(fd, html.c_str(), html.length(), 0);
+        std::string response = ss.str() + html;
+        int i = send(fd, response.c_str(), response.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+	    }
         if (!(dir = opendir(targetUri.c_str())))
         {
             std::cout << "Error: failed to open directory" << std::endl;
@@ -202,9 +233,14 @@ void response::listDirectories()
         html += "<li><a href=\"" + fileName + "\">" + fileName + "</a></li>\n";
         std::stringstream ss;
         ss << std::hex << html.length() << "\r\n";
-        send(fd, ss.str().c_str(), ss.str().length(), 0);
         html.append("\r\n");
-        send(fd, html.c_str(), html.length(), 0);
+        std::string response = ss.str() + html;
+        int i = send(fd, response.c_str(), response.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+	    }
+        //check
     }
     else if(flag == 9){
         closedir(dir);
@@ -212,13 +248,20 @@ void response::listDirectories()
         html = "</ul>\n<hr>\n</body>\n</html>\n";
         std::stringstream ss;
         ss << std::hex << html.length() << "\r\n";
-        send(fd, ss.str().c_str(), ss.str().length(), 0);
-        html.append("\r\n");
-        send(fd, html.c_str(), html.length(), 0);
+        std::string response = ss.str() + html + "\r\n";
+        int i = send(fd, response.c_str(), response.length(), 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+	    }
         flag = 10;
     }
     else if(flag == 10){
-        send(fd, "0\r\n\r\n", 5, 0);
+        int i = send(fd, "0\r\n\r\n", 5, 0);
+        if(i < 0){
+            SIGPIPE;
+            flag = 30;
+        }
         flag = 30;
     }
 }
@@ -229,9 +272,9 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
     (void)fd;
     
     if (status_code != 200) {
+        std::cout << status_code << std::endl;
         getErrorPage();
         sendErrorPage();
-        std::cout << " ==================> Heere " << status_code << std::endl;
     }
     if (request.getMethod() == "GET")
         methodGet();
@@ -248,7 +291,6 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
             else
                 methodPost(buff, size);
         } else {
-            // std::cout << "post\n";
             if (_isCgi) {
                 handelCGI();
             }

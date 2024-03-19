@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/17 16:57:04 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 01:38:30 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,20 +49,27 @@ void response::parsLength(const char *con, size_t& index, size_t size)
 {
     if (request.getContentLength() < size - index)
         size = request.getContentLength() + index;
-    upfile.write(con + index, size - index);
-    upfile.flush();
+    if (!_isCgi){
+        upfile.write(con + index, size - index);
+        upfile.flush();
+    }
+    else{
+        _cgiFile.write(con + index, size - index);
+        _cgiFile.flush();
+    }
+    // upfile.write(con + index, size - index);
+    // upfile.flush();
     request.contentLength -= size - index;
 
     index = size;
     if (request.contentLength == 0)
     {
-        upfile.close();
-        // flag = 201;
-        // handelCGI();
         if (!_isCgi){
-            // std::cout << "99999999999999"<< std::endl;
+            upfile.close();
             status_code = 201;
         }
+        else
+            _cgiFile.close();
         postDone = true;
         flag = 0;
     }
@@ -90,7 +97,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             }
             if (ihex == 20)
             {
-                upfile.close();
+                if(!_isCgi)
+                    upfile.close();
+                else
+                    _cgiFile.close();
+                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -104,7 +115,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
             ihex = 0;
             if (!(iss >> std::hex >> chunkSize))
             {
-                upfile.close();
+                if(!_isCgi)
+                    upfile.close();
+                else
+                    _cgiFile.close();
+                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -121,7 +136,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                 return;
             if (con[index] != '\r')
             {
-                upfile.close();
+                if(!_isCgi)
+                    upfile.close();
+                else
+                    _cgiFile.close();
+                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -135,7 +154,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                 return;
             if (con[index] != '\n')
             {
-                upfile.close();
+                if(!_isCgi)
+                    upfile.close();
+                else
+                    _cgiFile.close();
+                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -147,16 +170,31 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
         {
             if (size - index >= chunkSize)
             {
-                upfile.write(con + index, chunkSize);
-                upfile.flush();
+                if(!_isCgi){
+                    upfile.write(con + index, chunkSize);
+                    upfile.flush();
+                }
+                else{
+                    _cgiFile.write(con + index, chunkSize);
+                    _cgiFile.flush();
+                }
+                // upfile.write(con + index, chunkSize);
                 index += chunkSize;
                 chunkSize = 0;
                 flag = 6;
             }
             else
             {
-                upfile.write(con + index, size - index);
-                upfile.flush();
+                if(!_isCgi){
+                    upfile.write(con + index, size - index);
+                    upfile.flush();
+                }
+                else{
+                    _cgiFile.write(con + index, size - index);
+                    _cgiFile.flush();
+                }
+                // upfile.write(con + index, size - index);
+                // upfile.flush();
                 chunkSize -= size - index;
                 index = size;
             }
@@ -167,7 +205,11 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                 return;
             if (con[index] != '\r')
             {
-                upfile.close();
+                if(!_isCgi)
+                    upfile.close();
+                else
+                    _cgiFile.close();
+                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -181,16 +223,25 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                 return;
             if (con[index] != '\n')
             {
-                upfile.close();
+                if(!_isCgi)
+                    upfile.close();
+                else
+                    _cgiFile.close();
+                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
             }
             if (lastChunk)
             {
-                upfile.close();
-                if (!_isCgi)
+                if(!_isCgi){
+                    upfile.close();
                     status_code = 201;
+                }
+                else
+                    _cgiFile.close();
+                // upfile.close();
+                // if (!_isCgi)
                 postDone = true;
                 flag = 0;
                 return;
@@ -204,9 +255,8 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
 
 void    response::methodPost(const char *con, size_t size)
 {
-    (void) con;
-    (void) size;
     targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
+    std::cout << "POST :" << targetUri << std::endl;
     if(!allowedMethods())
     {
         status_code = 405;
@@ -232,8 +282,6 @@ void    response::methodPost(const char *con, size_t size)
         {
             flag = 1;
             parsLength(con, index, size);
-            // handelCGI();
-            std::cout << "----------------------------------------------\n";
         }
         else
             status_code = 400;
@@ -319,6 +367,7 @@ void    response::fileExtention()
     mime_[ "video/x-ms-asf"] =   "asf";
     mime_[ "video/x-mng"] = "mng";
 }
+
 void response::createFile()
 {
     std::cout << "__________create ___________" << std::endl;
@@ -326,7 +375,8 @@ void response::createFile()
         request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1) {
         std::string UplDir = request.location.root + request.location.upload;
-        std::cout << UplDir << "\n";
+        std::string cgitmp = request.location.root + "/tmp";
+        // std::cout << UplDir << "\n";
         if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
             perror("Upload Directory");
             status_code = 403;
@@ -334,8 +384,14 @@ void response::createFile()
         std::string randName = generateName();
         std::string ileType = request.getContentType();
         extention = mime_[ileType];
-        uplfile = UplDir + "/" + randName + "." + extention ;
-        upfile.open((uplfile).c_str());
+        if (_isCgi){
+            uplfile = cgitmp + "/" + randName + "." + extention;
+            _cgiFile.open((uplfile).c_str());
+        }
+        else{
+            uplfile = UplDir + "/" + randName + "." + extention;
+            upfile.open((uplfile).c_str());
+        }
     }
 }
 

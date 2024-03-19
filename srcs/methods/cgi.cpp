@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/18 00:16:20 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/19 01:22:50 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 
 void response::setEnv()
 {
-	// Set environment variables for CGI
-
 	std::string cgiEnv;
 	cgiHeader["CONTENT_TYPE"] = request.getContentType();
 	if (request.getMethod() == "POST")
@@ -28,7 +26,6 @@ void response::setEnv()
 		stat(uplfile.c_str(), &datafile);
 		cgiHeader["CONTENT_LENGTH"] = to_string(datafile.st_size);
 	}
-
 	cgiHeader["GATEWAY_INTERFACE"] = "CGI";
 	cgiHeader["REQUEST_METHOD"] = request.getMethod();
 	cgiHeader["QUERY_STRING"] = request.getQueryString();
@@ -70,7 +67,6 @@ void response::executePHP()
 	it = request.location.cgi.find("php");
 	if (it != request.location.cgi.end())
 	{
-		// cgiStartTime = std::clock();
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
 		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
@@ -78,14 +74,12 @@ void response::executePHP()
 		if (pid == 0)
 		{
 			setEnv();
-			// getEnv();
 			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
 				remove(uplfile.c_str());
 			}
-			std::cout << "GET\n";
 			freopen(path.c_str(), "w", stdout);
 			char *av[3];
 			av[0] = strdup(it->second.c_str());
@@ -110,26 +104,22 @@ bool response::_cgiProcess()
 	{
 		status_code = 500;
 		_cgiEnded = true;
-		std::cout << "___________CGIEnded_______3\n";
 		return true;
 	}
 	else
 	{
 		int wait = waitpid(pid, &status, WNOHANG);
-
 		if (wait == 0)
 		{
 			long long now = time(NULL);
 
 			request.setCGIRun();
-			// std::cout << " time = " << (now -  cgiStartTime_1) <<std::endl;
 			if ((now -  cgiStartTime) > 10)
 			{
 				std::cout << "time out \n";
 				kill(pid, SIGKILL);
 				status_code = 504;
 				_cgiEnded = true;
-				std::cout << "___________CGIEnded_______2\n";
 				return true;
 			}
 			else
@@ -140,11 +130,12 @@ bool response::_cgiProcess()
 			if (WIFEXITED(status))
 				status_code = 200;
 			_cgiEnded = true;
-			std::cout << "___________CGIEnded_______1\n";
+			// std::cout << "___________CGIEnded_______1\n";
 			return true;
 		}
 		else
 		{
+			std::cout << "internel server "<< std::endl;
 			status_code = 500;
 			_cgiEnded = true;
 			return true;
@@ -166,8 +157,7 @@ void response::handelCGI()
 		return;
 	if (_cgiEnded)
 	{
-		std::cout << " status " << status_code << std::endl;
-		std::cout << "___________CGIHandeler_______11111111111 \n";
+		// std::cout << "___________CGIHandeler_______11111111111 \n";
 		if (status_code == 500)
 		{
 			remove(path.c_str());
@@ -183,9 +173,9 @@ void response::handelCGI()
 			remove(path.c_str());
 			status_code = 408;
 		}
-		else if (status_code == 200)
+		else
 		{
-			std::cout << "___________CGIEnded_______\n";
+			// std::cout << "___________CGIEnded_______\n";
 			cgiSendResponse();
 			return;
 		}
@@ -199,7 +189,6 @@ void response::executePython()
 	it = request.location.cgi.find("py");
 	if (it != request.location.cgi.end())
 	{
-		// cgiStartTime = std::clock();
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
 		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
@@ -207,14 +196,12 @@ void response::executePython()
 		if (pid == 0)
 		{
 			setEnv();
-			// getEnv();
 			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
 				remove(uplfile.c_str());
 			}
-			std::cout << "GET\n";
 			freopen(path.c_str(), "w", stdout);
 			char *av[3];
 			av[0] = strdup(it->second.c_str());
@@ -255,14 +242,34 @@ void response::parsecgiFile()
 
 void response::cgiSendResponse()
 {
+	_isStatus = false ;
 	parsecgiFile();
-	std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
-	resHeader += "\r\nContent-Type:" + _cgiHeader["Content-type"];
-	resHeader +="\r\n";
+	std::string resHeader = "HTTP/1.1 ";
+	if(_cgiHeader["Status"].empty())
+		resHeader += to_string(status_code) + " " + setStatus(status_code);
+	else
+		resHeader += _cgiHeader["Status"];
+	resHeader += "\r\nContent-Type:";
+	if(!_cgiHeader["Content-Type"].empty() || !_cgiHeader["Content-type"].empty())
+	{
+		if (!_cgiHeader["Content-Type"].empty())
+			resHeader += _cgiHeader["Content-Type"];
+		else
+			resHeader += _cgiHeader["Content-type"];
+	}
+	resHeader += "\r\n";
+	if (!_cgiHeader["Location"].empty()){
+		resHeader += "Location:";
+		resHeader += _cgiHeader["Location"] + "\r\n";
+	}
 	resHeader += "Transfer-Encoding: chunked\r\n";
 	resHeader += "\r\n";
-	std::cout << resHeader ;
-	send(fd, resHeader.c_str(), resHeader.length(), 0);
+	std::cout << resHeader;
+	int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
+	if(i < 0){
+		SIGPIPE;
+		flag = 30;
+	}
 	flag = 3;
 	if (flag == 3)
 	{
@@ -278,16 +285,23 @@ void response::cgiSendResponse()
 		memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
 		memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
 		memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-		write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
+		int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
+		if(i < 0){
+			SIGPIPE;
+			flag = 30;
+		}
 		if (cinfile.eof()){
 			flag = 4;
 		}
 	}
-    if (flag == 4) {
-		std::cout << "oooooo\n";
-        send(fd, "0\r\n\r\n", 5, 0);
+	if (flag == 4) {
+		int i = send(fd, "0\r\n\r\n", 5, 0);
+		if(i < 0){
+			SIGPIPE;
+			flag = 30;
+		}
 		remove(path.c_str());
 		cinfile.close();
-        flag = 30;
-    }
+		flag = 30;
+	}
 }

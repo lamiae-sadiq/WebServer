@@ -1,6 +1,6 @@
 <?php
 
-
+    // header("Location: http://www.youtube.com");
 // Retrieve form data
 $username = $_POST["username"];
 $emailaddress = $_POST["emailaddress"];
