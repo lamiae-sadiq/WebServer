@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 15:34:24 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 01:40:01 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ class Request
 		std::string uri;
 		bool _isCgi;
 		bool _cgiRuning;
+		std::string realPath;
 		
 	public:
 		std::map<std::string,std::string> headers;
@@ -67,6 +68,10 @@ class Request
 		~Request();
 		std::string tmpBuff;
 		loc location;
+		std::string getRealPath()
+		{
+			return realPath;
+		}
 		long long int contentLength;
 		int parseHeaders(std::string buff,std::vector<Server> initServers);
 		int analyseHeaders(std::string buff);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 15:47:08 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 18:00:44 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,6 @@ std::string response::getErrorPage()
 void response::sendErrorPage()
 {
     targetUri = getErrorPage();
-
     if(access(targetUri.c_str(), R_OK | W_OK) == 0)
     {
         flag = 2;
@@ -143,7 +142,6 @@ void response::sendErrorPage()
             setHeader();
     }
 }
-
 
 void response::ErrorHeader()
 {
@@ -195,9 +193,11 @@ void response::setHeader()
         flag = 30;
     }
 }
-/// recheck
+
 void response::listDirectories()
 {
+    targetUri = request.getRealPath();
+    // std::cout << "list Dir " << targetUri << std::endl;
     std::string html;
     if(flag == 6){
         std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n";
@@ -210,9 +210,9 @@ void response::listDirectories()
     }
     else if(flag == 7){
         html.append("<html>\n<head>\n<title>Index of ");
-        html.append(target_url); 
+        html.append(request.getUrl()); 
         html.append("</title>\n</head>\n<body>\n<h1>Index of ");
-        html.append(target_url); 
+        html.append(request.getUrl()); 
         html.append("</h1>\n<hr>\n<ul>\n");
         std::stringstream ss;
         ss << std::hex << html.length() << "\r\n";
@@ -223,6 +223,7 @@ void response::listDirectories()
             SIGPIPE;
             flag = 30;
 	    }
+        // targetUri = request.getRealPath();
         if (!(dir = opendir(targetUri.c_str())))
         {
             std::cout << "Error: failed to open directory" << std::endl;
@@ -241,7 +242,11 @@ void response::listDirectories()
         std::string fileName = entry->d_name;
         if (fileName[0] == '.')
             return;
-        html += "<li><a href=\"" + fileName + "\">" + fileName + "</a></li>\n";
+        if (entry->d_type == DT_DIR)
+        {
+            fileName += "/";
+        }
+        html += "<li><a href=\"" + fileName + "\">" +entry->d_name+ "</a></li>\n";
         std::stringstream ss;
         ss << std::hex << html.length() << "\r\n";
         html.append("\r\n");

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 12:31:39 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 01:20:38 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,6 +255,7 @@ bool response::isLargeContent(long long int len)
 {
     if(len > request.location.max_body_size)
     {
+        remove(uplfile.c_str());
         status_code = 413;
         //remove file
         return true;
@@ -385,21 +386,25 @@ void response::createFile()
     if (request.location.upload[0] == '/')
         request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1) {
-        std::string UplDir = request.location.root + request.location.upload;
-        std::string cgitmp = request.location.root + "/tmp";
         // std::cout << UplDir << "\n";
-        if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
-            perror("Upload Directory");
-            status_code = 403;
-        }
         std::string randName = generateName();
         std::string ileType = request.getContentType();
         extention = mime_[ileType];
         if (_isCgi){
+            std::string cgitmp = request.location.root + "/tmp";
+            if (access(cgitmp.c_str(), F_OK | W_OK) == -1) {
+                perror("Upload Directory");
+                status_code = 500;
+            }
             uplfile = cgitmp + "/" + randName + "." + extention;
             _cgiFile.open((uplfile).c_str());
         }
         else{
+            std::string UplDir = request.location.upload;
+            if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
+                perror("Upload Directory");
+                status_code = 500;
+            }
             uplfile = UplDir + "/" + randName + "." + extention;
             upfile.open((uplfile).c_str());
         }

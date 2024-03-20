@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 15:47:23 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 16:40:58 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -432,21 +432,58 @@ int LocationLongestPrefix(std::string locationName,std::string Url)
 	}
 	return countMatchingCharacter;
 }
+int checkType(std::string path)
+{
+    std::fstream file(path.c_str());
+    if (file.is_open())
+    {
+        file.close();
+        return 1;
+    }
+    DIR *type = opendir(path.c_str());
+    if(type)
+    {
+        closedir(type);
+        return 2;
+    }
+	else
+		return 3;
+}
 
 
 void Request::getREalPath()
 {
 	std::string targetUri;
 	std::string toString;
-	char *realPath;
+	char *real_Path;
 	
-	targetUri = location.root + url.substr(location.location_name.size());
-	realPath = realpath(targetUri.c_str(),NULL);
-	if(realPath)
-	{	toString = realPath;
-		toString +="/";
-		if(toString.find(location.root) != 0)
-			throw HttpForbidden("Forbidden\n");
+	targetUri = location.root + url.substr(location.location_name.size()); 
+	// std::cout <<"*****========="<<  location.root << "||" <<url << "||" << location.location_name <<"\n";
+	// /nfs/sgoinfre/goinfre/Perso/lsadiq/last_v/srcs/Parser/test/../../..
+	real_Path = realpath(targetUri.c_str(),NULL);
+	if(real_Path)
+	{	if (checkType(real_Path) == 1)
+		{
+				// std::cout << "filename ====>" << realPath <<"\n";
+				realPath = real_Path;
+		}
+		else if (checkType(real_Path) == 2)
+		{
+			// std::cout << "diiiir ====>" << realPath <<"\n";
+			realPath = real_Path;
+			realPath.append("/");
+		}
+		// toString = real_Path;
+		// toString +="/";
+		// if(toString.find(location.root) != 0)
+		// 	throw HttpForbidden("Forbidden\n");
+		// std::cout << "real path" << realPath <<"\n";
+	}
+	else
+	{
+		// std::cout<< "ooooooopsssss:"<<targetUri <<"\n";
+		perror("k");
+		realPath = targetUri;
 	}
 }
 

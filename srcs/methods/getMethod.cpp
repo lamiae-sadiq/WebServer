@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 14:00:36 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 16:49:44 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void response::init()
     flag = 0;
     this->ihex = 0;
     lastChunk = false;
+    check = 0;
     // _isStatus = false;
     dir = NULL;
     postDone = false;
@@ -91,9 +92,9 @@ void    response::methodGet()
             status_code = 301;
             return;
         }
-        targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
-        // request.getUri() = targetUri;
-        //  std::cout << "targetUri   " << targetUri << std::endl;
+        // targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
+        targetUri = request.getRealPath();
+        //  std::cout << "targetUri:" << targetUri << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)

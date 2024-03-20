@@ -31,6 +31,7 @@ $filename = $upload_dir . '/' . $random . '_uploaded_file' . getenv('EXTENSION_'
 
 $chunk_size = 2048; // Chunk size for reading from input
 
+
 // Open file for writing
 $file = fopen($filename, 'wb');
 if (!$file) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/19 15:46:47 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:19:07 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void response::executePHP()
 	{
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/homes/kel-baam/Desktop/newOne/" + randName;
+		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last_v/" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
@@ -80,7 +80,7 @@ void response::executePHP()
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
-				remove(uplfile.c_str());
+				// remove(uplfile.c_str());
 			}
 			freopen(path.c_str(), "w", stdout);
 			char *av[3];
@@ -88,7 +88,7 @@ void response::executePHP()
 			av[1] = strdup(targetUri.c_str());
 			av[2] = NULL;
 			execve(it->second.c_str(), av, env);
-			exit(0);
+			kill(pid, SIGINT);
 		}
 		else
 		{
@@ -129,10 +129,11 @@ bool response::_cgiProcess()
 		}
 		else if (wait > 0)
 		{
+			if (WIFSIGNALED(status))
+				status_code = 500;
 			if (WIFEXITED(status))
 				status_code = 200;
 			_cgiEnded = true;
-			// std::cout << "___________CGIEnded_______1\n";
 			return true;
 		}
 		else
@@ -191,18 +192,18 @@ void response::executePython()
 	it = request.location.cgi.find("py");
 	if (it != request.location.cgi.end())
 	{
-		setEnv();/////////////////////////////////////////////////////////////////////////////////
+		setEnv();
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last/" + randName;
+		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last_v" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
-			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
+			std::cout << "======================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
-				remove(uplfile.c_str());
+				// remove(uplfile.c_str());
 			}
 			freopen(path.c_str(), "w", stdout);
 			char *av[3];
@@ -210,7 +211,7 @@ void response::executePython()
 			av[1] = strdup(targetUri.c_str());
 			av[2] = NULL;
 			execve(it->second.c_str(), av, env);
-			exit(0);
+			kill(pid, SIGINT);
 		}
 		else
 		{
@@ -245,39 +246,45 @@ void response::parsecgiFile()
 void response::cgiSendResponse()
 {
 	_isStatus = false ;
-	parsecgiFile();
-	std::string resHeader = "HTTP/1.1 ";
-	if(_cgiHeader["Status"].empty())
-		resHeader += to_string(status_code) + " " + setStatus(status_code);
-	else
-		resHeader += _cgiHeader["Status"];
-	resHeader += "\r\nContent-Type:";
-	if(!_cgiHeader["Content-Type"].empty() || !_cgiHeader["Content-type"].empty())
+	if (!cinfile.is_open())
+		parsecgiFile();
+	if (check == 0)
 	{
-		if (!_cgiHeader["Content-Type"].empty())
-			resHeader += _cgiHeader["Content-Type"];
+		std::string resHeader = "HTTP/1.1 ";
+		if(_cgiHeader["Status"].empty())
+			resHeader += to_string(status_code) + " " + setStatus(status_code);
 		else
-			resHeader += _cgiHeader["Content-type"];
+			resHeader += _cgiHeader["Status"];
+		resHeader += "\r\nContent-Type:";
+		if(!_cgiHeader["Content-Type"].empty() || !_cgiHeader["Content-type"].empty())
+		{
+			if (!_cgiHeader["Content-Type"].empty())
+				resHeader += _cgiHeader["Content-Type"];
+			else
+				resHeader += _cgiHeader["Content-type"];
+		}
+		resHeader += "\r\n";
+		if (!_cgiHeader["Location"].empty()){
+			resHeader += "Location:";
+			resHeader += _cgiHeader["Location"] + "\r\n";
+		}
+		resHeader += "Transfer-Encoding: chunked\r\n";
+		
+		if(!_cgiHeader["Set-Cookie"].empty())
+			resHeader +="Set-Cookie:"+ _cgiHeader["Set-Cookie"]+"\r\n";
+		resHeader += "\r\n";
+		std::cout << resHeader;
+		int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
+		if(i < 0){
+			SIGPIPE;
+			check = 30;
+		}
+		check = 1;
 	}
-	resHeader += "\r\n";
-	if (!_cgiHeader["Location"].empty()){
-		resHeader += "Location:";
-		resHeader += _cgiHeader["Location"] + "\r\n";
-	}
-	resHeader += "Transfer-Encoding: chunked\r\n";
-	if(_cgiHeader.find("Set-Cookie")!=_cgiHeader.end())
-		resHeader += "Set-Cookie:" + _cgiHeader["Set-Cookie"] + "\r\n";
-	resHeader += "\r\n";
-	// std::cout << resHeader;
-	int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
-	if(i < 0){
-		SIGPIPE;
-		flag = 30;
-	}
-	flag = 3;
-	if (flag == 3)
+	if (check == 1)
 	{
-		const int chunkSize = 1024;
+		std::cout << "___________SEND____________________\n";
+		const int chunkSize = 2048;
 		char buffer[chunkSize];
 		cinfile.read(buffer, chunkSize);
 		int bytesRead = cinfile.gcount();
@@ -295,10 +302,10 @@ void response::cgiSendResponse()
 			flag = 30;
 		}
 		if (cinfile.eof()){
-			flag = 4;
+			check = 3;
 		}
 	}
-	if (flag == 4) {
+	if (check == 3) {
 		int i = send(fd, "0\r\n\r\n", 5, 0);
 		if(i < 0){
 			SIGPIPE;
