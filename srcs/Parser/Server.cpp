@@ -6,20 +6,15 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 01:56:54 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:36:12 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Server.hpp"
 
 Server::Server()
-{
-    // error_pages[404] = "/nfs/homes/kel-baam/oof/srcs/errorPages/404.html";
-    // error_pages[405] = "/nfs/homes/kel-baam/oof/srcs/errorPages/405.html";
-    // error_pages[301] = "/nfs/homes/kel-baam/oof/srcs/errorPages/301.html";
-    // error_pages[500] = "/nfs/homes/kel-baam/oof/srcs/errorPages/500.html";
-    // error_pages[501] = "/nfs/homes/kel-baam/oof/srcs/errorPages/501.html";
-}
+{}
+
 Server::~Server(){};
 
 std::map<int, std::string> Server::getErrorPage()

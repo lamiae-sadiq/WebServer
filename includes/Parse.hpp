@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:18 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 12:37:01 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:41:35 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 #include "./Server.hpp"
 #include "./Location.hpp"
 #include "./Utils.hpp"
-// ishould check if the server data is four or not 
 
 class Parser
 {

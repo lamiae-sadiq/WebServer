@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:16 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 12:44:10 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:34:58 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,5 +144,3 @@ std::vector<Server> Parser::paseConfigueFile(std::string &configueFile)
     throw Exception("you have error in configue file\n"); 
   return parser.servers;
 }
-
-	

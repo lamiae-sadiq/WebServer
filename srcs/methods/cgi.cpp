@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/20 22:19:07 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/20 22:28:41 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void response::executePHP()
 	{
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last_v/" + randName;
+		path = "/nfs/homes/kel-baam/Desktop/lastNchaallah/" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
@@ -151,7 +151,7 @@ void response::handelCGI()
 {
 	if (!_cgiStarted)
 	{
-		if (request.location.cgi.find("php") != request.location.cgi.end())
+		if (request.location.cgi.find("php") != request.location.cgi.end() && extention == "php")
 			executePHP();
 		else
 			executePython();
@@ -195,7 +195,7 @@ void response::executePython()
 		setEnv();
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/last_v" + randName;
+		path = "/nfs/homes/kel-baam/Desktop/lastNchaallah/" + randName;
 		pid = fork();
 		if (pid == 0)
 		{

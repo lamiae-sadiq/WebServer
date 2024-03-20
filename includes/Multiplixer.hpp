@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:05 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 12:34:50 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:32:45 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@
 static std::string tmpBuff;
 class Multiplixer
 {
-		int count;
 		std::map<int,std::vector<Server> > masterSockets;
 		std::map<int,std::vector<Server> > matchServers ;
 		std::map<int,response *> responses;

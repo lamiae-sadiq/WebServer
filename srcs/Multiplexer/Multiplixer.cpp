@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 12:35:06 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:30:57 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 
 Multiplixer::Multiplixer()
 {
-	tmpBuff="";
-	count = 0;
+	tmpBuff = "";
 }
+
 Multiplixer::~Multiplixer(){};
 
 void Multiplixer::setNonBlocking(int &sockfd) 
@@ -32,7 +32,7 @@ void Multiplixer::addFdToEpoll(int epoll_instance,int sockfd, epoll_event *event
 	if(!flag)
 		event->events = EPOLLIN;
 	else
-		event->events = EPOLLIN | EPOLLOUT ;
+		event->events = EPOLLIN | EPOLLOUT;
 	event->data.fd = sockfd;
 	int epo_ctl= epoll_ctl(epoll_instance,EPOLL_CTL_ADD,sockfd,event);
 	if(epo_ctl < 0)
@@ -77,9 +77,7 @@ void Multiplixer::closeMasterSocket()
 {
 	std::map<int, std::vector<Server> >::iterator it = masterSockets.begin();
 	for(it = masterSockets.begin(); it != masterSockets.end();it++)
-	{
 		close(it->first);
-	}	
 }
 
 int Multiplixer::checkMasterSocketPort(Server server)
@@ -133,9 +131,17 @@ void Multiplixer::creatSockets(int epoll_instance,std::vector<Server> servers)
         		throw Exception(strerror(errno));
 			}
 			if (setsockopt(masterSockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT ,&a, sizeof(int)) < 0)
+			{
+				closeMasterSocket();
         		throw Exception(strerror(errno));
+			}
 			bindSocket(masterSockfd,servers[i].getServerData("port")[0],servers[i]);
 			listenn = listen(masterSockfd,SOMAXCONN);
+			if(listenn < 0)
+			{
+				closeMasterSocket();
+        		throw Exception(strerror(errno));
+			}
 			printf("listiining......\n");
 			addFdToEpoll(epoll_instance,masterSockfd,&event,0);
 		}
@@ -159,7 +165,6 @@ void  Multiplixer::acceptNewConnection(int epoll_instance,int sockfd,epoll_event
 	int newSockfd;
 	struct sockaddr_in client_add;
 	socklen_t add_len = sizeof(client_add);
-	
 	newSockfd = accept(sockfd,(struct sockaddr *)&client_add,&add_len);
 	if(newSockfd < 0)
         throw Exception(strerror(errno));
@@ -180,7 +185,6 @@ void Multiplixer::clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct 
 	response *tmp_res = responses[socketFd];
 	Request *tmp_req = requests[socketFd];
 
-	std::cout << "send response\n";
 	responses.erase(socketFd);
 	requests.erase(socketFd);
 	matchServers.erase(socketFd);
@@ -202,6 +206,8 @@ bool Multiplixer::isTimedout(response *response,Request &request)
 	gettimeofday(&request.end_time, NULL);
 	int time = (request.end_time.tv_sec - request.start_time.tv_sec) * 1000000LL +
     (request.end_time.tv_usec - request.start_time.tv_usec);
+	if(request.matchLocationDone)
+		request.setStatus(1);
 	if( time > 10000000LL)
 	{
 		response->setStatusCode(408);
@@ -235,7 +241,7 @@ void Multiplixer::start(std::vector<Server> servers)
 			{
 				int socketFd = events[i].data.fd;
 				Request &request = *(requests[socketFd]);
-				if(!isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
+				if(!request.getStatus() && !isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
 				{
 					byt = recv(socketFd,buff,2048, 0);
 					if(byt <= 0)
@@ -248,15 +254,12 @@ void Multiplixer::start(std::vector<Server> servers)
 					if(code != 1)
 						responses[socketFd]->setStatusCode(code);
 				}
-				if((events[i].events & EPOLLOUT))
+				if((events[i].events & EPOLLOUT) && request.getStatus() == 1)
 				{
-					if(request.getStatus() == 1)
-					{
 						responses[socketFd]->executeMethodes(buff,byt,socketFd);
+						request.setStatus(0);
 						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)// set a flag when we done 
 							clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
-						//sett satus to 0
-					}
 				}
 			}
 		}

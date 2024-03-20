@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 16:40:58 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/20 22:39:09 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ Request::Request()
 	firstReadOfBody = true;
 	_isCgi = false;
 	_cgiRuning = false;
+	matchLocationDone = false;
 };
 
 Request::~Request(){};
@@ -137,16 +138,16 @@ void Request::setUrl(std::string initVar)
 		throw  HttpBadRequest("Bad request");
 	if(initVar.length() > 2048)
 		throw HttpUriTooLong("Uri Too Long");
-	// std::cout <<"================>" << initVar << "\n";
-	url = decodingUri(initVar);
 	index = url.find("?");
-	if(url.find_first_not_of(allowedCharacter)!= std::string::npos)
-		throw  HttpBadRequest("Bad request");
 	if (index != std::string::npos)
 	{
 		query = url.substr(index + 1);
 		url = url.substr(0, index);
 	}
+	
+	url = decodingUri(initVar);
+	if(url.find_first_not_of(allowedCharacter)!= std::string::npos)
+		throw  HttpBadRequest("Bad request");
 }
 
 void Request::checkVersion(std::string &version)
@@ -198,6 +199,7 @@ void Request::storeRequestLineInfo(std::vector<std::string> vec)
 void Request::storeHostHeader(std::string line)
 {
 	size_t index;
+
 	if(line.empty())
 		throw  HttpBadRequest("Bad request");
 	Utils::skipSpaces(line);
@@ -210,6 +212,7 @@ void Request::storeHostHeader(std::string line)
 	}
 	else
 		host = line;
+
 }
 
 std::string Request::decodingUri(std::string str)
@@ -290,8 +293,6 @@ void Request::storeRequest(std::string line)
 {
 	size_t index = line.find(":");
 	std::string key = line;
-	if(countHeaders)
-		Utils::strToLower(line);
 	if(!countHeaders)
 	{
 	 	storeRequestLineInfo(Utils::splitString(line,' '));
@@ -302,7 +303,10 @@ void Request::storeRequest(std::string line)
 	{
 		key = line.substr(0,index);
 		line = line.substr(index+1);
+		Utils::strToLower(key);
 	}
+	else
+		Utils::strToLower(key);
 	chekHeaderError(key);
 	setHeader(key,line);
 }
@@ -347,7 +351,6 @@ void Request::storeLocation(Server &server, Location iniLocation)
 		location.redirect_path = iniLocation.getLocationData("return")[1];
 	if(!server.getServerData("client_max_body_size")[0].empty())
 		location.max_body_size = Utils::stringToLongLong(server.getServerData("client_max_body_size")[0].c_str());
-	// std::cout << "whhhhy==>" << server.getErrorPage().size() <<"\n";
 	if(server.getErrorPage().size() > 0)
 		location.error_pages = server.getErrorPage();
 	if(iniLocation.getLocationData("root").size() == 1)
@@ -432,6 +435,8 @@ int LocationLongestPrefix(std::string locationName,std::string Url)
 	}
 	return countMatchingCharacter;
 }
+
+
 int checkType(std::string path)
 {
     std::fstream file(path.c_str());
@@ -458,18 +463,12 @@ void Request::getREalPath()
 	char *real_Path;
 	
 	targetUri = location.root + url.substr(location.location_name.size()); 
-	// std::cout <<"*****========="<<  location.root << "||" <<url << "||" << location.location_name <<"\n";
-	// /nfs/sgoinfre/goinfre/Perso/lsadiq/last_v/srcs/Parser/test/../../..
 	real_Path = realpath(targetUri.c_str(),NULL);
 	if(real_Path)
 	{	if (checkType(real_Path) == 1)
-		{
-				// std::cout << "filename ====>" << realPath <<"\n";
-				realPath = real_Path;
-		}
+			realPath = real_Path;
 		else if (checkType(real_Path) == 2)
 		{
-			// std::cout << "diiiir ====>" << realPath <<"\n";
 			realPath = real_Path;
 			realPath.append("/");
 		}
@@ -481,12 +480,9 @@ void Request::getREalPath()
 	}
 	else
 	{
-		// std::cout<< "ooooooopsssss:"<<targetUri <<"\n";
-		perror("k");
 		realPath = targetUri;
 	}
 }
-
 void Request::matchLocation(Server currentServer)
 {
 	std::string locationName;
@@ -555,7 +551,7 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 {
 	try
 	{
-		if(!status)
+		if(!matchLocationDone)
 		{
 			servers = initServers;
 			if(analyseHeaders(buff))
@@ -563,10 +559,11 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				Server server = matchServer();
 				matchLocation(server);
-				// printREquest();e
+				// printREquest();
+				matchLocationDone = true;
 				status = 1;
-				return 1;
 			}
+			return 1;
 		}
 	}
 	catch(HttpException& e)

@@ -6,12 +6,12 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/17 14:38:05 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/20 22:36:45 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/Location.hpp"
 
+#include "../../includes/Location.hpp"
 
 Location::Location(){};
 
@@ -111,6 +111,10 @@ void Location::checkCgiError(std::vector<std::string> vec)
 {
     if(vec.size() != 2)
         throw Exception("Error: cgi is incorrect\n");
+    if(vec[0] == "php" && vec[1] != "/usr/bin/php-cgi")
+        throw Exception("Error: php command is incorrect\n");
+    if(vec[0] == "py" && vec[1] != "/usr/bin/python3")
+        throw Exception("Error: py command is incorrect\n");
 }
 
 void Location::checkLocationError(std::string directive,std::vector<std::string> vec,int countSpaces)
