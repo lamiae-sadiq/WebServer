@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/21 17:19:59 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:30:11 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,8 +281,8 @@ void	Request::chekHeaderError(std::string key)
 void Request::checkContentType(std::string &contetType)
 {
 	Utils::skipSpaces(contetType);
-	if(contetType.find("boundary") != std::string::npos)
-		throw  HttpNotImplemented("Not Implemented");
+	// if(contetType.find("boundary") != std::string::npos)
+	// 	throw  HttpNotImplemented("Not Implemented");
 	if(contetType.empty())
 		throw HttpBadRequest("Bad request");
 		
@@ -394,6 +394,7 @@ void  Request::printREquest()
 	std::cout << "eror pages siize==>" << location.error_pages.size() << "\n";
 	std::cout << "queri==>" << getQueryString() <<"\n";
 	std::map<int, std::string>::iterator itt = location.error_pages.begin();
+	std::cout << "size errpr==>"<<location.error_pages.size() <<"\n";
 	while(itt != location.error_pages.end())
 	{
 		std::cout <<  "error pages ================>" << itt->second<<"\n";
@@ -444,16 +445,18 @@ int checkType(std::string path)
     if (file.is_open())
     {
         file.close();
-        return 1;
+        return FILE;
     }
+	else
+		return -1;
     DIR *type = opendir(path.c_str());
     if(type)
     {
         closedir(type);
-        return 2;
+        return DIRECTORY;
     }
 	else
-		return 3;
+		return -1;
 }
 
 
@@ -465,14 +468,17 @@ void Request::getREalPath()
 	
 	targetUri = location.root + url.substr(location.location_name.size()); 
 	real_Path = realpath(targetUri.c_str(),NULL);
+	
 	if(real_Path)
-	{	if (checkType(real_Path) == 1)
+	{	if (checkType(real_Path) == FILE)
 			realPath = real_Path;
-		else if (checkType(real_Path) == 2)
+		else if (checkType(real_Path) == DIRECTORY)
 		{
 			realPath = real_Path;
 			realPath.append("/");
 		}
+		else
+			realPath = real_Path;
 		toString = real_Path;
 		toString +="/";
 		if(toString.find(location.root) != 0)
@@ -482,6 +488,7 @@ void Request::getREalPath()
 	{
 		realPath = targetUri;
 	}
+
 }
 void Request::matchLocation(Server currentServer)
 {

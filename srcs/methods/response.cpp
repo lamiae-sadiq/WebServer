@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 17:19:26 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:28:21 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void    response::sendData()
         resHeader +="\r\n";
         resHeader += "Transfer-Encoding: chunked\r\n";
         resHeader += "\r\n";
+       
         int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
         if(i < 0){
             SIGPIPE;
@@ -62,6 +63,7 @@ void    response::sendData()
         memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
         memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
         memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
+        
         int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
         if(i < 0){
             SIGPIPE;
@@ -120,16 +122,23 @@ const std::string response::HTMLPage() {
 std::string response::getErrorPage() 
 {
     if (request.location.error_pages.find(status_code) != request.location.error_pages.end())
-        return request.location.error_pages[status_code];
+       return request.location.error_pages[status_code];
     return "404";
 }
+
+int a = 0;
 
 void response::sendErrorPage()
 {
     targetUri = getErrorPage();
+    
     if(access(targetUri.c_str(), R_OK | W_OK) == 0)
     {
-        flag = 2;
+        if(!flagOn)
+        {
+            flag =2;
+            flagOn = true;
+        }
         check_extention(targetUri);
         content_type = fileType;
         sendData();

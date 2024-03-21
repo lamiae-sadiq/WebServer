@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 17:19:11 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:21:27 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,6 +278,11 @@ void    response::methodPost(const char *con, size_t size)
             check_extention(targetUri);
             if(extention == "php" || extention == "py")
                 _isCgi = true;
+        }
+        if (!_isCgi && request.getContentType().find("boundary") != std::string::npos)
+        {
+            status_code = 501;
+            return ; 
         }
         size_t index = 0;
         createFile();

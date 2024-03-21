@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 17:02:20 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 18:18:16 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void response::init()
     lastChunk = false;
     check = 0;
     // _isStatus = false;
+    flagOn = false;
     dir = NULL;
     postDone = false;
     fileExtention();
@@ -100,7 +101,7 @@ void    response::methodGet()
         }
         // targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
         targetUri = request.getRealPath();
-        //  std::cout << "targetUri:" << targetUri << std::endl;
+         std::cout << "targetUri:" << targetUri << std::endl;
         if(!allowedMethods())
             status_code = 405;
         else if(access(this->targetUri.c_str(), F_OK) == 0)

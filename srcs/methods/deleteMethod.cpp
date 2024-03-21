@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 17:18:46 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:27:38 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,21 +52,25 @@ void	response::Delete()
             status_code = 405;
 	else if (access(this->targetUri.c_str(), F_OK) == 0)
 	{
-		if (checkType(targetUri) == FILE)
+		if (access(this->targetUri.c_str(), R_OK) == 0)
 		{
-			if(std::remove(targetUri.c_str()) < 0)
-				status_code = 403;
-			else
-			status_code = 204;
-		}
-		if(checkType(targetUri) == DIRECTORY)
-		{	
-			if(targetUri[targetUri.length() - 1] == '/'){
-				deleteDir(targetUri);
+			if (checkType(targetUri) == FILE)
+			{
+				if(std::remove(targetUri.c_str()) < 0)
+					status_code = 403;
+				else
+				status_code = 204;
 			}
-			else
-				status_code = 409;
+			if(checkType(targetUri) == DIRECTORY)
+			{	
+				if(targetUri[targetUri.length() - 1] == '/')
+					deleteDir(targetUri);
+				else
+					status_code = 409;
+			}
 		}
+		else 
+			status_code = 403;
 	}
 	else
 		status_code = 404;

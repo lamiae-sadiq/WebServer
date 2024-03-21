@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 15:46:16 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 18:17:41 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class response
 		std::ofstream 	upfile;
 		std::string 	chunkSizeStr;
 		long long int   totalChunkedLength;
+		bool			flagOn;
 		// bool 			close;
 		DIR* 			dir;
 		int 			flag;
