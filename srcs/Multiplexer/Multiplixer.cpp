@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:30:57 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 02:26:08 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ void Multiplixer::creatSockets(int epoll_instance,std::vector<Server> servers)
 				closeMasterSocket();
         		throw Exception(strerror(errno));
 			}
-			printf("listiining......\n");
+			printf("listening......\n");
 			addFdToEpoll(epoll_instance,masterSockfd,&event,0);
 		}
 		masterSockets[masterSockfd].push_back(servers[i]);

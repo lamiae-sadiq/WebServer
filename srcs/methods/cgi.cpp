@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/20 22:28:41 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 03:35:09 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,9 @@ void response::setEnv()
 	}
 	cgiHeader["GATEWAY_INTERFACE"] = "CGI";
 	cgiHeader["REQUEST_METHOD"] = request.getMethod();
-	
 	cgiHeader["QUERY_STRING"] = request.getQueryString();
 	cgiHeader["PATH_INFO"] = request.getUrl();
 	cgiHeader["HTTP_COOKIE"] = request.getCookies();
-	// std::cout <<"coookies"<< cgiHeader["HTTP_COOKIE"] << "=======" <<  request.getCookies() <<"\n";
 	cgiHeader["SCRIPT_NAME"] = request.getUrl();
 	cgiHeader["SCRIPT_FILENAME"] = targetUri;
 	cgiHeader["PATH_TRANSLATED"] = targetUri;
@@ -72,15 +70,50 @@ void response::executePHP()
 	{
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/homes/kel-baam/Desktop/lastNchaallah/" + randName;
+		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webCu/" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
-			std::cout << "=================================================pop = " << request.getMethod() << std::endl;
+			std::cout << "=====================================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
-				// remove(uplfile.c_str());
+				remove(uplfile.c_str());
+			}
+			freopen(path.c_str(), "w", stdout);
+			char *av[3];
+			av[0] = strdup(it->second.c_str());
+			av[1] = strdup(targetUri.c_str());
+			av[2] = NULL;
+			execve(it->second.c_str(), av, env);
+			kill(pid, SIGINT);
+		}
+		else
+		{
+			_cgiStarted = true;
+		}
+	}
+}
+
+void response::executePython()
+{
+	std::cout << "___________PY_______\n";
+	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
+	it = request.location.cgi.find("py");
+	if (it != request.location.cgi.end())
+	{
+		setEnv();
+		cgiStartTime = time(NULL);
+		std::string randName = generateName();
+		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webCu/" + randName;
+		pid = fork();
+		if (pid == 0)
+		{
+			std::cout << "======================pop = " << request.getMethod() << std::endl;
+			if (request.getMethod() == "POST")
+			{
+				freopen(uplfile.c_str(), "r", stdin);
+				remove(uplfile.c_str());
 			}
 			freopen(path.c_str(), "w", stdout);
 			char *av[3];
@@ -147,10 +180,75 @@ bool response::_cgiProcess()
 	return false;
 }
 
+void response::parsecgiFile()
+{
+	cinfile.open(path.c_str());
+	if (cinfile.is_open())
+	{
+		std::string line;
+		while (getline(cinfile, line))
+		{
+			if (line == "\n" || line == "\r\n" || line == "\r" || line == "")
+				break;
+			if(line.find("Status") != std::string::npos)
+			{
+				_isStatus = true ;
+				line = line.substr(8);
+			}
+			buff += line + "\n";
+		}
+	}
+}
+
+
+void response::cgiSendResponse()
+{
+	_isStatus = false ;
+	if (!cinfile.is_open())
+		parsecgiFile();
+	if (check == 0)
+	{
+		std::string resHeader = "HTTP/1.1 ";
+		if(_isStatus)
+			resHeader += buff;
+		else{
+			resHeader += "200 OK";
+		resHeader += buff;
+			
+		}
+		resHeader += "\r\n";
+		// std::cout << resHeader;
+		int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
+		if(i < 0){
+			SIGPIPE;
+			check = 30;
+		}
+		check = 1;
+	}
+	if (check == 1)
+	{
+		std::cout << "___________SEND____________________\n";
+		const int chunkSize = 2048;
+		char buffer[chunkSize];
+		cinfile.read(buffer, chunkSize);
+		int i = send(fd, buffer, cinfile.gcount(), 0);
+		if(i < 0){
+			SIGPIPE;
+			flag = 30;
+		}
+		if (cinfile.eof()){
+			remove(path.c_str());
+			cinfile.close();
+			flag = 30;
+		}
+	}
+}
+
 void response::handelCGI()
 {
 	if (!_cgiStarted)
 	{
+		check_extention(targetUri);
 		if (request.location.cgi.find("php") != request.location.cgi.end() && extention == "php")
 			executePHP();
 		else
@@ -160,7 +258,6 @@ void response::handelCGI()
 		return;
 	if (_cgiEnded)
 	{
-		// std::cout << "___________CGIHandeler_______11111111111 \n";
 		if (status_code == 500)
 		{
 			remove(path.c_str());
@@ -178,141 +275,8 @@ void response::handelCGI()
 		}
 		else
 		{
-			// std::cout << "___________CGIEnded_______\n";
 			cgiSendResponse();
 			return;
 		}
-	}
-}
-
-void response::executePython()
-{
-	std::cout << "___________PY_______\n";
-	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
-	it = request.location.cgi.find("py");
-	if (it != request.location.cgi.end())
-	{
-		setEnv();
-		cgiStartTime = time(NULL);
-		std::string randName = generateName();
-		path = "/nfs/homes/kel-baam/Desktop/lastNchaallah/" + randName;
-		pid = fork();
-		if (pid == 0)
-		{
-			std::cout << "======================pop = " << request.getMethod() << std::endl;
-			if (request.getMethod() == "POST")
-			{
-				freopen(uplfile.c_str(), "r", stdin);
-				// remove(uplfile.c_str());
-			}
-			freopen(path.c_str(), "w", stdout);
-			char *av[3];
-			av[0] = strdup(it->second.c_str());
-			av[1] = strdup(targetUri.c_str());
-			av[2] = NULL;
-			execve(it->second.c_str(), av, env);
-			kill(pid, SIGINT);
-		}
-		else
-		{
-			_cgiStarted = true;
-		}
-	}
-}
-
-void response::parsecgiFile()
-{
-	cinfile.open(path.c_str());
-	if (cinfile.is_open())
-	{
-		std::string line;
-		while (getline(cinfile, line))
-		{
-			if (line == "\n" || line == "\r\n" || line == "\r" || line == "")
-				break;
-			size_t pos = line.find(':');
-			if (pos != std::string::npos)
-			{
-				std::string key = line.substr(0, pos);
-				std::string value = line.substr(pos + 1);
-				_cgiHeader[key] = value;
-			}
-		}
-	}
-	else
-		status_code = 404;
-}
-
-void response::cgiSendResponse()
-{
-	_isStatus = false ;
-	if (!cinfile.is_open())
-		parsecgiFile();
-	if (check == 0)
-	{
-		std::string resHeader = "HTTP/1.1 ";
-		if(_cgiHeader["Status"].empty())
-			resHeader += to_string(status_code) + " " + setStatus(status_code);
-		else
-			resHeader += _cgiHeader["Status"];
-		resHeader += "\r\nContent-Type:";
-		if(!_cgiHeader["Content-Type"].empty() || !_cgiHeader["Content-type"].empty())
-		{
-			if (!_cgiHeader["Content-Type"].empty())
-				resHeader += _cgiHeader["Content-Type"];
-			else
-				resHeader += _cgiHeader["Content-type"];
-		}
-		resHeader += "\r\n";
-		if (!_cgiHeader["Location"].empty()){
-			resHeader += "Location:";
-			resHeader += _cgiHeader["Location"] + "\r\n";
-		}
-		resHeader += "Transfer-Encoding: chunked\r\n";
-		
-		if(!_cgiHeader["Set-Cookie"].empty())
-			resHeader +="Set-Cookie:"+ _cgiHeader["Set-Cookie"]+"\r\n";
-		resHeader += "\r\n";
-		std::cout << resHeader;
-		int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
-		if(i < 0){
-			SIGPIPE;
-			check = 30;
-		}
-		check = 1;
-	}
-	if (check == 1)
-	{
-		std::cout << "___________SEND____________________\n";
-		const int chunkSize = 2048;
-		char buffer[chunkSize];
-		cinfile.read(buffer, chunkSize);
-		int bytesRead = cinfile.gcount();
-		std::stringstream ss;
-		ss << std::hex << bytesRead;
-		std::string chunkSizeHex = ss.str();
-		std::string chunkHeader = chunkSizeHex + "\r\n";
-		char concatenatedSends[chunkHeader.length() + bytesRead + 2];
-		memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
-		memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
-		memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-		int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
-		if(i < 0){
-			SIGPIPE;
-			flag = 30;
-		}
-		if (cinfile.eof()){
-			check = 3;
-		}
-	}
-	if (check == 3) {
-		int i = send(fd, "0\r\n\r\n", 5, 0);
-		if(i < 0){
-			SIGPIPE;
-			flag = 30;
-		}
-		remove(path.c_str());
-		cinfile.close();
-		flag = 30;
 	}
 }

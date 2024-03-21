@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/20 01:20:38 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 02:59:34 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void response::parsLength(const char *con, size_t& index, size_t size)
     if (request.contentLength == 0)
     {
         if (!_isCgi){
+            std::cout << "is post \n";
             upfile.close();
             status_code = 201;
         }
@@ -265,8 +266,7 @@ bool response::isLargeContent(long long int len)
 
 void    response::methodPost(const char *con, size_t size)
 {
-    targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
-    std::cout << "POST :" << targetUri << std::endl;
+    targetUri = request.getRealPath();
     if(!allowedMethods())
     {
         status_code = 405;
@@ -383,10 +383,7 @@ void    response::fileExtention()
 void response::createFile()
 {
     std::cout << "__________create ___________" << std::endl;
-    if (request.location.upload[0] == '/')
-        request.location.upload.erase(0, 1);
     if (request.location.upload.length() > 1) {
-        // std::cout << UplDir << "\n";
         std::string randName = generateName();
         std::string ileType = request.getContentType();
         extention = mime_[ileType];

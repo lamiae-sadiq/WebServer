@@ -40,7 +40,7 @@ if (!$file) {
 }
 
 // Read from input and write to file
-$input_stream = fopen('php://input', 'rb');
+$input_stream = fopen('/nfs/sgoinfre/goinfre/Perso/lsadiq/webCu/vd.mp4', 'rb');
 while (!feof($input_stream)) {
     $data_chunk = fread($input_stream, $chunk_size);
     fwrite($file, $data_chunk);
