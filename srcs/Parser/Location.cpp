@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:36:45 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 12:51:30 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,10 @@ void  Location::checkLocationName(std::vector<std::string> location_name)
 
 void Location::checkUpload(std::vector<std::string> upload)
 {
+    size_t len = upload[0].length() - 1;
     if(upload.size() != 1)
+        throw Exception("Error: uplad path is incorrect\n");
+    if(upload[0][0] !='/' || upload[0][len] != '/')
         throw Exception("Error: uplad path is incorrect\n");
 }
 

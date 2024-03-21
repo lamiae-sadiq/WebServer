@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/21 02:26:08 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 17:19:30 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,9 +206,9 @@ bool Multiplixer::isTimedout(response *response,Request &request)
 	gettimeofday(&request.end_time, NULL);
 	int time = (request.end_time.tv_sec - request.start_time.tv_sec) * 1000000LL +
     (request.end_time.tv_usec - request.start_time.tv_usec);
-	if(request.matchLocationDone)
-		request.setStatus(1);
-	if( time > 10000000LL)
+	// if(request.matchLocationDone)
+	// 	request.setStatus(1);
+	if( time > 10000000LL && !response->getIsCgi())
 	{
 		response->setStatusCode(408);
 		request.setStatus(1);
@@ -241,7 +241,7 @@ void Multiplixer::start(std::vector<Server> servers)
 			{
 				int socketFd = events[i].data.fd;
 				Request &request = *(requests[socketFd]);
-				if(!request.getStatus() && !isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
+				if(!isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
 				{
 					byt = recv(socketFd,buff,2048, 0);
 					if(byt <= 0)
@@ -257,7 +257,7 @@ void Multiplixer::start(std::vector<Server> servers)
 				if((events[i].events & EPOLLOUT) && request.getStatus() == 1)
 				{
 						responses[socketFd]->executeMethodes(buff,byt,socketFd);
-						request.setStatus(0);
+						// request.setStatus(0);
 						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)// set a flag when we done 
 							clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 				}

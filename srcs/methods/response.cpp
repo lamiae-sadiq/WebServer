@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/20 18:00:44 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 17:19:26 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,6 @@ void response::sendErrorPage()
 void response::ErrorHeader()
 {
     const std::string errorPage = HTMLPage();
-    std::cout << "method : " << request.getMethod() << std::endl;
     std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
     header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
     header.append(to_string(errorPage.length()));
@@ -178,7 +177,6 @@ void response::setHeader()
     }
     if (status_code >= 200 && status_code <= 204)
     {
-        std::cout << "------------------" << status_code << std::endl;
         const std::string responsePage = HTMLPage();
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
@@ -197,7 +195,6 @@ void response::setHeader()
 void response::listDirectories()
 {
     targetUri = request.getRealPath();
-    // std::cout << "list Dir " << targetUri << std::endl;
     std::string html;
     if(flag == 6){
         std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n";
@@ -289,7 +286,7 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
     
     if (status_code != 200)
         sendErrorPage();
-    if (request.getMethod() == "GET")
+    else if (request.getMethod() == "GET")
         methodGet();
     else if (request.getMethod() == "DELETE")
         Delete();

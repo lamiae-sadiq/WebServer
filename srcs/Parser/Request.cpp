@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:39:09 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/21 17:19:59 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ void Request::setHeader(std::string &key,std::string &value)
 	Utils::skipSpaces(value);
 	if(key == "host" && value.empty())
 		throw HttpBadRequest("Bad request");
-	// std::cout << key <<"||" << value <<"\n";
 	headers[key] = value;
 }
 
@@ -138,14 +137,15 @@ void Request::setUrl(std::string initVar)
 		throw  HttpBadRequest("Bad request");
 	if(initVar.length() > 2048)
 		throw HttpUriTooLong("Uri Too Long");
-	index = url.find("?");
+	index = initVar.find("?");
 	if (index != std::string::npos)
 	{
-		query = url.substr(index + 1);
-		url = url.substr(0, index);
+		query = initVar.substr(index + 1);
+		url = initVar.substr(0, index);
 	}
-	
-	url = decodingUri(initVar);
+	else
+		url = initVar;
+	url = decodingUri(url);
 	if(url.find_first_not_of(allowedCharacter)!= std::string::npos)
 		throw  HttpBadRequest("Bad request");
 }
@@ -392,6 +392,7 @@ void  Request::printREquest()
 	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
 	std::cout << "cooookies====>|" << cookies << "|\n";
 	std::cout << "eror pages siize==>" << location.error_pages.size() << "\n";
+	std::cout << "queri==>" << getQueryString() <<"\n";
 	std::map<int, std::string>::iterator itt = location.error_pages.begin();
 	while(itt != location.error_pages.end())
 	{
@@ -472,11 +473,10 @@ void Request::getREalPath()
 			realPath = real_Path;
 			realPath.append("/");
 		}
-		// toString = real_Path;
-		// toString +="/";
-		// if(toString.find(location.root) != 0)
-		// 	throw HttpForbidden("Forbidden\n");
-		// std::cout << "real path" << realPath <<"\n";
+		toString = real_Path;
+		toString +="/";
+		if(toString.find(location.root) != 0)
+			throw HttpForbidden("Forbidden\n");
 	}
 	else
 	{

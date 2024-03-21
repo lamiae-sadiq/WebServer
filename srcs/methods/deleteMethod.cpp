@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   deleteMethod.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/06 23:01:37 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 17:18:46 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,7 @@ void	response::deleteDir(std::string uri)
 		{
 			std::string path = uri + "/" + entry->d_name;
 			if (entry->d_name[0] != '.')
-			{
-				// std::cout << path << std::endl;
 				deleteDir(path);
-			}
 		}
 		else
 		{
@@ -49,7 +46,8 @@ void	response::deleteDir(std::string uri)
 
 void	response::Delete()
 {
-	targetUri = request.location.root + request.getUrl().substr(request.location.location_name.size());
+	targetUri = request.getRealPath();
+	
 	if(!allowedMethods())
             status_code = 405;
 	else if (access(this->targetUri.c_str(), F_OK) == 0)
@@ -63,7 +61,7 @@ void	response::Delete()
 		}
 		if(checkType(targetUri) == DIRECTORY)
 		{	
-			if(targetUri[targetUri.length() - 1] != '/'){
+			if(targetUri[targetUri.length() - 1] == '/'){
 				deleteDir(targetUri);
 			}
 			else

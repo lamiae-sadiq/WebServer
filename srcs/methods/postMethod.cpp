@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 02:59:34 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 17:19:11 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ void response::parsLength(const char *con, size_t& index, size_t size)
     if (request.contentLength == 0)
     {
         if (!_isCgi){
-            std::cout << "is post \n";
             upfile.close();
             status_code = 201;
         }
@@ -264,6 +263,7 @@ bool response::isLargeContent(long long int len)
     return false;
 }
 
+
 void    response::methodPost(const char *con, size_t size)
 {
     targetUri = request.getRealPath();
@@ -390,7 +390,7 @@ void response::createFile()
         if (_isCgi){
             std::string cgitmp = request.location.root + "/tmp";
             if (access(cgitmp.c_str(), F_OK | W_OK) == -1) {
-                perror("Upload Directory");
+                perror("cgitmp Directory");
                 status_code = 500;
             }
             uplfile = cgitmp + "/" + randName + "." + extention;

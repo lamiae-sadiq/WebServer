@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/20 16:49:44 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 17:02:20 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,16 @@ const std::string	response::setStatus(int status)
 			return "Not Implemented";
         case 400:
             return "Bad request ";
+        case 413:
+            return "Request Entity Too Large";
+        case 411:
+            return "length required";
         case 505:
             return "HTTP Version Not Supported";
         case 504:
             return "Gateway Timeout";
+        case 409:
+            return "Conflict";
 		default:
 			return "Internal Server Error";
 	}

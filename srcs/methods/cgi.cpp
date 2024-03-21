@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 03:35:09 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/21 17:18:38 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,18 +63,18 @@ char **response::getEnv()
 void response::executePHP()
 {
 	setEnv();
-	std::cout << "___________PHP_______\n";
+	// std::cout << "___________PHP_______\n";
 	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
 	it = request.location.cgi.find("php");
 	if (it != request.location.cgi.end())
 	{
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webCu/" + randName;
+		path = "./" + randName;
 		pid = fork();
 		if (pid == 0)
 		{
-			std::cout << "=====================================pop = " << request.getMethod() << std::endl;
+			// std::cout << "=====================================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
@@ -105,7 +105,8 @@ void response::executePython()
 		setEnv();
 		cgiStartTime = time(NULL);
 		std::string randName = generateName();
-		path = "/nfs/sgoinfre/goinfre/Perso/lsadiq/webCu/" + randName;
+		path = "./" + randName;
+
 		pid = fork();
 		if (pid == 0)
 		{
@@ -148,7 +149,6 @@ bool response::_cgiProcess()
 		{
 			long long now = time(NULL);
 
-			request.setCGIRun();
 			if ((now -  cgiStartTime) > 10)
 			{
 				std::cout << "time out \n";
@@ -217,7 +217,6 @@ void response::cgiSendResponse()
 			
 		}
 		resHeader += "\r\n";
-		// std::cout << resHeader;
 		int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
 		if(i < 0){
 			SIGPIPE;
@@ -227,7 +226,7 @@ void response::cgiSendResponse()
 	}
 	if (check == 1)
 	{
-		std::cout << "___________SEND____________________\n";
+		// std::cout << "___________SEND____________________\n";
 		const int chunkSize = 2048;
 		char buffer[chunkSize];
 		cinfile.read(buffer, chunkSize);
@@ -251,7 +250,7 @@ void response::handelCGI()
 		check_extention(targetUri);
 		if (request.location.cgi.find("php") != request.location.cgi.end() && extention == "php")
 			executePHP();
-		else
+		else if (request.location.cgi.find("py") != request.location.cgi.end() && extention == "py")
 			executePython();
 	}
 	if (!_cgiProcess())
