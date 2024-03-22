@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 21:28:21 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 01:43:38 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,11 @@ void    response::sendData()
        
         int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
         }
         flag = 3;
     }
-    if (flag == 3)
+    else if (flag == 3)
     {
         const int chunkSize = 1024;
         char buffer[chunkSize];
@@ -66,17 +65,15 @@ void    response::sendData()
         
         int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
         }
         if (ifile.eof()){
             flag = 4;
         }
     }
-    if (flag == 4) {
+    else if (flag == 4) {
         int i = send(fd, "0\r\n\r\n", 5, 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
 	    }
         ifile.close();
@@ -179,7 +176,6 @@ void response::setHeader()
         header += "\r\n\r\n";
         int i = send(fd, header.c_str(), header.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
 	    }
         flag = 30;
@@ -194,7 +190,6 @@ void response::setHeader()
         header.append(responsePage);
         int i = send(fd, header.c_str(), header.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
         }
         flag = 30;
@@ -205,11 +200,11 @@ void response::listDirectories()
 {
     targetUri = request.getRealPath();
     std::string html;
-    if(flag == 6){
+    if(flag == 6)
+    {
         std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n";
         int i = send(fd, header.c_str(), header.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
         }
         flag = 7;
@@ -226,10 +221,8 @@ void response::listDirectories()
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
 	    }
-        // targetUri = request.getRealPath();
         if (!(dir = opendir(targetUri.c_str())))
         {
             std::cout << "Error: failed to open directory" << std::endl;
@@ -259,7 +252,6 @@ void response::listDirectories()
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
 	    }
         //check
@@ -273,17 +265,12 @@ void response::listDirectories()
         std::string response = ss.str() + html + "\r\n";
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i < 0){
-            SIGPIPE;
             flag = 30;
 	    }
         flag = 10;
     }
     else if(flag == 10){
-        int i = send(fd, "0\r\n\r\n", 5, 0);
-        if(i < 0){
-            SIGPIPE;
-            flag = 30;
-        }
+        send(fd, "0\r\n\r\n", 5, 0);
         flag = 30;
     }
 }

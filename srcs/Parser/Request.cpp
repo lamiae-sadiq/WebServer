@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/21 21:30:11 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 02:26:29 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -448,7 +448,7 @@ int checkType(std::string path)
         return FILE;
     }
 	else
-		return -1;
+		return -2;
     DIR *type = opendir(path.c_str());
     if(type)
     {
@@ -466,23 +466,34 @@ void Request::getREalPath()
 	std::string toString;
 	char *real_Path;
 	
-	targetUri = location.root + url.substr(location.location_name.size()); 
+	targetUri = location.root + url.substr(location.location_name.size());
 	real_Path = realpath(targetUri.c_str(),NULL);
 	
 	if(real_Path)
-	{	if (checkType(real_Path) == FILE)
+	{
+		toString = real_Path;
+		toString +="/";
+		if(toString.find(location.root) != 0)
+			throw HttpForbidden("Forbidden\n");
+			
+		if (checkType(real_Path) == FILE)
 			realPath = real_Path;
-		else if (checkType(real_Path) == DIRECTORY)
+		// else
+		// {
+		// 	std::cout << "=============+>1\n";
+		// 	realPath = real_Path;
+		// 	return;
+		// }
+		if (checkType(real_Path) == DIRECTORY)
 		{
 			realPath = real_Path;
 			realPath.append("/");
 		}
 		else
+		{
 			realPath = real_Path;
-		toString = real_Path;
-		toString +="/";
-		if(toString.find(location.root) != 0)
-			throw HttpForbidden("Forbidden\n");
+			realPath.append("/");
+		}
 	}
 	else
 	{

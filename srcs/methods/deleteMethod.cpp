@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 21:27:38 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 02:33:28 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	response::deleteDir(std::string uri)
 		status_code = 403;
 		return ;
 	}
+
 	while((entry = readdir(dir)) != NULL)
 	{
 		if (entry->d_type == DT_DIR)
@@ -47,12 +48,12 @@ void	response::deleteDir(std::string uri)
 void	response::Delete()
 {
 	targetUri = request.getRealPath();
-	
+	// std::cout << targetUri <<"|\n";
 	if(!allowedMethods())
             status_code = 405;
 	else if (access(this->targetUri.c_str(), F_OK) == 0)
 	{
-		if (access(this->targetUri.c_str(), R_OK) == 0)
+		if (access(this->targetUri.c_str(), W_OK) == 0)
 		{
 			if (checkType(targetUri) == FILE)
 			{
@@ -61,8 +62,8 @@ void	response::Delete()
 				else
 				status_code = 204;
 			}
-			if(checkType(targetUri) == DIRECTORY)
-			{	
+		if(checkType(targetUri) == DIRECTORY)
+			{
 				if(targetUri[targetUri.length() - 1] == '/')
 					deleteDir(targetUri);
 				else

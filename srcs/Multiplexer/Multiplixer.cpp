@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/21 21:41:07 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 01:03:49 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,7 +230,7 @@ void Multiplixer::start(std::vector<Server> servers)
 	signal(SIGPIPE, SIG_IGN);
 	while(1)
 	{
-		readyFiles = epoll_wait(epoll_instance,events,MAX_EVENTS,-1);
+		readyFiles = epoll_wait(epoll_instance, events, MAX_EVENTS, -1);
 		for(size_t i = 0; i < readyFiles;++i)
 		{
 			bzero(buff,sizeof(buff));
