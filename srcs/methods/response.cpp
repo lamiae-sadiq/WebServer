@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 01:43:38 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:14:45 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ void    response::sendData()
         resHeader +="\r\n";
         resHeader += "Transfer-Encoding: chunked\r\n";
         resHeader += "\r\n";
-       
+
         int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
-        if(i < 0){
-            flag = 30;
+        if(i <= 0){
+            Close = true;
         }
         flag = 3;
     }
@@ -62,10 +62,9 @@ void    response::sendData()
         memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
         memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
         memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-        
         int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
-        if(i < 0){
-            flag = 30;
+        if(i <= 0){
+            Close = true;
         }
         if (ifile.eof()){
             flag = 4;
@@ -74,10 +73,10 @@ void    response::sendData()
     else if (flag == 4) {
         int i = send(fd, "0\r\n\r\n", 5, 0);
         if(i < 0){
-            flag = 30;
+            Close = true;
 	    }
         ifile.close();
-        flag = 30;
+        Close = true;
     }
 }
 
@@ -116,20 +115,11 @@ const std::string response::HTMLPage() {
             "</html>\n");
 }
 
-std::string response::getErrorPage() 
-{
-    if (request.location.error_pages.find(status_code) != request.location.error_pages.end())
-       return request.location.error_pages[status_code];
-    return "404";
-}
-
-int a = 0;
-
 void response::sendErrorPage()
 {
-    targetUri = getErrorPage();
-    
-    if(access(targetUri.c_str(), R_OK | W_OK) == 0)
+    if (request.location.error_pages.find(status_code) != request.location.error_pages.end())
+            targetUri = request.location.error_pages[status_code];
+    if(access(targetUri.c_str(), F_OK) == 0)
     {
         if(!flagOn)
         {
@@ -162,9 +152,9 @@ void response::ErrorHeader()
     int i = send(fd, header.c_str(), header.length(), 0);
     if(i < 0){
 		SIGPIPE;
-		flag = 30;
+		Close = true;
 	}
-    flag = 30;
+    Close = true;
 }
 
 void response::setHeader()
@@ -176,9 +166,9 @@ void response::setHeader()
         header += "\r\n\r\n";
         int i = send(fd, header.c_str(), header.length(), 0);
         if(i < 0){
-            flag = 30;
+            Close = true;
 	    }
-        flag = 30;
+        Close = true;
     }
     if (status_code >= 200 && status_code <= 204)
     {
@@ -189,10 +179,10 @@ void response::setHeader()
         header += "\r\n\r\n";
         header.append(responsePage);
         int i = send(fd, header.c_str(), header.length(), 0);
-        if(i < 0){
-            flag = 30;
+        if(i <= 0){
+            Close = true;
         }
-        flag = 30;
+        Close = true;
     }
 }
 
@@ -204,8 +194,8 @@ void response::listDirectories()
     {
         std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n";
         int i = send(fd, header.c_str(), header.length(), 0);
-        if(i < 0){
-            flag = 30;
+        if(i <= 0){
+            Close = true;
         }
         flag = 7;
     }
@@ -221,7 +211,7 @@ void response::listDirectories()
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i < 0){
-            flag = 30;
+            Close = true;
 	    }
         if (!(dir = opendir(targetUri.c_str())))
         {
@@ -252,7 +242,7 @@ void response::listDirectories()
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i < 0){
-            flag = 30;
+            Close = true;
 	    }
         //check
     }
@@ -265,13 +255,13 @@ void response::listDirectories()
         std::string response = ss.str() + html + "\r\n";
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i < 0){
-            flag = 30;
+            Close = true;
 	    }
         flag = 10;
     }
     else if(flag == 10){
         send(fd, "0\r\n\r\n", 5, 0);
-        flag = 30;
+        Close = true;
     }
 }
 

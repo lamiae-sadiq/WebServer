@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 17:18:38 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:14:45 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 
 void response::setEnv()
 {
-	std::string cgiEnv;
 	cgiHeader["CONTENT_TYPE"] = request.getContentType();
 	if (request.getMethod() == "POST")
 	{
@@ -62,8 +61,6 @@ char **response::getEnv()
 
 void response::executePHP()
 {
-	setEnv();
-	// std::cout << "___________PHP_______\n";
 	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
 	it = request.location.cgi.find("php");
 	if (it != request.location.cgi.end())
@@ -74,7 +71,7 @@ void response::executePHP()
 		pid = fork();
 		if (pid == 0)
 		{
-			// std::cout << "=====================================pop = " << request.getMethod() << std::endl;
+			setEnv();
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
@@ -97,7 +94,6 @@ void response::executePHP()
 
 void response::executePython()
 {
-	std::cout << "___________PY_______\n";
 	std::map<std::string, std::string>::iterator it = request.location.cgi.begin();
 	it = request.location.cgi.find("py");
 	if (it != request.location.cgi.end())
@@ -110,7 +106,6 @@ void response::executePython()
 		pid = fork();
 		if (pid == 0)
 		{
-			std::cout << "======================pop = " << request.getMethod() << std::endl;
 			if (request.getMethod() == "POST")
 			{
 				freopen(uplfile.c_str(), "r", stdin);
@@ -125,9 +120,7 @@ void response::executePython()
 			kill(pid, SIGINT);
 		}
 		else
-		{
 			_cgiStarted = true;
-		}
 	}
 }
 
@@ -193,7 +186,7 @@ void response::parsecgiFile()
 			if(line.find("Status") != std::string::npos)
 			{
 				_isStatus = true ;
-				line = line.substr(8);
+				_cgiStatus = line.substr(8);
 			}
 			buff += line + "\n";
 		}
@@ -209,36 +202,33 @@ void response::cgiSendResponse()
 	if (check == 0)
 	{
 		std::string resHeader = "HTTP/1.1 ";
-		if(_isStatus)
+		if(_isStatus){
+			resHeader += _cgiStatus + "\r\n";	
 			resHeader += buff;
+		}
 		else{
-			resHeader += "200 OK";
+			resHeader += "200 OK\r\n";
 		resHeader += buff;
 			
 		}
 		resHeader += "\r\n";
 		int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
-		if(i < 0){
-			SIGPIPE;
+		if(i <= 0)
 			check = 30;
-		}
 		check = 1;
 	}
 	if (check == 1)
 	{
-		// std::cout << "___________SEND____________________\n";
 		const int chunkSize = 2048;
 		char buffer[chunkSize];
 		cinfile.read(buffer, chunkSize);
 		int i = send(fd, buffer, cinfile.gcount(), 0);
-		if(i < 0){
-			SIGPIPE;
-			flag = 30;
-		}
+		if(i < 0)
+			Close = true;
 		if (cinfile.eof()){
 			remove(path.c_str());
 			cinfile.close();
-			flag = 30;
+			Close = true;
 		}
 	}
 }

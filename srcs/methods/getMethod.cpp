@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 13:58:06 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:29:02 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void response::init()
     _cgiEnded = false;
     _isCgi = false;
     // _isCgi  = false;
-    // close = true;
+    Close = false;
     // this->_cgiMap = request.location.cgi;
     flag = 0;
     this->ihex = 0;
@@ -96,7 +96,7 @@ void response::methodGet()
             return;
         }
         targetUri = request.getRealPath();
-        std::cout << targetUri << "\n";
+        // std::cout << targetUri << "\n";
         if (!allowedMethods())
             status_code = 405;
         else if (access(this->targetUri.c_str(), F_OK) == 0)
@@ -146,17 +146,14 @@ void response::methodGet()
                     return;
                 }
                 if (checkType(targetUri) == NOT_FOUND)
-                {
-                    std::cout << " not found " << std::endl;
                     status_code = 404;
-                }
             }
             else
                 status_code = 403;
         }
         else
         {
-            std::cout << "targetUri doesn't exist" << std::endl;
+            // std::cout << "targetUri doesn't exist" << std::endl;
             status_code = 404;
         }
     }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   methodHelp.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 13:55:46 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:18:34 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,13 @@ std::string to_string(T value) {
     std::ostringstream os;
     os << value;
     return os.str();
+}
+
+bool response::getIsCgi(){
+    return _isCgi;
+}
+bool response::getClose(){
+    return Close;
 }
 
 std::string response::getTargetUrl(){

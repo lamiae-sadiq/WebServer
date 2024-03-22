@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/21 21:21:27 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:28:25 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -387,7 +387,6 @@ void    response::fileExtention()
 
 void response::createFile()
 {
-    std::cout << "__________create ___________" << std::endl;
     if (request.location.upload.length() > 1) {
         std::string randName = generateName();
         std::string ileType = request.getContentType();

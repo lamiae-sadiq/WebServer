@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/22 01:03:49 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:15:36 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,7 @@ void Multiplixer::start(std::vector<Server> servers)
 				{
 						responses[socketFd]->executeMethodes(buff,byt,socketFd);
 						// request.setStatus(0);
-						if(responses[socketFd]->getFlag() == 30 || responses[socketFd]->getFlag() == 201)// set a flag when we done 
+						if(responses[socketFd]->getClose())// set a flag when we done 
 							clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 				}
 			}
