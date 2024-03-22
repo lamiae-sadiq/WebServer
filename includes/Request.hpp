@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/21 21:29:21 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 12:51:52 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,11 @@
 #include "HttpException.hpp"
 #include <iostream>
 #include <sstream>
-
+#include <limits.h>
 #define FILE 1
+#define FILE_PER 2
 #define DIRECTORY 0
+#define DIR_PER 3
 
 
 typedef struct loc

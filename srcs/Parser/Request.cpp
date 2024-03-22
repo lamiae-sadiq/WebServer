@@ -6,11 +6,13 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/22 02:26:29 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 14:07:23 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Request.hpp"
+#include <sys/stat.h>
+#include <dirent.h>
 
 Request::Request()
 {
@@ -281,8 +283,7 @@ void	Request::chekHeaderError(std::string key)
 void Request::checkContentType(std::string &contetType)
 {
 	Utils::skipSpaces(contetType);
-	// if(contetType.find("boundary") != std::string::npos)
-	// 	throw  HttpNotImplemented("Not Implemented");
+	
 	if(contetType.empty())
 		throw HttpBadRequest("Bad request");
 		
@@ -439,68 +440,34 @@ int LocationLongestPrefix(std::string locationName,std::string Url)
 }
 
 
-int checkType(std::string path)
-{
-    std::fstream file(path.c_str());
-    if (file.is_open())
-    {
-        file.close();
-        return FILE;
-    }
-	else
-		return -2;
-    DIR *type = opendir(path.c_str());
-    if(type)
-    {
-        closedir(type);
-        return DIRECTORY;
-    }
-	else
-		return -1;
-}
 
 
 void Request::getREalPath()
 {
 	std::string targetUri;
-	std::string toString;
+	char real_Pathh[PATH_MAX];
 	char *real_Path;
+	char *currentDir;
 	
 	targetUri = location.root + url.substr(location.location_name.size());
-	real_Path = realpath(targetUri.c_str(),NULL);
+	real_Path = realpath(targetUri.c_str(),real_Pathh);
+	currentDir = realpath(".",NULL);
 	
 	if(real_Path)
 	{
-		toString = real_Path;
-		toString +="/";
-		if(toString.find(location.root) != 0)
-			throw HttpForbidden("Forbidden\n");
-			
-		if (checkType(real_Path) == FILE)
-			realPath = real_Path;
-		// else
-		// {
-		// 	std::cout << "=============+>1\n";
-		// 	realPath = real_Path;
-		// 	return;
-		// }
-		if (checkType(real_Path) == DIRECTORY)
-		{
-			realPath = real_Path;
-			realPath.append("/");
-		}
+		realPath = real_Pathh;
+		if(targetUri[targetUri.length() - 1] == '/' && realPath[realPath.length() - 1] != '/')
+			realPath += '/';
 		else
-		{
-			realPath = real_Path;
-			realPath.append("/");
-		}
+			realPath = real_Pathh;
+		if(realPath.find(currentDir) != 0)
+			throw HttpForbidden("Forbidden\n");
 	}
 	else
-	{
-		realPath = targetUri;
-	}
-
+		realPath = real_Pathh;
 }
+
+
 void Request::matchLocation(Server currentServer)
 {
 	std::string locationName;

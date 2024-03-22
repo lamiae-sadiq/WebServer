@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 02:18:48 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/22 13:55:46 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,12 +174,10 @@ void response::check_extention(std::string file)
     fillMime();
     std::string::size_type idx;
     idx = file.rfind('.');
-    if (idx != std::string::npos){
+    if (idx != std::string::npos)
+    {
         extention = file.substr(idx + 1);
-        // std::cout << "extention: " << extention << std::endl;
-        // std::cout << _mime[extention] << std::endl;
         fileType =  _mime[extention];
-        // std::cout << "fileType: " << fileType << std::endl;
     }
     else
         fileType = "text/plain";
