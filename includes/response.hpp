@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 00:21:18 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 02:49:18 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,14 @@
 #include <map>
 #include "Request.hpp"
 #include "Server.hpp"
-#include "cgi.hpp"
 #include <ctime>
 
 #define FILE 1
 #define DIRECTORY 0
 #define NOT_FOUND -1
 #define FORBIDDEN -2
-// static int i = 0;
 #define CGI 0
 
-// class server;
-// class Cgi;
 
 class response
 {

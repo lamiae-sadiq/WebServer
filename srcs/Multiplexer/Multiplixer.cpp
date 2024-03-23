@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 00:09:51 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 02:46:22 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Multiplixer.hpp"
-
 
 Multiplixer::Multiplixer()
 {
@@ -184,7 +183,6 @@ void Multiplixer::clearSocketFdFRomEpoll(int socketFd,int epoll_instance,struct 
 	close(socketFd);
 	response *tmp_res = responses[socketFd];
 	Request *tmp_req = requests[socketFd];
-
 	responses.erase(socketFd);
 	requests.erase(socketFd);
 	matchServers.erase(socketFd);
@@ -206,8 +204,8 @@ bool Multiplixer::isTimedout(response *response,Request &request)
 	gettimeofday(&request.end_time, NULL);
 	int time = (request.end_time.tv_sec - request.start_time.tv_sec) * 1000000LL +
     (request.end_time.tv_usec - request.start_time.tv_usec);
-	// if(request.matchLocationDone)
-	// 	request.setStatus(1);
+	if(request.matchLocationDone)
+		request.setStatus(1);
 	if( time > 10000000LL && !response->getIsCgi())
 	{
 		response->setStatusCode(408);
@@ -225,7 +223,6 @@ void Multiplixer::start(std::vector<Server> servers)
 	char buff[2048];
 	int code;
 	int byt;
-	
 	CreateNetwork(epoll_instance,servers);
 	signal(SIGPIPE, SIG_IGN);
 	while(1)
@@ -241,7 +238,7 @@ void Multiplixer::start(std::vector<Server> servers)
 			{
 				int socketFd = events[i].data.fd;
 				Request &request = *(requests[socketFd]);
-				if(!isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
+				if(!request.getStatus() && !isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
 				{
 					byt = recv(socketFd,buff,2048, 0);
 					if(byt <= 0)
@@ -249,17 +246,21 @@ void Multiplixer::start(std::vector<Server> servers)
 						clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
 						continue;
 					}
+					request.setSizeBody(byt);
+					request.setBody(std::string(buff,byt));
 					restartTime(request);
 					code = request.parseHeaders(std::string(buff,byt),matchServers[socketFd]);
 					if(code != 1)
 						responses[socketFd]->setStatusCode(code);
 				}
-				if((events[i].events & EPOLLOUT) && request.getStatus() == 1)
+				else if((events[i].events & EPOLLOUT) && request.getStatus() == 1)
 				{
-						responses[socketFd]->executeMethodes(buff,byt,socketFd);
-						// request.setStatus(0);
-						if(responses[socketFd]->getClose())// set a flag when we done 
-							clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);
+					responses[socketFd]->executeMethodes(request.getBody().c_str(),request.getSizeBody(),socketFd);
+					request.setStatus(0);
+					request.setSizeBody(0);
+					request.setBody("");
+					if(responses[socketFd]->getClose())
+						clearSocketFdFRomEpoll(socketFd, epoll_instance, events,i);					
 				}
 			}
 		}

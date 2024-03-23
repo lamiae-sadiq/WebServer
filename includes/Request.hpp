@@ -6,11 +6,14 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/22 12:51:52 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 02:49:09 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
 #pragma once
+
 
 #include "./Parse.hpp"
 #include <sys/socket.h>
@@ -51,6 +54,7 @@ class Request
 {
 	private:
 		std::vector<Server> servers;
+		Server matchedServer;
 		std::string host;
 		std::string method;
 		std::string url;
@@ -68,6 +72,8 @@ class Request
 		std::string realPath;
 		
 	public:
+		std::string body;
+		size_t sizeBody;
 		bool matchLocationDone;
 		std::map<std::string,std::string> headers;
 		struct timeval start_time, end_time;
@@ -75,10 +81,11 @@ class Request
 		~Request();
 		std::string tmpBuff;
 		loc location;
-		std::string getRealPath()
-		{
-			return realPath;
-		}
+		std::string getRealPath();
+		std::string getBody();
+		size_t getSizeBody();
+		void setBody(std::string intBody);
+		void setSizeBody(size_t size);
 		long long int contentLength;
 		int parseHeaders(std::string buff,std::vector<Server> initServers);
 		int analyseHeaders(std::string buff);

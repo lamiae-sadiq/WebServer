@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/22 22:50:50 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 02:46:58 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Request.hpp"
+
 #include <sys/stat.h>
 #include <dirent.h>
 
@@ -43,6 +44,26 @@ Request::Request()
 
 Request::~Request(){};
 
+std::string Request::getRealPath()
+{
+	return realPath;
+}
+std::string Request::getBody()
+{
+	return body;
+}
+size_t Request::getSizeBody()
+{
+	return 	sizeBody;
+}
+void Request::setBody(std::string intBody)
+{
+	body = intBody;
+}
+void Request::setSizeBody(size_t size)
+{
+	sizeBody = size;
+}
 void	Request::setCGIRun()
 {
 	this->_cgiRuning = true;
@@ -201,7 +222,7 @@ void Request::storeRequestLineInfo(std::vector<std::string> vec)
 void Request::storeHostHeader(std::string line)
 {
 	size_t index;
-
+	
 	if(line.empty())
 		throw  HttpBadRequest("Bad request");
 	Utils::skipSpaces(line);
@@ -214,14 +235,13 @@ void Request::storeHostHeader(std::string line)
 	}
 	else
 		host = line;
-
 }
 
 std::string Request::decodingUri(std::string str)
 {
     size_t index = 0;
 	char *parse;
-    char ch;
+    unsigned char  ch;
     std::string tmpStr;
     std::stringstream ss(str);
     while(index < str.length())
@@ -237,7 +257,7 @@ std::string Request::decodingUri(std::string str)
 			}
         }
             index++;
-        tmpStr.push_back(ch);
+        tmpStr+= ch;
     }
 	return tmpStr;
 }
@@ -346,7 +366,8 @@ int Request::analyseHeaders(std::string buff)
 
 void Request::storeLocation(Server &server, Location iniLocation)
 {
-	if(iniLocation.getLocationData("return").size() == 1)
+
+	if(iniLocation.getLocationData("return").size() == 2)
 		location.redirect_code = atoi(iniLocation.getLocationData("return")[0].c_str());
 	if(iniLocation.getLocationData("return").size() == 2)
 		location.redirect_path = iniLocation.getLocationData("return")[1];
@@ -393,7 +414,7 @@ void  Request::printREquest()
 	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
 	std::cout << "cooookies====>|" << cookies << "|\n";
 	std::cout << "eror pages siize==>" << location.error_pages.size() << "\n";
-	// std::cout << "queri==>" << getQueryString() <<"\n";
+	std::cout << "queri==>" << getQueryString() <<"\n";
 	std::map<int, std::string>::iterator itt = location.error_pages.begin();
 	std::cout << "size errpr==>"<<location.error_pages.size() <<"\n";
 	while(itt != location.error_pages.end())
@@ -542,8 +563,8 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 			if(analyseHeaders(buff))
 			{
 				checkStoreData();
-				Server server = matchServer();
-				matchLocation(server);
+				matchedServer = matchServer();
+				matchLocation(matchedServer);
 				// printREquest();
 				matchLocationDone = true;
 				status = 1;

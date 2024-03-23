@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 02:42:23 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 03:05:38 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void    response::sendData()
     }
     else if (flag == 4) {
         int i = send(fd, "0\r\n\r\n", 5, 0);
-        if(i < 0){
+        if(i <= 0){
             Close = true;
 	    }
         ifile.close();
@@ -165,11 +165,7 @@ void response::ErrorHeader()
     if (request.getMethod() != "HEAD") {
         header.append(errorPage);
     }
-    int i = send(fd, header.c_str(), header.length(), 0);
-    if(i < 0){
-		SIGPIPE;
-		Close = true;
-	}
+    send(fd, header.c_str(), header.length(), 0);
     Close = true;
 }
 
@@ -180,10 +176,7 @@ void response::setHeader()
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nLocation: " + target_url);
         header += "\r\n\r\n";
-        int i = send(fd, header.c_str(), header.length(), 0);
-        if(i < 0){
-            Close = true;
-	    }
+        send(fd, header.c_str(), header.length(), 0);
         Close = true;
     }
     if (status_code >= 200 && status_code <= 204)
@@ -194,10 +187,7 @@ void response::setHeader()
         header.append(to_string(responsePage.length()));
         header += "\r\n\r\n";
         header.append(responsePage);
-        int i = send(fd, header.c_str(), header.length(), 0);
-        if(i <= 0){
-            Close = true;
-        }
+        send(fd, header.c_str(), header.length(), 0);
         Close = true;
     }
 }
@@ -226,7 +216,7 @@ void response::listDirectories()
         html.append("\r\n");
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
-        if(i < 0){
+        if(i <= 0){
             Close = true;
 	    }
         if (!(dir = opendir(targetUri.c_str())))
@@ -257,9 +247,8 @@ void response::listDirectories()
         html.append("\r\n");
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
-        if(i < 0){
+        if(i <= 0)
             Close = true;
-	    }
         //check
     }
     else if(flag == 9){
@@ -270,9 +259,8 @@ void response::listDirectories()
         ss << std::hex << html.length() << "\r\n";
         std::string response = ss.str() + html + "\r\n";
         int i = send(fd, response.c_str(), response.length(), 0);
-        if(i < 0){
+        if(i <= 0)
             Close = true;
-	    }
         flag = 10;
     }
     else if(flag == 10){

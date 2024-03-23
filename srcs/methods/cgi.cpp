@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 02:21:28 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 03:03:29 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,13 +217,13 @@ void response::cgiSendResponse()
 			check = 30;
 		check = 1;
 	}
-	if (check == 1)
+	else if (check == 1)
 	{
 		const int chunkSize = 2048;
 		char buffer[chunkSize];
 		cinfile.read(buffer, chunkSize);
 		int i = send(fd, buffer, cinfile.gcount(), 0);
-		if(i < 0)
+		if(i <= 0)
 			Close = true;
 		if (cinfile.eof()){
 			remove(path.c_str());
