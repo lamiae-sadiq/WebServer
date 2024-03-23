@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/21 12:51:30 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 22:44:22 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void Location::checkIndexError(std::vector<std::string> index)
 
 void Location::checkReturnError(std::vector<std::string> returnDirective)
 {
-    long long int returnCode = Utils::stringToLongLong(returnDirective[0]);
+    long long returnCode = Utils::stringToLongLong(returnDirective[0]);
     if(!Utils::checkOverflowError(returnDirective[0],returnCode))
         throw Exception("Error: redirection is incorrect\n");
     if(returnDirective.size() != 2)

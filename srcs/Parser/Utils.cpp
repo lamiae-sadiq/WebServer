@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:55:29 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:40:07 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 22:44:48 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,16 +115,16 @@ void Utils::strToLower(std::string &str)
   }
 }
 
-long long int  Utils::stringToLongLong(std::string str)
+long long   Utils::stringToLongLong(std::string str)
 {
-    long long int num;
+    long long  num;
     std::stringstream ToLong;
     ToLong << str ;
     ToLong >> num;
     return num;
 }
 
-bool  Utils::checkOverflowError(std::string originNum, long long int currentNum)
+bool  Utils::checkOverflowError(std::string originNum, long long  currentNum)
 {
     std::stringstream ToString;
     std::string currentString;

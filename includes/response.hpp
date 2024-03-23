@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 21:40:31 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 22:43:45 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class response
 		Request         						&request;
 		std::ofstream 							upfile;
 		std::string 							chunkSizeStr;
-		long long int   						totalChunkedLength;
+		long long 	  						totalChunkedLength;
 		bool									flagOn;
 		DIR* 									dir;
 		int 									flag;
@@ -153,7 +153,7 @@ class response
 		void									parsecgiFile();
 		void									handelCGI();
 		bool									_cgiProcess();
-		bool 									isLargeContent(long long int len);
+		bool 									isLargeContent(long long  len);
 		template <typename T>
 		std::string to_string(T value) {
 			std::ostringstream os;

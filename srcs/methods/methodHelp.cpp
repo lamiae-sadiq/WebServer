@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   methodHelp.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 18:38:47 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 23:29:26 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,11 +208,5 @@ bool    response::allowedMethods()
     return false;
 }
 
-void    response::allow()
-{
-    std::vector<std::string>::iterator it = this->request.location.method.begin();
-    for(;it != this->request.location.method.end(); it++){
-            std::cout << *it << std::endl;
-    }
-}
+
 

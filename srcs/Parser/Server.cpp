@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:36:12 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 22:44:48 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ bool  Server::isValidServer()
 
 void Server::checkPortError(std::vector<std::string> port)
 {
-    long long int portNum = Utils::stringToLongLong(port[0]);
+    long long  portNum = Utils::stringToLongLong(port[0]);
     if(port.size() != 1)
         throw Exception("Error: port is incorrect");
     if(!Utils::checkOverflowError(port[0],portNum))
@@ -112,7 +112,7 @@ void Server::checkHostError(std::vector<std::string> host)
 
 void Server::checkClientMaxBody(std::vector<std::string> bodySize)
 {
-    long long int maxSize = Utils::stringToLongLong(bodySize[0].c_str());
+    long long  maxSize = Utils::stringToLongLong(bodySize[0].c_str());
     if(!Utils::checkOverflowError(bodySize[0],maxSize))
         throw Exception("Error: max_body_size is incorrect\n");
     if(maxSize < 0)

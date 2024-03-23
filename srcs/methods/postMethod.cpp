@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 21:26:23 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 23:30:02 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,13 +250,12 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
     }
     
 }
-bool response::isLargeContent(long long int len)
+bool response::isLargeContent(long long len)
 {
     if(len > request.location.max_body_size)
     {
         remove(uplfile.c_str());
         status_code = 413;
-        //remove file
         return true;
     }
     return false;
@@ -289,13 +288,11 @@ void    response::methodPost(const char *con, size_t size)
             return;
         if (request.getUploadType() == "Chunk")
         {
-            // std::cout << "chunked "<< std::endl;
             flag = 2;
             parseChunk(con, index, size);
         }
         else if (request.getUploadType() == "length")
         {
-            // std::cout << "len-------"<< std::endl;
             if(isLargeContent(request.contentLength))
                 return;
             flag = 1;
@@ -347,7 +344,6 @@ void response::createFile()
         }
         else{
             std::string UplDir = request.location.upload;
-            std::cout << UplDir << std::endl;
             if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
                 perror("Upload Directory");
                 status_code = 500;

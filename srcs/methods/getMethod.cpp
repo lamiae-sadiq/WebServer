@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 21:42:35 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 22:40:14 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void response::init()
     flagOn = false;
     dir = NULL;
     postDone = false;
+    totalChunkedLength = 0;
 }
 
 response::response(Request &initRequest) : request(initRequest)

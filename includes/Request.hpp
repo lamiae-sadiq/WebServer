@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 21:41:17 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 22:43:35 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 
 typedef struct loc
 {
-	long long int				max_body_size;
+	long long 			max_body_size;
 	std::string 				root;
 	std::string 				index;
 	std::string 				auto_index;
@@ -87,7 +87,7 @@ class Request
 		size_t getSizeBody();
 		void setBody(std::string intBody);
 		void setSizeBody(size_t size);
-		long long int contentLength;
+		long long  contentLength;
 		int parseHeaders(std::string buff,std::vector<Server> initServers);
 		int analyseHeaders(std::string buff);
 		void storeRequest(std::string line);

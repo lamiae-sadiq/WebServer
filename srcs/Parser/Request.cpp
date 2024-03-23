@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 21:37:52 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 23:30:08 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ Request::Request()
 	_isCgi = false;
 	_cgiRuning = false;
 	matchLocationDone = false;
+	sizeBody = 0;
+	
 	fileExtention();
 };
 
@@ -338,7 +340,7 @@ void Request::checkTransferEncoding(std::string value)
 
 void Request::checkContentLength(std::string length)
 {
-	long long int len;
+	long long  len;
 	
 	Utils::skipSpaces(length);
 	len = Utils::stringToLongLong(length);
@@ -627,7 +629,6 @@ void Request::checkStoreData()
 		Utils::skipSpaces(headers["cookie"]);
 		cookies = headers["cookie"];
 	}
-	// std::cout <<
 	if(method == "POST" && uplod_type.empty())
 		throw HttpLengthRequired("length Required");
 	if(method == "POST" && uplod_type == "length" && !contentLength)
