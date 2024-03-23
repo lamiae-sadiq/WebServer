@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 18:06:40 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:38:14 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,7 @@ bool Multiplixer::isTimedout(response *response,Request &request)
 	gettimeofday(&request.end_time, NULL);
 	int time = (request.end_time.tv_sec - request.start_time.tv_sec) * 1000000LL +
     (request.end_time.tv_usec - request.start_time.tv_usec);
-	if(request.matchLocationDone)
+	if(request.getMatchedLocation())
 		request.setStatus(1);
 	if( time > 10000000LL && !response->getIsCgi())
 	{
@@ -212,7 +212,7 @@ bool Multiplixer::isTimedout(response *response,Request &request)
 		request.setStatus(1);
 		return true;
 	}
-	if(request.matchLocationDone && request.getMethod() != "POST")
+	if(request.getMatchedLocation() && request.getMethod() != "POST")
 		return true;
 	return false;
 }

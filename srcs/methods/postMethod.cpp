@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 18:06:08 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:26:23 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <fcntl.h>
 
 
-std::map<std::string, std::string> response::mime_;
 
 bool    response::checkUpload()
 {
@@ -290,19 +289,22 @@ void    response::methodPost(const char *con, size_t size)
             return;
         if (request.getUploadType() == "Chunk")
         {
-            std::cout << "chunked "<< std::endl;
+            // std::cout << "chunked "<< std::endl;
             flag = 2;
             parseChunk(con, index, size);
         }
         else if (request.getUploadType() == "length")
         {
+            // std::cout << "len-------"<< std::endl;
             if(isLargeContent(request.contentLength))
                 return;
             flag = 1;
             parsLength(con, index, size);
         }
-        else
+        else{
+               
             status_code = 400;
+        }
     }
     else if (flag == 1) {
 
@@ -325,73 +327,15 @@ std::string response::generateName()
 	return (name);
 }
 
-void    response::fileExtention()
-{
-    mime_[ "text/html"] = "html";
-    mime_[ "text/css"] = "css";
-    mime_[ "text/xml"] =     "xml";
-    mime_[ "image/gif"] =   "gif";
-    mime_[ "image/jpeg"] = "jpeg";
-    mime_[ "image/jpg"] = "jpg";
-    mime_[ "application/x-javascript"] = "js";
-    mime_[ "text/plain"] = "txt";
-    mime_[ "text/x-component"] = "htc";
-    mime_[ "text/mathml"] = "mml";
-    mime_[ "image/png"] = "png";
-    mime_[ "image/x-icon"] = "ico";
-    mime_[ "image/x-jng"] = "jng";
-    mime_[ "image/vnd.wap.wbmp"] =   "wbmp";
-    mime_[ "application/mac-binhex40"] = "hqx";
-    mime_[ "application/pdf"] = "pdf";
-    mime_[ "application/x-cocoa"] = "cco";
-    mime_[ "application/x-java-archive-diff"] = "jardiff";
-    mime_[ "application/x-java-jnlp-file"] = "jnlp";
-    mime_[ "application/x-makeself"] =   "run";
-    mime_[ "application/x-perl"] = "pl";
-    mime_[ "application/x-pilot"] = "prc";
-    mime_[ "application/x-rar-compressed"] = "rar";
-    mime_[ "application/x-redhat-package-manager"] = "rpm";
-    mime_[ "application/x-sea"] = "sea";
-    mime_[ "application/x-shockwave-flash"] = "swf";
-    mime_[ "application/x-stuffit"] = "sit";
-    mime_[ "application/x-tcl"] =    "tcl";
-    mime_[ "application/x-tcl"] =   "tk";
-    mime_[ "application/x-x509-ca-cert"] = "der";
-    mime_[ "application/x-x509-ca-cert"] = "pem";
-    mime_[ "application/x-x509-ca-cert"] = "crt";
-    mime_[ "application/x-xpinstall"] = "xpi";
-    mime_[ "application/octet-stream"] = "msm";
-    mime_[ "audio/mpeg"] = "mp3";
-    mime_["video/mp4"] = "mp4";
-    mime_[ "audio/x-realaudio"] = "ra";
-    mime_[ "video/mpeg"] = "mpeg";
-    mime_[ "video/mpeg"] = "mpg";
-    mime_[ "video/quicktime"] = "mov";
-    mime_[ "video/x-flv"] = "flv";
-    mime_[ "application/zip"] = "zip";
-    mime_[ "application/octet-stream"] = "deb";
-    mime_[ "application/octet-stream"] = "bin";
-    mime_[ "application/octet-stream"] = "exe";
-    mime_[ "application/octet-stream"] = "dll";
-    mime_[ "application/octet-stream"] = "dmg";
-    mime_[ "application/octet-stream"] = "eot";
-    mime_[ "application/octet-stream"] = "iso";
-    mime_[ "application/octet-stream"] = "img";
-    mime_[ "application/octet-stream"] = "msi";
-    mime_[ "application/octet-stream"] = "msp";
-    mime_[ "video/x-msvideo"] = "avi";
-    mime_[ "video/x-ms-wmv"] = "wmv";
-    mime_[ "video/x-ms-asf"] = "asx";
-    mime_[ "video/x-ms-asf"] =   "asf";
-    mime_[ "video/x-mng"] = "mng";
-}
-
 void response::createFile()
 {
-    if (request.location.upload.length() > 1) {
+    if (request.location.upload.length() > 1)
+    {
         std::string randName = generateName();
         std::string ileType = request.getContentType();
-        extention = mime_[ileType];
+         if(!request.getsm().count(ileType))
+		    ileType = "text/plain";
+        extention = request.getMimeType(ileType);
         if (_isCgi){
             std::string cgitmp = request.location.root + "/tmp";
             if (access(cgitmp.c_str(), F_OK | W_OK) == -1) {
@@ -410,8 +354,8 @@ void response::createFile()
             }
             uplfile = UplDir + "/" + randName + "." + extention;
             upfile.open((uplfile).c_str());
+            }
         }
-    }
 }
 
 

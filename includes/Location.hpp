@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 09:07:35 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/19 12:36:04 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:41:55 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ class Location
                 Location();
                 void setLocationData(std::string key, std::vector<std::string> vec);
                 std::vector<std::string> getLocationData(std::string key);
-                void printData();
                 static void checkLocationError(std::string directive,std::vector<std::string> vec,int countSpaces);
                 static void checkAutoindexError(std::vector<std::string> autoindex);
                 static void checkMethodsError(std::vector<std::string> methods); 

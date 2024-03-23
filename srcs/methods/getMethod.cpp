@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 18:06:23 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:42:35 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/response.hpp"
 #include "../../includes/Request.hpp"
-#include "../../includes/cgi.hpp"
 
 void response::init()
 {
@@ -33,7 +32,6 @@ void response::init()
     flagOn = false;
     dir = NULL;
     postDone = false;
-    fileExtention();
 }
 
 response::response(Request &initRequest) : request(initRequest)

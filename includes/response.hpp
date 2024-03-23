@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 17:54:36 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:40:31 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ class response
 		std::string 							extention;
 		std::string								pathUpload;
 		static									std::map<std::string, std::string> _mime;
-		static									std::map<std::string, std::string> mime_;
 		std::string								uploadFileNmae;
 		std::string								fileType;
 		std::string								body;
@@ -111,15 +110,12 @@ class response
 		void   	 								sendData();
 		int 									checkType(std::string path);
 		static	void    						fillMime();
-		static	void    						fileExtention();
 
 		//geters //
-		std::map<std::string, std::string> 		getMime_();
 		std::string 							getTargetUrl();
 		std::string								getTargetUri();
 		std::string								getLine();
 		std::string								getName();
-		std::string								getContentType();
 		std::string								getExtension();
 		std::string								getUploadFN();
 		bool									getIsCgi();
@@ -148,14 +144,12 @@ class response
 		void    								sendErrorPage();
 		void    								allow();
 		void									setHeader();
-		void   									ErrorResponse();
 		/////////////////cgi///////////////
 		void									setEnv();
         void									executePHP();
         void									executePython();
         char**									getEnv();
 		void									cgiSendResponse();
-		void									setCgiHeader();
 		void									parsecgiFile();
 		void									handelCGI();
 		bool									_cgiProcess();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 02:49:09 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:41:17 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,12 @@ class Request
 		bool _isCgi;
 		bool _cgiRuning;
 		std::string realPath;
-		
-	public:
+		static	std::map<std::string, std::string> mime_;
 		std::string body;
 		size_t sizeBody;
 		bool matchLocationDone;
+		
+	public:
 		std::map<std::string,std::string> headers;
 		struct timeval start_time, end_time;
 		Request();
@@ -94,6 +95,7 @@ class Request
 		void storeRequestLineInfo(std::vector<std::string> vec);
 		void storeLocation(Server &server,Location iniLocation);
 		int getStatus()const;
+		bool getMatchedLocation();
 		void setStatus(int init);
 		bool getFirstReadBody()const;
 		loc getLocation()const;
@@ -127,5 +129,8 @@ class Request
 		std::string getUri()const;
 		std::string getQueryString()const;
 		void getREalPath();
+		std::string getMimeType(std::string key);
+		std::map<std::string, std::string>	getsm();
+		static	void    fileExtention();
 };
 

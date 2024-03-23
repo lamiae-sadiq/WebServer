@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 18:05:38 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:44:11 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ void    response::sendData()
         resHeader +="\r\n";
         resHeader += "Transfer-Encoding: chunked\r\n";
         resHeader += "\r\n";
+        std::cout<< resHeader<< std::endl;
         std::cout << "scop1\n";
         int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
         if(i <= 0){

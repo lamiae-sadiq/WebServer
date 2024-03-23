@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   deleteMethod.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 18:06:15 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:42:44 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/response.hpp"
-#include "../../includes/cgi.hpp"
 
 void	response::deleteDir(std::string uri)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:46:06 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/16 13:54:11 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:43:15 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ class Server
 {
         mapOfVectors serverData;
         std::map<int, std::string> error_pages;
-        int countServerData;
         std::vector<Location> locations;
     public:
         Server();
@@ -39,7 +38,6 @@ class Server
         std::map<int, std::string> getErrorPage();
         void setServerData(std::string key ,std::vector<std::string> vec);
         std::vector<std::string> getServerData(std::string key);
-        void        printLOcationINfo();
         size_t      directiveSize(std::string directive);
         void        locationAddBack();
         static void checkErrorPages(std::vector<std::string> vec);

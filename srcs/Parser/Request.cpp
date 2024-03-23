@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 16:19:59 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:37:52 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 #include <sys/stat.h>
 #include <dirent.h>
+
+std::map<std::string, std::string> Request::mime_;
 
 Request::Request()
 {
@@ -40,7 +42,69 @@ Request::Request()
 	_isCgi = false;
 	_cgiRuning = false;
 	matchLocationDone = false;
+	fileExtention();
 };
+
+void    Request::fileExtention()
+{
+    mime_[ "text/html"] = "html";
+    mime_[ "text/css"] = "css";
+    mime_[ "text/xml"] =     "xml";
+    mime_[ "image/gif"] =   "gif";
+    mime_[ "image/jpeg"] = "jpeg";
+    mime_[ "image/jpg"] = "jpg";
+    mime_[ "application/x-javascript"] = "js";
+    mime_[ "text/plain"] = "txt";
+    mime_[ "text/x-component"] = "htc";
+    mime_[ "text/mathml"] = "mml";
+    mime_[ "image/png"] = "png";
+    mime_[ "image/x-icon"] = "ico";
+    mime_[ "image/x-jng"] = "jng";
+    mime_[ "image/vnd.wap.wbmp"] =   "wbmp";
+    mime_[ "application/mac-binhex40"] = "hqx";
+    mime_[ "application/pdf"] = "pdf";
+    mime_[ "application/x-cocoa"] = "cco";
+    mime_[ "application/x-java-archive-diff"] = "jardiff";
+    mime_[ "application/x-java-jnlp-file"] = "jnlp";
+    mime_[ "application/x-makeself"] =   "run";
+    mime_[ "application/x-perl"] = "pl";
+    mime_[ "application/x-pilot"] = "prc";
+    mime_[ "application/x-rar-compressed"] = "rar";
+    mime_[ "application/x-redhat-package-manager"] = "rpm";
+    mime_[ "application/x-sea"] = "sea";
+    mime_[ "application/x-shockwave-flash"] = "swf";
+    mime_[ "application/x-stuffit"] = "sit";
+    mime_[ "application/x-tcl"] =    "tcl";
+    mime_[ "application/x-tcl"] =   "tk";
+    mime_[ "application/x-x509-ca-cert"] = "der";
+    mime_[ "application/x-x509-ca-cert"] = "pem";
+    mime_[ "application/x-x509-ca-cert"] = "crt";
+    mime_[ "application/x-xpinstall"] = "xpi";
+    mime_[ "application/octet-stream"] = "msm";
+    mime_[ "audio/mpeg"] = "mp3";
+    mime_["video/mp4"] = "mp4";
+    mime_[ "audio/x-realaudio"] = "ra";
+    mime_[ "video/mpeg"] = "mpeg";
+    mime_[ "video/mpeg"] = "mpg";
+    mime_[ "video/quicktime"] = "mov";
+    mime_[ "video/x-flv"] = "flv";
+    mime_[ "application/zip"] = "zip";
+    mime_[ "application/octet-stream"] = "deb";
+    mime_[ "application/octet-stream"] = "bin";
+    mime_[ "application/octet-stream"] = "exe";
+    mime_[ "application/octet-stream"] = "dll";
+    mime_[ "application/octet-stream"] = "dmg";
+    mime_[ "application/octet-stream"] = "eot";
+    mime_[ "application/octet-stream"] = "iso";
+    mime_[ "application/octet-stream"] = "img";
+    mime_[ "application/octet-stream"] = "msi";
+    mime_[ "application/octet-stream"] = "msp";
+    mime_[ "video/x-msvideo"] = "avi";
+    mime_[ "video/x-ms-wmv"] = "wmv";
+    mime_[ "video/x-ms-asf"] = "asx";
+    mime_[ "video/x-ms-asf"] =   "asf";
+    mime_[ "video/x-mng"] = "mng";
+}
 
 Request::~Request(){};
 
@@ -309,10 +373,21 @@ void Request::checkContentType(std::string &contetType)
 	
 	if(contetType.empty())
 		throw HttpBadRequest("Bad request");
-		
 	content_Type = contetType;
 }
+bool Request::getMatchedLocation()
+{
+	return matchLocationDone;
+}
+std::string Request::getMimeType(std::string key)
+{
+	return mime_[key];
+}
 
+std::map<std::string, std::string>	Request::getsm()
+{
+	return mime_;
+}
 void Request::storeRequest(std::string line)
 {
 	size_t index = line.find(":");
@@ -556,7 +631,7 @@ void Request::checkStoreData()
 	if(method == "POST" && uplod_type.empty())
 		throw HttpLengthRequired("length Required");
 	if(method == "POST" && uplod_type == "length" && !contentLength)
-		throw HttpBadRequest("Bad request");
+		throw HttpBadRequest("request");
 }
 
 int Request::parseHeaders(std::string buff,std::vector<Server> initServers)

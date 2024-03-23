@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 18:18:34 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 18:38:47 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ std::map<std::string, std::string> response::getMime() {
     return _mime;
 }
 
-std::map<std::string, std::string> response::getMime_() {
-    return mime_;
-}
+// std::map<std::string, std::string> response::getMime_() {
+//     return mime_;
+// }
 
 
 void    response::fillMime()

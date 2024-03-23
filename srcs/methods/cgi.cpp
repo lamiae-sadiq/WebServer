@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 03:03:29 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:02:31 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 void response::setEnv()
 {
 	cgiHeader["CONTENT_TYPE"] = request.getContentType();
+	std::cout << request.getContentType() << "+++++++++++++"<<std::endl;
 	if (request.getMethod() == "POST")
 	{
 		struct stat datafile;
@@ -212,6 +213,7 @@ void response::cgiSendResponse()
 			
 		}
 		resHeader += "\r\n";
+		std::cout << resHeader<< std::endl;
 		int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
 		if(i <= 0)
 			check = 30;
