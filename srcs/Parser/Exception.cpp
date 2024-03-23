@@ -1,23 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Exception.hpp                                      :+:      :+:    :+:   */
+/*   Exception.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/16 13:51:55 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 23:41:44 by kel-baam         ###   ########.fr       */
+/*   Created: 2024/03/23 23:39:06 by kel-baam          #+#    #+#             */
+/*   Updated: 2024/03/23 23:41:19 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-#include <iostream>
+#include "../../includes/Exception.hpp"
 
-class   Exception:public  std::exception
+Exception::Exception(const char* init):msg(init){};
+
+
+const char* Exception::what() const throw()
 {
-    private:
-        const char* msg;
-    public:
-        Exception(const char* init);
-        const char* what() const throw();
-};
+    return msg;
+}

@@ -6,7 +6,7 @@
 #    By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/25 15:26:00 by lsadiq            #+#    #+#              #
-#    Updated: 2024/03/16 21:31:26 by kel-baam         ###   ########.fr        #
+#    Updated: 2024/03/23 23:47:14 by kel-baam         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,13 +19,13 @@ MULT = Multiplixer.cpp
 
 M_MULT = $(addprefix srcs/Multiplexer/,$(MULT))
 
-SRCS =  Parse.cpp Server.cpp Utils.cpp Location.cpp  Request.cpp HttpException.cpp
+SRCS =  Parse.cpp Server.cpp Utils.cpp Location.cpp  Request.cpp HttpException.cpp  Exception.cpp 
 
 P_SRCS	= 	$(addprefix srcs/Parser/,$(SRCS))
 
 SRC = getMethod.cpp methodHelp.cpp postMethod.cpp deleteMethod.cpp response.cpp cgi.cpp
 
-M_SRCS	=	$(addprefix srcs/methods/,$(SRC))
+M_SRCS	=	$(addprefix srcs/Response/,$(SRC))
 
 OBJS = $(MAIN:.cpp=.o) $(M_SRCS:.cpp=.o) $(P_SRCS:.cpp=.o) $(M_MULT:.cpp=.o)
 

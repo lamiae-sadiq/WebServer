@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 22:43:35 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 23:48:06 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,12 @@ class Request
 		bool matchLocationDone;
 		
 	public:
-		std::map<std::string,std::string> headers;
 		struct timeval start_time, end_time;
-		Request();
-		~Request();
+		std::map<std::string,std::string> headers;
 		std::string tmpBuff;
 		loc location;
+		Request();
+		~Request();
 		std::string getRealPath();
 		std::string getBody();
 		size_t getSizeBody();

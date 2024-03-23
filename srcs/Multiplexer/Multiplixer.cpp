@@ -3,19 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Multiplixer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 21:38:14 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 23:47:27 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Multiplixer.hpp"
 
-Multiplixer::Multiplixer()
-{
-	tmpBuff = "";
-}
+Multiplixer::Multiplixer(){}
 
 Multiplixer::~Multiplixer(){};
 

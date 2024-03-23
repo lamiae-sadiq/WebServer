@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 23:30:08 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 23:44:57 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -332,7 +332,7 @@ void Request::checkTransferEncoding(std::string value)
 {
 	Utils::skipSpaces(value);
 	if(value != "chunked")
-		throw HttpNotImplemented("Not Implemented"); //to be checked
+		throw HttpNotImplemented("Not Implemented");
 	if(value.empty())
 		throw HttpBadRequest("Bad request");
 	uplod_type =  "Chunk";
@@ -348,7 +348,7 @@ void Request::checkContentLength(std::string length)
 	if(!Utils::isInteger(length) || length.empty())
 		throw  HttpBadRequest("Bad request");
 	if(!Utils::checkOverflowError(length,len))
-		throw HttpNotImplemented("Error: length overflowed\n"); //to be checked
+		throw HttpNotImplemented("Error: length overflowed\n"); 
 	if(uplod_type.empty())
 	{
 		uplod_type ="length";
@@ -377,10 +377,12 @@ void Request::checkContentType(std::string &contetType)
 		throw HttpBadRequest("Bad request");
 	content_Type = contetType;
 }
+
 bool Request::getMatchedLocation()
 {
 	return matchLocationDone;
 }
+
 std::string Request::getMimeType(std::string key)
 {
 	return mime_[key];
@@ -629,9 +631,9 @@ void Request::checkStoreData()
 		Utils::skipSpaces(headers["cookie"]);
 		cookies = headers["cookie"];
 	}
-	if(method == "POST" && uplod_type.empty())
+	if(method == "POST_METHODE" && uplod_type.empty())
 		throw HttpLengthRequired("length Required");
-	if(method == "POST" && uplod_type == "length" && !contentLength)
+	if(method == "POST_METHODE" && uplod_type == "length" && !contentLength)
 		throw HttpBadRequest("request");
 }
 

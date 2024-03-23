@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:05 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:32:45 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 23:47:32 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 #define MAX_EVENTS 50
 #define EXPECTEDFDS 1000
 
-static std::string tmpBuff;
+
 class Multiplixer
 {
 		std::map<int,std::vector<Server> > masterSockets;
