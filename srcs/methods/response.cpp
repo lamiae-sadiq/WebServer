@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 01:19:56 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 02:42:23 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,22 +130,25 @@ void  response::getErrorPage()
 
 void response::sendErrorPage()
 {
-    if (request.location.error_pages.find(status_code) != request.location.error_pages.end())
-            targetUri = request.location.error_pages[status_code];
-    if(access(targetUri.c_str(), F_OK | R_OK) == 0)
-    {
-        if(!flagOn)
+    if (request.location.error_pages.find(status_code) != request.location.error_pages.end()){
+        targetUri = request.location.error_pages[status_code];
+        if(access(targetUri.c_str(), F_OK | R_OK) == 0)
         {
-            flag =2;
-            flagOn = true;
+            if(!flagOn)
+            {
+                flag =2;
+                flagOn = true;
+            }
+            check_extention(targetUri);
+            content_type = fileType;
+            sendData();
         }
-        check_extention(targetUri);
-        content_type = fileType;
-        sendData();
+        else
+            if(status_code >= 400)
+            ErrorHeader();
     }
     else
     {
-        std::cout << status_code << std::endl;
         if(status_code >= 400)
             ErrorHeader();
     }
@@ -185,7 +188,6 @@ void response::setHeader()
     }
     if (status_code >= 200 && status_code <= 204)
     {
-        std::cout << "++++++++++++++++++++++++\n";
         const std::string responsePage = HTMLPage();
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nContent-Type: text/html\r\nContent-length:  ");

@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 01:16:46 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 02:21:28 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,7 @@ void response::cgiSendResponse()
 		if(i < 0)
 			Close = true;
 		if (cinfile.eof()){
-			// remove(path.c_str());
+			remove(path.c_str());
 			cinfile.close();
 			Close = true;
 		}
