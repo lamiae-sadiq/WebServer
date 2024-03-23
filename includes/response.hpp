@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 18:27:54 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 00:21:18 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,10 +148,11 @@ class response
 		const std::string 						HTMLPage();
 		const std::string    					setStatus(int status);
 		void 									ErrorHeader();
-		std::string 							getErrorPage();
+		void		 							getErrorPage();
 		void    								sendErrorPage();
 		void    								allow();
 		void									setHeader();
+		void   									ErrorResponse();
 		/////////////////cgi///////////////
 		void									setEnv();
         void									executePHP();

@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 18:28:25 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/22 22:03:15 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -402,6 +402,7 @@ void response::createFile()
         }
         else{
             std::string UplDir = request.location.upload;
+            std::cout << UplDir << std::endl;
             if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
                 perror("Upload Directory");
                 status_code = 500;

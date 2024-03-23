@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 18:29:02 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 01:31:00 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,8 @@ void response::methodGet()
     {
         if (!request.location.redirect_path.empty())
         {
-            target_url = request.location.redirect_path;
+            target_url =  request.location.redirect_path;
+            std::cout << target_url << std::endl;
             status_code = 301;
             return;
         }
@@ -152,10 +153,7 @@ void response::methodGet()
                 status_code = 403;
         }
         else
-        {
-            // std::cout << "targetUri doesn't exist" << std::endl;
             status_code = 404;
-        }
     }
     else if (flag >= 2 && flag <= 4)
         sendData();

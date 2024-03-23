@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/22 15:21:34 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/22 22:50:50 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -393,7 +393,7 @@ void  Request::printREquest()
 	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
 	std::cout << "cooookies====>|" << cookies << "|\n";
 	std::cout << "eror pages siize==>" << location.error_pages.size() << "\n";
-	std::cout << "queri==>" << getQueryString() <<"\n";
+	// std::cout << "queri==>" << getQueryString() <<"\n";
 	std::map<int, std::string>::iterator itt = location.error_pages.begin();
 	std::cout << "size errpr==>"<<location.error_pages.size() <<"\n";
 	while(itt != location.error_pages.end())

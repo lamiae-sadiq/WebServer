@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 18:14:45 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 01:19:56 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,10 @@ void    response::sendData()
     if (flag == 2)
     {
         ifile.open(targetUri.c_str());
-        if (!ifile.is_open())
-            throw std::runtime_error("Error: failed to open video ifile");
+        if (!ifile.is_open()){
+            // throw std::runtime_error("Error: failed to open video ifile");
+            Close = true;
+        }
         std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         resHeader += "\r\nContent-Type: ";
         resHeader += content_type;
@@ -114,12 +116,23 @@ const std::string response::HTMLPage() {
             "</body>\n"
             "</html>\n");
 }
+void  response::getErrorPage()
+{
+    std::map<int, std::string>::iterator it = request.location.error_pages.begin();
+    while(it != request.location.error_pages.end())
+	{
+		std::cout <<  "error pages " << it->first<<"\n";
+        std::cout << request.location.error_pages[status_code] << std::endl;
+		it++;
+	}
+}
+
 
 void response::sendErrorPage()
 {
     if (request.location.error_pages.find(status_code) != request.location.error_pages.end())
             targetUri = request.location.error_pages[status_code];
-    if(access(targetUri.c_str(), F_OK) == 0)
+    if(access(targetUri.c_str(), F_OK | R_OK) == 0)
     {
         if(!flagOn)
         {
@@ -132,11 +145,11 @@ void response::sendErrorPage()
     }
     else
     {
+        std::cout << status_code << std::endl;
         if(status_code >= 400)
             ErrorHeader();
-        else
-            setHeader();
     }
+
 }
 
 void response::ErrorHeader()
@@ -172,6 +185,7 @@ void response::setHeader()
     }
     if (status_code >= 200 && status_code <= 204)
     {
+        std::cout << "++++++++++++++++++++++++\n";
         const std::string responsePage = HTMLPage();
         std::string header = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         header.append("\r\nContent-Type: text/html\r\nContent-length:  ");
@@ -271,7 +285,10 @@ void response::executeMethodes(const char *buff,size_t size,int fd)
     (void)fd;
     
     if (status_code != 200)
+    {
+        setHeader();
         sendErrorPage();
+    }
     else if (request.getMethod() == "GET")
         methodGet();
     else if (request.getMethod() == "DELETE")
