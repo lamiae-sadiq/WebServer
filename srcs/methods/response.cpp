@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 03:05:38 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 18:05:38 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void    response::sendData()
         resHeader +="\r\n";
         resHeader += "Transfer-Encoding: chunked\r\n";
         resHeader += "\r\n";
-
+        std::cout << "scop1\n";
         int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
         if(i <= 0){
             Close = true;
@@ -200,9 +200,8 @@ void response::listDirectories()
     {
         std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n";
         int i = send(fd, header.c_str(), header.length(), 0);
-        if(i <= 0){
+        if(i <= 0)
             Close = true;
-        }
         flag = 7;
     }
     else if(flag == 7){
@@ -216,9 +215,8 @@ void response::listDirectories()
         html.append("\r\n");
         std::string response = ss.str() + html;
         int i = send(fd, response.c_str(), response.length(), 0);
-        if(i <= 0){
+        if(i <= 0)
             Close = true;
-	    }
         if (!(dir = opendir(targetUri.c_str())))
         {
             std::cout << "Error: failed to open directory" << std::endl;
@@ -249,7 +247,6 @@ void response::listDirectories()
         int i = send(fd, response.c_str(), response.length(), 0);
         if(i <= 0)
             Close = true;
-        //check
     }
     else if(flag == 9){
         closedir(dir);
@@ -263,17 +260,17 @@ void response::listDirectories()
             Close = true;
         flag = 10;
     }
-    else if(flag == 10){
+    else if(flag == 10)
+    {
         send(fd, "0\r\n\r\n", 5, 0);
         Close = true;
     }
 }
 
 
-void response::executeMethodes(const char *buff,size_t size,int fd)
+void response::executeMethodes(const char *buff,size_t size)
 {
-    (void)fd;
-    
+ 
     if (status_code != 200)
     {
         setHeader();

@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 02:49:18 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 17:54:36 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ class response
 		void									Delete();
 		void									deleteDir(std::string uri);
 		void 									init();
-		void 									executeMethodes(const char *buff,size_t size,int fd);
+		void 									executeMethodes(const char *buff,size_t size);
 		const std::string 						HTMLPage();
 		const std::string    					setStatus(int status);
 		void 									ErrorHeader();

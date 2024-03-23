@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/22 22:03:15 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 18:06:08 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,7 @@ void    response::methodPost(const char *con, size_t size)
             return;
         if (request.getUploadType() == "Chunk")
         {
+            std::cout << "chunked "<< std::endl;
             flag = 2;
             parseChunk(con, index, size);
         }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   deleteMethod.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 00:10:20 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 18:06:15 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ void	response::deleteDir(std::string uri)
 
 void	response::Delete()
 {
-	// targetUri = "/nfs/sgoinfre/goinfre/Perso/lsadiq/test_time/serv1/fl1/fl2/test";
 	targetUri = request.getRealPath();
 	std::cout << targetUri<< std::endl;
 	if(!allowedMethods())

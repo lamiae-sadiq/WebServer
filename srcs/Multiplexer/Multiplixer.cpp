@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:31:07 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 02:46:22 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 18:06:40 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,6 +212,8 @@ bool Multiplixer::isTimedout(response *response,Request &request)
 		request.setStatus(1);
 		return true;
 	}
+	if(request.matchLocationDone && request.getMethod() != "POST")
+		return true;
 	return false;
 }
 
@@ -239,7 +241,7 @@ void Multiplixer::start(std::vector<Server> servers)
 				int socketFd = events[i].data.fd;
 				Request &request = *(requests[socketFd]);
 				if(!request.getStatus() && !isTimedout(responses[socketFd],request) && (events[i].events & EPOLLIN))
-				{
+				{	
 					byt = recv(socketFd,buff,2048, 0);
 					if(byt <= 0)
 					{
@@ -255,7 +257,7 @@ void Multiplixer::start(std::vector<Server> servers)
 				}
 				else if((events[i].events & EPOLLOUT) && request.getStatus() == 1)
 				{
-					responses[socketFd]->executeMethodes(request.getBody().c_str(),request.getSizeBody(),socketFd);
+					responses[socketFd]->executeMethodes(request.getBody().c_str(),request.getSizeBody());
 					request.setStatus(0);
 					request.setSizeBody(0);
 					request.setBody("");

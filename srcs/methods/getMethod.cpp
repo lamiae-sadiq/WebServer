@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 02:20:32 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/23 18:06:23 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,6 @@ void response::methodGet()
             return;
         }
         targetUri = request.getRealPath();
-        // std::cout << targetUri << "\n";
         if (!allowedMethods())
             status_code = 405;
         else if (access(this->targetUri.c_str(), F_OK) == 0)
@@ -155,7 +154,11 @@ void response::methodGet()
             status_code = 404;
     }
     else if (flag >= 2 && flag <= 4)
+    {
         sendData();
-    else if (flag >= 6 && flag <= 10)
+    }
+    else if (flag >= 6 && flag <= 10){
+        
         listDirectories();
+    }
 }

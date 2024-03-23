@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 02:46:58 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/23 16:19:59 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,7 +267,7 @@ void Request::checkTransferEncoding(std::string value)
 	Utils::skipSpaces(value);
 	if(value != "chunked")
 		throw HttpNotImplemented("Not Implemented"); //to be checked
-	if(uplod_type == "length" || value.empty())
+	if(value.empty())
 		throw HttpBadRequest("Bad request");
 	uplod_type =  "Chunk";
 }
@@ -283,8 +283,11 @@ void Request::checkContentLength(std::string length)
 		throw  HttpBadRequest("Bad request");
 	if(!Utils::checkOverflowError(length,len))
 		throw HttpNotImplemented("Error: length overflowed\n"); //to be checked
-	contentLength = len;
-	uplod_type ="length";
+	if(uplod_type.empty())
+	{
+		uplod_type ="length";
+		contentLength = len;	
+	}
 }
 
 
@@ -549,8 +552,11 @@ void Request::checkStoreData()
 		Utils::skipSpaces(headers["cookie"]);
 		cookies = headers["cookie"];
 	}
+	// std::cout <<
 	if(method == "POST" && uplod_type.empty())
 		throw HttpLengthRequired("length Required");
+	if(method == "POST" && uplod_type == "length" && !contentLength)
+		throw HttpBadRequest("Bad request");
 }
 
 int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
