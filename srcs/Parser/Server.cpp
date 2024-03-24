@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 22:44:48 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 12:58:24 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,30 @@ void Server::checkPortError(std::vector<std::string> port)
 
 void Server::checkHostError(std::vector<std::string> host)
 {
+    std::vector<std::string> nums;
+    size_t index;
+    long long  maxSize;
+    
     if(host.size() != 1)
         throw Exception("Error: host is incorrect\n");
     if(host[0] =="localhost")
         host[0] ="127.0.0.1";
+    
+    nums = Utils::splitString(host[0],'.');
+    if(host[0].find_first_not_of("0123456789.") != std::string::npos)
+    {
+        if(std::count(host[0].begin(),host[0].end(),'.') != 3)
+            throw Exception("Error: host is incorrect\n");
+        for(size_t i = 0; i < nums.size();i++)
+        {
+            maxSize = Utils::stringToLongLong(nums[i].c_str());
+            if(!Utils::checkOverflowError(nums[i].c_str(),maxSize))
+                throw  Exception("Error: there is an error in host ip");
+            index = nums[i].find_first_not_of("0123456789");
+            if(index!= std::string::npos || atoi(nums[i].c_str()) < 0 || atoi(nums[i].c_str()) > 255)
+                throw  Exception("Error: there is an error in host ip");
+        }
+    }
 }
 
 void Server::checkClientMaxBody(std::vector<std::string> bodySize)

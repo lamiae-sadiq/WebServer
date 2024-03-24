@@ -6,7 +6,7 @@
 /*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 22:44:22 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:19:18 by kel-baam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,11 @@ void Location::setLocationData(std::string key, std::vector<std::string> vec)
     if(locationData.count(key) >= 1)
         throw Exception("Error: directive is duplicated\n");
     if(key == "cgi")
+    {
+        if(locationData.count(vec[0]) >= 1)
+            throw Exception("Error: directive is duplicated\n");
         locationData[vec[0]].insert(locationData[vec[0]].end(),vec[1]);
+    }
     else
         locationData[key].insert(locationData[key].end(),vec.begin(),vec.end());
 }
