@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:37 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 23:48:06 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:51:11 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ typedef struct loc
 	std::string 				root;
 	std::string 				index;
 	std::string 				auto_index;
-	bool		 				allowedUpload;
 	std::string 				upload;
 	std::string 				location_name;
 	std::vector<std::string> 	method;
@@ -121,7 +120,6 @@ class Request
 		void checkTransferEncoding(std::string value);
 		void checkContentLength(std::string length);
 		void chekHeaderError(std::string key);
-		void printREquest();
 		void checkContentType(std::string &contetType);
 		std::string decodingUri(std::string str);	
 		void checkStoreData();	

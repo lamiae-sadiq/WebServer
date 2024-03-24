@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 16:53:58 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/24 13:19:18 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:38:32 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,6 @@ void Location::checkUpload(std::vector<std::string> upload)
         throw Exception("Error: uplad path is incorrect\n");
 }
 
-void Location::checkAllowedUpload(std::vector<std::string> allowedApload)
-{
-    if(allowedApload.size() != 1 || (allowedApload[0] != ON && allowedApload[0] != OFF))
-        throw Exception("Error: allowedUpload is incorrect\n");
-}
 
 void Location::checkIndexError(std::vector<std::string> index)
 {
@@ -132,8 +127,6 @@ void Location::checkLocationError(std::string directive,std::vector<std::string>
         checkIndexError(vec);
     else if(directive =="location_name")
         checkLocationName(vec);
-    else if(directive == "allowedUpload")
-       checkAllowedUpload(vec);
     else if(directive == "upload")
         checkUpload(vec);
     else if(directive == "autoindex")

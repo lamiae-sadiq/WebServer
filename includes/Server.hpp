@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:46:06 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 21:43:15 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/24 13:51:41 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include "Exception.hpp"
+
 typedef std::map<std::string,std::vector<std::string> > mapOfVectors;
 class Server
 {

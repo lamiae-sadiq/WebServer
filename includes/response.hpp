@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/26 14:35:49 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 22:43:45 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:51:34 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,15 +140,12 @@ class response
 		const std::string 						HTMLPage();
 		const std::string    					setStatus(int status);
 		void 									ErrorHeader();
-		void		 							getErrorPage();
 		void    								sendErrorPage();
-		void    								allow();
 		void									setHeader();
 		/////////////////cgi///////////////
 		void									setEnv();
         void									executePHP();
         void									executePython();
-        char**									getEnv();
 		void									cgiSendResponse();
 		void									parsecgiFile();
 		void									handelCGI();

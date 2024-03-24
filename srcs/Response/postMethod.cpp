@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   postMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:27:53 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 23:30:02 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:46:29 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ std::string	response::getUploadFN(){
 bool passheader(const char *con, size_t& index, size_t size)
 {
     (void)size;
-    (void)index;
-    // con[size] = '\0';
     if (strstr(con, "\r\n\r\n") != NULL)
     {
         index = strstr(con, "\r\n\r\n") - con + 4;
@@ -56,8 +54,6 @@ void response::parsLength(const char *con, size_t& index, size_t size)
         _cgiFile.write(con + index, size - index);
         _cgiFile.flush();
     }
-    // upfile.write(con + index, size - index);
-    // upfile.flush();
     request.contentLength -= size - index;
 
     index = size;
@@ -99,7 +95,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     upfile.close();
                 else
                     _cgiFile.close();
-                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -117,7 +112,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     upfile.close();
                 else
                     _cgiFile.close();
-                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -138,7 +132,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     upfile.close();
                 else
                     _cgiFile.close();
-                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -156,7 +149,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     upfile.close();
                 else
                     _cgiFile.close();
-                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -176,7 +168,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     _cgiFile.write(con + index, chunkSize);
                     _cgiFile.flush();
                 }
-                // upfile.write(con + index, chunkSize);
                 index += chunkSize;
                 chunkSize = 0;
                 flag = 6;
@@ -191,8 +182,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     _cgiFile.write(con + index, size - index);
                     _cgiFile.flush();
                 }
-                // upfile.write(con + index, size - index);
-                // upfile.flush();
                 chunkSize -= size - index;
                 index = size;
             }
@@ -207,7 +196,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     upfile.close();
                 else
                     _cgiFile.close();
-                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -225,7 +213,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                     upfile.close();
                 else
                     _cgiFile.close();
-                // upfile.close();
                 status_code = 400;
                 flag = 0;
                 return;
@@ -238,8 +225,6 @@ void    response::parseChunk(const char *con, size_t& index, size_t size)
                 }
                 else
                     _cgiFile.close();
-                // upfile.close();
-                // if (!_isCgi)
                 postDone = true;
                 flag = 0;
                 return;
@@ -271,12 +256,22 @@ void    response::methodPost(const char *con, size_t size)
     }
     else if (flag == 0)
     {
-        if(checkType(targetUri) == FILE)
+        if (access(this->targetUri.c_str(), F_OK) == 0)
         {
-            check_extention(targetUri);
-            if(extention == "php" || extention == "py")
-                _isCgi = true;
+            if (access(this->targetUri.c_str(), R_OK) == 0)
+            {
+                if(checkType(targetUri) == FILE)
+                {
+                    check_extention(targetUri);
+                    if(extention == "php" || extention == "py")
+                        _isCgi = true;
+                } 
+            }
+            else
+                status_code = 403;
         }
+        else
+            status_code = 404;
         if (!_isCgi && request.getContentType().find("boundary") != std::string::npos)
         {
             status_code = 501;
@@ -336,7 +331,6 @@ void response::createFile()
         if (_isCgi){
             std::string cgitmp = request.location.root + "/tmp";
             if (access(cgitmp.c_str(), F_OK | W_OK) == -1) {
-                perror("cgitmp Directory");
                 status_code = 500;
             }
             uplfile = cgitmp + "/" + randName + "." + extention;
@@ -345,7 +339,6 @@ void response::createFile()
         else{
             std::string UplDir = request.location.upload;
             if (access(UplDir.c_str(), F_OK | W_OK) == -1) {
-                perror("Upload Directory");
                 status_code = 500;
             }
             uplfile = UplDir + "/" + randName + "." + extention;

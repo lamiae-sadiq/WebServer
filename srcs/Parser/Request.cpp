@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 17:00:45 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 23:44:57 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 19:41:42 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Request::Request()
 	location.redirect_code = 0;
 	location.auto_index = "off";
 	location.index = "";
-	location.allowedUpload = false;
 	location.upload = "";
 	location.location_name = "";
 	location.redirect_path = "";
@@ -469,54 +468,11 @@ void Request::storeLocation(Server &server, Location iniLocation)
 		location.location_name = iniLocation.getLocationData("location_name")[0];
 	if(iniLocation.getLocationData("http_methods").size() > 0)
 		location.method =  iniLocation.getLocationData("http_methods");
-	if(!(iniLocation.getLocationData("allowedUpload").empty()) &&  iniLocation.getLocationData("allowedUpload")[0] == "on")
-		location.allowedUpload = true;
 	if(iniLocation.getLocationData("php").size() > 0)
 		location.cgi["php"] = iniLocation.getLocationData("php")[0];
 	if(iniLocation.getLocationData("py").size() > 0)
 		location.cgi["py"] = iniLocation.getLocationData("py")[0];
 }
-
-void  Request::printREquest()
-{
-	std::cout << "request info======\n";
-	std::cout <<"version======>|" <<version << "|\n";
-	std::cout << "url=======>|" << url << "|\n";
-	std::cout << "content_Type======>|" << content_Type << "|\n";
-	std::cout << "uplod_type======>|" << uplod_type << "|\n";
-	std::cout << "content length======>|" << contentLength << "|\n";
-	std::cout << "max_body_size ======>>>>|" <<  location.max_body_size <<"|\n";
-	std::cout << "root ======>>>>|" <<  location.root<<"|\n";
-	std::cout << "index ======>>>>|" <<  location.index<<"|\n";
-	std::cout << "auto_index ======>>>>|" <<  location.auto_index<<"|\n";
-	std::cout << "upload ======>>>>|" <<  location.upload<<"|\n";
-	std::cout << "location_name ======>>>>|" <<  location.location_name<<"|\n";
-	std::cout << "allowedUpload ======>>>>|" <<  location.allowedUpload<<"|\n";
-	std::cout << "redirect_path ======>>>>|" << location.redirect_path<<"|\n";
-	std::cout << "redirect_code ======>>>>|" << location.redirect_code<<"|\n";
-	std::cout << "cooookies====>|" << cookies << "|\n";
-	std::cout << "eror pages siize==>" << location.error_pages.size() << "\n";
-	std::cout << "queri==>" << getQueryString() <<"\n";
-	std::map<int, std::string>::iterator itt = location.error_pages.begin();
-	std::cout << "size errpr==>"<<location.error_pages.size() <<"\n";
-	while(itt != location.error_pages.end())
-	{
-		std::cout <<  "error pages ================>" << itt->second<<"\n";
-		itt++;
-	}
-	for(size_t i = 0;i < location.method.size();i++)
-	{
-		std::cout << "methods ======>>>>|" <<  location.method[i] << "|\n";
-	}
-	std::map<std::string, std::string>::iterator it = location.cgi.begin();
-	while(it != location.cgi.end())
-	{
-		std::cout << (it->first) <<" " << (it->second) << "\n";
-		it++;
-	}
-}
-
-
 
 int LocationLongestPrefix(std::string locationName,std::string Url)
 {
@@ -553,21 +509,20 @@ void Request::getREalPath()
 	char *currentDir;
 	
 	targetUri = location.root + url.substr(location.location_name.size());
+	realPath = targetUri;
 	real_Path = realpath(targetUri.c_str(),real_Pathh);
 	currentDir = realpath(".",NULL);
 	
 	if(real_Path)
 	{
 		realPath = real_Pathh;
-		if(targetUri[targetUri.length() - 1] == '/' && realPath[realPath.length() - 1] != '/')
+		if(targetUri[targetUri.length() - 1] == '/')
 			realPath += '/';
 		else
 			realPath = real_Pathh;
 		if(realPath.find(currentDir) != 0)
 			throw HttpForbidden("Forbidden\n");
 	}
-	else
-		realPath = real_Pathh;
 }
 
 
@@ -631,10 +586,10 @@ void Request::checkStoreData()
 		Utils::skipSpaces(headers["cookie"]);
 		cookies = headers["cookie"];
 	}
-	if(method == "POST_METHODE" && uplod_type.empty())
+	if(method == "POST" && uplod_type.empty())
 		throw HttpLengthRequired("length Required");
-	if(method == "POST_METHODE" && uplod_type == "length" && !contentLength)
-		throw HttpBadRequest("request");
+	if(method == "POST" && (uplod_type == "length") && !contentLength)
+		throw HttpBadRequest("Bad request");
 }
 
 int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
@@ -649,7 +604,6 @@ int Request::parseHeaders(std::string buff,std::vector<Server> initServers)
 				checkStoreData();
 				matchedServer = matchServer();
 				matchLocation(matchedServer);
-				// printREquest();
 				matchLocationDone = true;
 				status = 1;
 			}

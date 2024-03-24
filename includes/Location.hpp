@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 09:07:35 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 21:41:55 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/24 13:38:45 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ class Location
                 static void checkAutoindexError(std::vector<std::string> autoindex);
                 static void checkMethodsError(std::vector<std::string> methods); 
                 static void  checkLocationName(std::vector<std::string> location_name);   
-                static void checkAllowedUpload(std::vector<std::string> allowedApload);
                 static void checkIndexError(std::vector<std::string> index);
                 static void checkReturnError(std::vector<std::string> returnDirective);
                 static void checkRootError(std::vector<std::string> root);

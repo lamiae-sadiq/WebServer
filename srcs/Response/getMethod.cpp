@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   getMethod.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 13:09:22 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 22:40:14 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 18:16:04 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,11 @@ void response::init()
     _cgiStarted = false;
     _cgiEnded = false;
     _isCgi = false;
-    // _isCgi  = false;
     Close = false;
-    // this->_cgiMap = request.location.cgi;
     flag = 0;
     this->ihex = 0;
     lastChunk = false;
     check = 0;
-    // _isStatus = false;
     flagOn = false;
     dir = NULL;
     postDone = false;
@@ -122,7 +119,7 @@ void response::methodGet()
                     if (targetUri[targetUri.length() - 1] != '/')
                     {
                         status_code = 301;
-                        target_url.append("/");
+                        target_url = request.getUrl().append("/");
                         return;
                     }
                     if (!request.location.index.empty() && (access((targetUri + request.location.index).c_str(), F_OK | R_OK) == 0))
@@ -153,11 +150,7 @@ void response::methodGet()
             status_code = 404;
     }
     else if (flag >= 2 && flag <= 4)
-    {
         sendData();
-    }
-    else if (flag >= 6 && flag <= 10){
-        
+    else if (flag >= 6 && flag <= 10)
         listDirectories();
-    }
 }

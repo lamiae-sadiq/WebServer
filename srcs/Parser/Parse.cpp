@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 15:14:16 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/20 22:34:58 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 18:29:59 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,13 +105,16 @@ void Parser::checkFinalData(std::vector<Server> servers)
       throw Exception("you have error in configue file\n");   
     servers[i].isValidLocations();
   }
+  if(!servers.size())
+    throw Exception("you have error in configue file\n");
+    
 }
 
 void Parser::readFile(std::string line,std::ifstream& readFile)
 {
   std::getline(readFile,line);
   if(line != "server")
-    throw Exception("you have error in configue file\n"); 
+    throw Exception("you have error in configue file\n");
   while(!readFile.eof())
   {
     if(line == "server")
@@ -141,6 +144,7 @@ std::vector<Server> Parser::paseConfigueFile(std::string &configueFile)
   if(readFile.is_open())
     parser.readFile(line,readFile);
   else
-    throw Exception("you have error in configue file\n"); 
+    throw Exception("you have error in configue file\n");
+  readFile.close();
   return parser.servers;
 }

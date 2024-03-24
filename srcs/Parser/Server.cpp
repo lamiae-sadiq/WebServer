@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 19:04:39 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/24 12:58:24 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:36:31 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void Server::checkPortError(std::vector<std::string> port)
         throw Exception("Error: port is incorrect");
     if(!Utils::checkOverflowError(port[0],portNum))
       	throw Exception("Error: port is incorrect");
-    if(portNum > 65535)
+    if(portNum < 1 ||  portNum> 65535)
         throw  Exception("Error: port is incorrect");
 }
 

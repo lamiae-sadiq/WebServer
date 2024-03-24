@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:55:29 by kel-baam          #+#    #+#             */
-/*   Updated: 2024/03/23 22:44:48 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:49:30 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ void  Utils::skipSpaces(std::string &line)
   line = line.substr(start,len - start - count + 1); 
 }
 
-//also in the end
 int  Utils::countTabulation(std::string &line)
 {
   int count = 0;

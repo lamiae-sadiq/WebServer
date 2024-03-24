@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 03:01:02 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 23:29:10 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:43:23 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,17 +46,6 @@ void response::setEnv()
 		i++;
 	}
 	env[i] = NULL;
-}
-
-char **response::getEnv()
-{
-	int i = 0;
-	while (env[i] != NULL)
-	{
-		std::cout << env[i] << std::endl;
-		i++;
-	}
-	return env;
 }
 
 void response::executePHP()
@@ -163,7 +152,6 @@ bool response::_cgiProcess()
 		}
 		else
 		{
-			std::cout << "internel server "<< std::endl;
 			status_code = 500;
 			_cgiEnded = true;
 			return true;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   methodHelp.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:01:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 23:29:26 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:45:34 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,6 @@ int response::getFd(){
     return fd;
 }
 
-// bool response::getClose(){
-//     return close;
-// }
-
 std::ifstream& response::getIfile() {
     return ifile;
 }
@@ -83,11 +79,6 @@ loc response::getLocation(){
 std::map<std::string, std::string> response::getMime() {
     return _mime;
 }
-
-// std::map<std::string, std::string> response::getMime_() {
-//     return mime_;
-// }
-
 
 void    response::fillMime()
 {
@@ -201,7 +192,6 @@ bool    response::allowedMethods()
     std::vector<std::string>::iterator it = this->request.location.method.begin();
     for(;it != this->request.location.method.end(); it++){
         if(*it == request.getMethod()){
-            // std::cout << "method : " << request.getMethod()<< std::endl;
                 return true;
         }
     }

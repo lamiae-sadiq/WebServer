@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   deleteMethod.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kel-baam <kel-baam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 09:36:00 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 23:29:14 by kel-baam         ###   ########.fr       */
+/*   Updated: 2024/03/24 16:07:22 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,26 @@ void	response::deleteDir(std::string uri)
 		if (entry->d_type == DT_DIR)
 		{
 			std::string path = uri + "/" + entry->d_name;
+			if (access(path.c_str(), W_OK | R_OK) != 0)
+				status_code = 403;
 			if (entry->d_name[0] != '.')
 				deleteDir(path);
 		}
 		else
 		{
 			std::string path = uri + "/" + entry->d_name;
-			std::remove(path.c_str());
+			if (access(path.c_str(), W_OK | R_OK) == 0)
+				std::remove(path.c_str());
+			else
+				status_code = 403;
 		}
 	}
 	closedir(dir);
-	remove(uri.c_str());
+	if (remove(uri.c_str()))
+	{
+		status_code = 403;
+		return;
+	}
 	status_code = 204;
 }
 
@@ -60,13 +69,8 @@ void	response::Delete()
 				else
 				status_code = 204;
 			}
-		if(checkType(targetUri) == DIRECTORY)
-			{
-				if(targetUri[targetUri.length() - 1] == '/')
-					deleteDir(targetUri);
-				else
-					status_code = 409;
-			}
+			if(checkType(targetUri) == DIRECTORY)
+				deleteDir(targetUri);
 		}
 		else 
 			status_code = 403;

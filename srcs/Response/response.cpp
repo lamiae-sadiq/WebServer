@@ -6,7 +6,7 @@
 /*   By: lsadiq <lsadiq@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 16:25:03 by lsadiq            #+#    #+#             */
-/*   Updated: 2024/03/23 20:44:11 by lsadiq           ###   ########.fr       */
+/*   Updated: 2024/03/24 18:14:33 by lsadiq           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,14 @@ void    response::sendData()
     if (flag == 2)
     {
         ifile.open(targetUri.c_str());
-        if (!ifile.is_open()){
-            // throw std::runtime_error("Error: failed to open video ifile");
+        if (!ifile.is_open())
             Close = true;
-        }
         std::string resHeader = "HTTP/1.1 " + to_string(status_code) + " " + setStatus(status_code);
         resHeader += "\r\nContent-Type: ";
         resHeader += content_type;
         resHeader +="\r\n";
         resHeader += "Transfer-Encoding: chunked\r\n";
         resHeader += "\r\n";
-        std::cout<< resHeader<< std::endl;
-        std::cout << "scop1\n";
         int i = send(fd, resHeader.c_str(), resHeader.length(), 0);
         if(i <= 0){
             Close = true;
@@ -65,7 +61,7 @@ void    response::sendData()
         memcpy(concatenatedSends, chunkHeader.c_str(), chunkHeader.length());
         memcpy(concatenatedSends + chunkHeader.length(), buffer, bytesRead);
         memcpy(concatenatedSends + chunkHeader.length() + bytesRead, "\r\n", 2);
-        int i = write (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2);
+        int i = send (fd, concatenatedSends, chunkHeader.length() + bytesRead + 2, 0);
         if(i <= 0){
             Close = true;
         }
@@ -117,17 +113,6 @@ const std::string response::HTMLPage() {
             "</body>\n"
             "</html>\n");
 }
-void  response::getErrorPage()
-{
-    std::map<int, std::string>::iterator it = request.location.error_pages.begin();
-    while(it != request.location.error_pages.end())
-	{
-		std::cout <<  "error pages " << it->first<<"\n";
-        std::cout << request.location.error_pages[status_code] << std::endl;
-		it++;
-	}
-}
-
 
 void response::sendErrorPage()
 {
@@ -205,7 +190,8 @@ void response::listDirectories()
             Close = true;
         flag = 7;
     }
-    else if(flag == 7){
+    else if(flag == 7)
+    {
         html.append("<html>\n<head>\n<title>Index of ");
         html.append(request.getUrl()); 
         html.append("</title>\n</head>\n<body>\n<h1>Index of ");
@@ -220,7 +206,6 @@ void response::listDirectories()
             Close = true;
         if (!(dir = opendir(targetUri.c_str())))
         {
-            std::cout << "Error: failed to open directory" << std::endl;
             status_code = 500;
             return;
         }
